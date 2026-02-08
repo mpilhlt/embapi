@@ -349,14 +349,14 @@ curl -X GET "https://api.example.com/v1/llm-services/alice/openai-large/shared-w
 
 Get all LLM service definitions owned by `_system`.
 
-**Endpoint:** `GET /v1/llm-service-definitions/_system`
+**Endpoint:** `GET /v1/llm-definitions/_system`
 
 **Authentication:** Any authenticated user
 
 **Example:**
 
 ```bash
-curl -X GET "https://api.example.com/v1/llm-service-definitions/_system" \
+curl -X GET "https://api.example.com/v1/llm-definitions/_system" \
   -H "Authorization: Bearer alice_api_key"
 ```
 
@@ -401,7 +401,7 @@ curl -X GET "https://api.example.com/v1/llm-service-definitions/_system" \
 
 Create a reusable LLM service definition template.
 
-**Endpoint:** `POST /v1/llm-service-definitions/{username}`
+**Endpoint:** `POST /v1/llm-definitions/{username}`
 
 **Authentication:** Admin or the user themselves
 

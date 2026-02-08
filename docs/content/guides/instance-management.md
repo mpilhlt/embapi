@@ -25,7 +25,7 @@ The system provides pre-configured templates for common LLM services:
 
 ```bash
 # List available system definitions (no auth required)
-curl -X GET "https://api.example.com/v1/llm-service-definitions/_system"
+curl -X GET "https://api.example.com/v1/llm-definitions/_system"
 ```
 
 **Default System Definitions:**
@@ -102,7 +102,7 @@ Users can create their own definitions as templates:
 
 ```bash
 # Step 1: Create a custom definition
-curl -X PUT "https://api.example.com/v1/llm-service-definitions/alice/my-custom-config" \
+curl -X PUT "https://api.example.com/v1/llm-definitions/alice/my-custom-config" \
   -H "Authorization: Bearer alice_api_key" \
   -H "Content-Type: application/json" \
   -d '{
