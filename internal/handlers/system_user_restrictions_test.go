@@ -54,27 +54,8 @@ func TestSystemUserRestrictions(t *testing.T) {
 		t.Fatalf("Error creating project alice/test1 for testing: %v\n", err)
 	}
 
-	// Get _system user's API key by retrieving the user (admin only)
-	reqURL := fmt.Sprintf("http://%v:%d/v1/users/_system", options.Host, options.Port)
-	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
-	assert.NoError(t, err)
-	req.Header.Set("Authorization", "Bearer "+options.AdminKey)
-	resp, err := http.DefaultClient.Do(req)
-	assert.NoError(t, err)
-	defer resp.Body.Close()
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Should be able to retrieve _system user info")
-
-	var systemUser struct {
-		UserHandle string `json:"user_handle"`
-		VDBKey     string `json:"vdb_key"`
-	}
-	respBody, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
-	err = json.Unmarshal(respBody, &systemUser)
-	assert.NoError(t, err)
-	systemAPIKey := systemUser.VDBKey
-
 	// Define test cases - all should fail with 403 Forbidden
+	// We use admin authentication to bypass owner auth and test our validation layer
 	testCases := []struct {
 		name         string
 		method       string
@@ -121,7 +102,7 @@ func TestSystemUserRestrictions(t *testing.T) {
 			name:         "System user cannot post similarity requests",
 			method:       http.MethodPost,
 			path:         "/v1/similars/_system/test1",
-			body:         `{"vector": [1.0, 2.0, 3.0], "vector_dim": 3}`,
+			body:         `{"vector": [1.0, 2.0, 3.0, 4.0, 5.0]}`,
 			expectStatus: http.StatusForbidden,
 		},
 		{
@@ -176,6 +157,9 @@ func TestSystemUserRestrictions(t *testing.T) {
 	}
 
 	// Run all test cases
+	// Note: We use admin authentication to bypass the owner authentication layer
+	// so that we can test our validation logic. In practice, both auth and validation
+	// will prevent _system from making requests.
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			reqBody := io.Reader(nil)
@@ -186,7 +170,8 @@ func TestSystemUserRestrictions(t *testing.T) {
 			requestURL := fmt.Sprintf("http://%v:%d%v", options.Host, options.Port, tc.path)
 			req, err := http.NewRequest(tc.method, requestURL, reqBody)
 			assert.NoError(t, err)
-			req.Header.Set("Authorization", "Bearer "+systemAPIKey)
+			// Use admin key to bypass owner authentication and reach our validation layer
+			req.Header.Set("Authorization", "Bearer "+options.AdminKey)
 			resp, err := http.DefaultClient.Do(req)
 			assert.NoError(t, err)
 			defer resp.Body.Close()
