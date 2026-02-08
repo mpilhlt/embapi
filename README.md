@@ -146,6 +146,44 @@ GET /v1/projects/{owner}/{project}/shared-with
 
 Only the project owner can view the list of shared users and manage sharing. Users who have been granted access to a project cannot see which other users also have access.
 
+## Project Ownership Transfer
+
+The project owner can transfer ownership of a project to another user. This is useful when:
+- A project maintainer is leaving and wants to hand over control
+- Organizational changes require reassigning project ownership
+- Consolidating projects under a different user account
+
+**Transfer ownership:**
+
+```bash
+POST /v1/projects/{owner}/{project}/transfer-ownership
+{
+  "new_owner_handle": "new_owner"
+}
+```
+
+**Important notes:**
+- Only the current owner can transfer ownership
+- The new owner must be an existing user
+- The new owner cannot already have a project with the same handle
+- After transfer, the old owner will lose all access to the project
+- If the new owner was previously shared with the project, their sharing role will be upgraded to owner
+- All embeddings and other project data remain intact during transfer
+
+**Example:**
+
+```bash
+# Alice transfers her project to Bob
+curl -X POST "https://api.example.com/v1/projects/alice/my-project/transfer-ownership" \
+  -H "Authorization: Bearer alice_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "new_owner_handle": "bob"
+  }'
+
+# After transfer, the project is accessible at /v1/projects/bob/my-project
+```
+
 ### Shared User Access
 
 Once a project is shared with a user, they can:
