@@ -41,7 +41,7 @@ func TestSimilarsFunc(t *testing.T) {
 	}
 
 	// Create LLM Service
-	InstanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the dhamps-vdb code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
+	InstanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the embapi code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
 	_, err = createInstance(t, InstanceJSON, "alice", aliceAPIKey)
 	if err != nil {
 		t.Fatalf("Error creating LLM service openai-large for testing: %v\n", err)
@@ -244,7 +244,7 @@ func TestPostSimilar(t *testing.T) {
 	}
 
 	// Create LLM Service Instance with 5 dimensions
-	InstanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the dhamps-vdb code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
+	InstanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the embapi code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
 	_, err = createInstance(t, InstanceJSON, "alice", aliceAPIKey)
 	if err != nil {
 		t.Fatalf("Error creating LLM service embedding1 for testing: %v\n", err)

@@ -686,20 +686,20 @@ func (q *Queries) GetInstancesByUser(ctx context.Context, arg GetInstancesByUser
 }
 
 const getKeyByUser = `-- name: GetKeyByUser :one
-SELECT "embapi_key"
+SELECT "vdb_key"
 FROM users
 WHERE "user_handle" = $1 LIMIT 1
 `
 
 func (q *Queries) GetKeyByUser(ctx context.Context, userHandle string) (string, error) {
 	row := q.db.QueryRow(ctx, getKeyByUser, userHandle)
-	var embapi_key string
-	err := row.Scan(&embapi_key)
-	return embapi_key, err
+	var vdb_key string
+	err := row.Scan(&vdb_key)
+	return vdb_key, err
 }
 
 const getKeysByDefinition = `-- name: GetKeysByDefinition :many
-SELECT users."user_handle", users."embapi_key"
+SELECT users."user_handle", users."vdb_key"
 FROM users
 JOIN definitions_shared_with
 ON users."user_handle" = definitions_shared_with."user_handle"
@@ -719,7 +719,7 @@ type GetKeysByDefinitionParams struct {
 
 type GetKeysByDefinitionRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
-	EmbAPIKey     string `db:"embapi_key" json:"embapi_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByDefinition(ctx context.Context, arg GetKeysByDefinitionParams) ([]GetKeysByDefinitionRow, error) {
@@ -748,7 +748,7 @@ func (q *Queries) GetKeysByDefinition(ctx context.Context, arg GetKeysByDefiniti
 }
 
 const getKeysByInstance = `-- name: GetKeysByInstance :many
-SELECT users."user_handle", instances_shared_with."role", users."embapi_key"
+SELECT users."user_handle", instances_shared_with."role", users."vdb_key"
 FROM users
 JOIN instances_shared_with
 ON users."user_handle" = instances_shared_with."user_handle"
@@ -769,7 +769,7 @@ type GetKeysByInstanceParams struct {
 type GetKeysByInstanceRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
 	Role       string `db:"role" json:"role"`
-	EmbAPIKey     string `db:"embapi_key" json:"embapi_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByInstance(ctx context.Context, arg GetKeysByInstanceParams) ([]GetKeysByInstanceRow, error) {
@@ -798,7 +798,7 @@ func (q *Queries) GetKeysByInstance(ctx context.Context, arg GetKeysByInstancePa
 }
 
 const getKeysByProject = `-- name: GetKeysByProject :many
-SELECT users."user_handle", users_projects."role", users."embapi_key"
+SELECT users."user_handle", users_projects."role", users."vdb_key"
 FROM users
 JOIN users_projects
 ON users."user_handle" = users_projects."user_handle"
@@ -819,7 +819,7 @@ type GetKeysByProjectParams struct {
 type GetKeysByProjectRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
 	Role       string `db:"role" json:"role"`
-	EmbAPIKey     string `db:"embapi_key" json:"embapi_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByProject(ctx context.Context, arg GetKeysByProjectParams) ([]GetKeysByProjectRow, error) {
@@ -1361,14 +1361,14 @@ func (q *Queries) GetSystemDefinitions(ctx context.Context, arg GetSystemDefinit
 	return items, nil
 }
 
-const getUserByEmbAPIKey = `-- name: GetUserByEmbAPIKey :one
+const getUserByVDBKey = `-- name: GetUserByVDBKey :one
 SELECT "user_handle"
 FROM users
-WHERE "embapi_key" = $1 LIMIT 1
+WHERE "vdb_key" = $1 LIMIT 1
 `
 
-func (q *Queries) GetUserByEmbAPIKey(ctx context.Context, vdbKey string) (string, error) {
-	row := q.db.QueryRow(ctx, getUserByEmbAPIKey, vdbKey)
+func (q *Queries) GetUserByVDBKey(ctx context.Context, vdbKey string) (string, error) {
+	row := q.db.QueryRow(ctx, getUserByVDBKey, vdbKey)
 	var user_handle string
 	err := row.Scan(&user_handle)
 	return user_handle, err
@@ -2153,7 +2153,7 @@ func (q *Queries) RetrieveSharedInstance(ctx context.Context, arg RetrieveShared
 }
 
 const retrieveUser = `-- name: RetrieveUser :one
-SELECT user_handle, name, email, embapi_key, created_at, updated_at
+SELECT user_handle, name, email, vdb_key, created_at, updated_at
 FROM users
 WHERE "user_handle" = $1 LIMIT 1
 `
@@ -2598,14 +2598,14 @@ const upsertUser = `-- name: UpsertUser :one
 
 INSERT
 INTO users (
-  "user_handle", "name", "email", "embapi_key", "created_at", "updated_at"
+  "user_handle", "name", "email", "vdb_key", "created_at", "updated_at"
 ) VALUES (
   $1, $2, $3, $4, NOW(), NOW()
 )
 ON CONFLICT ("user_handle") DO UPDATE SET
   "name" = EXCLUDED."name",
   "email" = EXCLUDED."email",
-  "embapi_key" = EXCLUDED."embapi_key",
+  "vdb_key" = EXCLUDED."vdb_key",
   "updated_at" = NOW()
 RETURNING users."user_handle"
 `
@@ -2614,7 +2614,7 @@ type UpsertUserParams struct {
 	UserHandle string      `db:"user_handle" json:"user_handle"`
 	Name       pgtype.Text `db:"name" json:"name"`
 	Email      string      `db:"email" json:"email"`
-	EmbAPIKey     string      `db:"embapi_key" json:"embapi_key"`
+	EmbAPIKey  string      `db:"vdb_key" json:"vdb_key"`
 }
 
 // Generate go code with: sqlc generate

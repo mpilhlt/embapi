@@ -82,7 +82,7 @@ All configuration is done via environment variables. You can set them:
 | `SERVICE_DBPORT` | Database port | `5432` |
 | `SERVICE_DBUSER` | Database username | `postgres` |
 | `SERVICE_DBPASSWORD` | Database password | `postgres` |
-| `SERVICE_DBNAME` | Database name | `dhamps_vdb` |
+| `SERVICE_DBNAME` | Database name | `embapi` |
 | `API_PORT` | External port to expose API | `8880` |
 | `POSTGRES_PORT` | External port to expose PostgreSQL | `5432` |
 
@@ -238,7 +238,7 @@ docker run -d \
   -e SERVICE_DBPORT=5432 \
   -e SERVICE_DBUSER=dbuser \
   -e SERVICE_DBPASSWORD=dbpass \
-  -e SERVICE_DBNAME=dhamps_vdb \
+  -e SERVICE_DBNAME=embapi \
   -e SERVICE_ADMINKEY=admin-key \
   -e ENCRYPTION_KEY=encryption-key-32-chars-min \
   embapi:latest
@@ -270,19 +270,19 @@ Connect to your PostgreSQL server and run:
 
 ```sql
 -- Create database
-CREATE DATABASE dhamps_vdb;
+CREATE DATABASE embapi;
 
 -- Create user
-CREATE USER dhamps_user WITH PASSWORD 'secure_password';
+CREATE USER embapi_user WITH PASSWORD 'secure_password';
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
+GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
 
 -- Connect to the database
-\c dhamps_vdb
+\c embapi
 
 -- Grant schema permissions
-GRANT ALL ON SCHEMA public TO dhamps_user;
+GRANT ALL ON SCHEMA public TO embapi_user;
 
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -295,9 +295,9 @@ In your `.env` file:
 ```bash
 SERVICE_DBHOST=your-database-host.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 ```
 
 For docker-compose with external database, you can either:
@@ -336,10 +336,10 @@ docker volume inspect embapi_postgres_data
 
 ```bash
 # Backup
-docker-compose exec postgres pg_dump -U postgres dhamps_vdb > backup.sql
+docker-compose exec postgres pg_dump -U postgres embapi > backup.sql
 
 # Restore
-docker-compose exec -T postgres psql -U postgres dhamps_vdb < backup.sql
+docker-compose exec -T postgres psql -U postgres embapi < backup.sql
 ```
 
 ## Security Considerations
@@ -413,7 +413,7 @@ docker-compose ps
 docker-compose logs postgres
 
 # Test database connection
-docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT 1;"
+docker-compose exec postgres psql -U postgres -d embapi -c "SELECT 1;"
 ```
 
 ### Can't connect to API
@@ -554,7 +554,7 @@ curl http://localhost:8880/
 
 ```bash
 # Connect to PostgreSQL
-docker-compose exec postgres psql -U postgres -d dhamps_vdb
+docker-compose exec postgres psql -U postgres -d embapi
 
 # Check pgvector extension
 \dx

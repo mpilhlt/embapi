@@ -56,7 +56,7 @@ SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=password
-SERVICE_DBNAME=dhamps_vdb_dev
+SERVICE_DBNAME=embapi_dev
 
 # Encryption key (32+ characters)
 ENCRYPTION_KEY=your-secure-encryption-key-min-32-chars
@@ -72,7 +72,7 @@ For local development:
 # Start PostgreSQL with pgvector
 podman run -p 5432:5432 \
   -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=dhamps_vdb_dev \
+  -e POSTGRES_DB=embapi_dev \
   pgvector/pgvector:0.7.4-pg16
 
 # Or use docker-compose

@@ -216,7 +216,7 @@ Database username.
 
 ```bash
 SERVICE_DBUSER=postgres        # Default superuser
-SERVICE_DBUSER=dhamps_user     # Dedicated user (recommended)
+SERVICE_DBUSER=embapi_user     # Dedicated user (recommended)
 ```
 
 **Security:**
@@ -264,8 +264,8 @@ Database name.
 **Example:**
 
 ```bash
-SERVICE_DBNAME=dhamps_vdb      # Production database
-SERVICE_DBNAME=dhamps_test     # Testing database
+SERVICE_DBNAME=embapi      # Production database
+SERVICE_DBNAME=embapi_test     # Testing database
 ```
 
 ## Configuration Examples
@@ -281,7 +281,7 @@ SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=postgres
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 SERVICE_ADMINKEY=dev-admin-key-not-for-production
 ENCRYPTION_KEY=dev-encryption-key-min-32-chars-long
 ```
@@ -297,7 +297,7 @@ SERVICE_DBHOST=postgres
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=secure_db_password_here
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 SERVICE_ADMINKEY=generated_admin_key_from_setup_script
 ENCRYPTION_KEY=generated_encryption_key_from_setup_script
 ```
@@ -311,9 +311,9 @@ SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=db.internal.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_prod_user
+SERVICE_DBUSER=embapi_prod_user
 SERVICE_DBPASSWORD=<from-secrets-manager>
-SERVICE_DBNAME=dhamps_vdb_prod
+SERVICE_DBNAME=embapi_prod
 SERVICE_ADMINKEY=<from-secrets-manager>
 ENCRYPTION_KEY=<from-secrets-manager>
 ```
@@ -391,7 +391,7 @@ Some variables support command-line flags:
   --db-port 5432 \
   --db-user postgres \
   --db-password password \
-  --db-name dhamps_vdb
+  --db-name embapi
 ```
 
 **Note:** ENCRYPTION_KEY must be set as environment variable, not flag.

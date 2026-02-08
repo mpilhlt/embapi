@@ -159,7 +159,7 @@ func TestInstancesFunc(t *testing.T) {
 			requestPath:  "/v1/llm-instances/alice/embedding1",
 			bodyPath:     "",
 			EmbAPIKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/InstanceFull.json\",\n  \"owner\": \"alice\",\n  \"instance_handle\": \"embedding1\",\n  \"instance_id\": 1,\n  \"access_role\": \"owner\",\n  \"endpoint\": \"https://api.foo.bar/v1/embed\",\n  \"description\": \"An LLM Service just for testing if the dhamps-vdb code is working\",\n  \"has_api_key\": true,\n  \"api_standard\": \"openai\",\n  \"model\": \"embed-test1\",\n  \"dimensions\": 5\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/InstanceFull.json\",\n  \"owner\": \"alice\",\n  \"instance_handle\": \"embedding1\",\n  \"instance_id\": 1,\n  \"access_role\": \"owner\",\n  \"endpoint\": \"https://api.foo.bar/v1/embed\",\n  \"description\": \"An LLM Service just for testing if the embapi code is working\",\n  \"has_api_key\": true,\n  \"api_standard\": \"openai\",\n  \"model\": \"embed-test1\",\n  \"dimensions\": 5\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{

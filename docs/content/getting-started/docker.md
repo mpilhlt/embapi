@@ -121,7 +121,7 @@ docker run -d \
   -e SERVICE_DBPORT=5432 \
   -e SERVICE_DBUSER=dbuser \
   -e SERVICE_DBPASSWORD=dbpass \
-  -e SERVICE_DBNAME=dhamps_vdb \
+  -e SERVICE_DBNAME=embapi \
   -e SERVICE_ADMINKEY=admin-key \
   -e ENCRYPTION_KEY=encryption-key \
   embapi:latest
@@ -257,10 +257,10 @@ docker volume inspect embapi_postgres_data
 
 ```bash
 # Create backup
-docker-compose exec postgres pg_dump -U postgres dhamps_vdb > backup.sql
+docker-compose exec postgres pg_dump -U postgres embapi > backup.sql
 
 # Restore from backup
-docker-compose exec -T postgres psql -U postgres dhamps_vdb < backup.sql
+docker-compose exec -T postgres psql -U postgres embapi < backup.sql
 ```
 
 ## Networking
@@ -348,7 +348,7 @@ curl http://localhost:8880/docs
 
 ```bash
 # Connect to PostgreSQL
-docker-compose exec postgres psql -U postgres -d dhamps_vdb
+docker-compose exec postgres psql -U postgres -d embapi
 
 # Check pgvector extension
 \dx
@@ -392,7 +392,7 @@ docker-compose ps
 docker-compose logs postgres
 
 # Test connection
-docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT 1;"
+docker-compose exec postgres psql -U postgres -d embapi -c "SELECT 1;"
 ```
 
 ### Can't Connect to API
@@ -495,19 +495,19 @@ If using an external PostgreSQL database:
 
 ```sql
 -- Create database
-CREATE DATABASE dhamps_vdb;
+CREATE DATABASE embapi;
 
 -- Create user
-CREATE USER dhamps_user WITH PASSWORD 'secure_password';
+CREATE USER embapi_user WITH PASSWORD 'secure_password';
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
+GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
 
 -- Connect to database
-\c dhamps_vdb
+\c embapi
 
 -- Grant schema permissions
-GRANT ALL ON SCHEMA public TO dhamps_user;
+GRANT ALL ON SCHEMA public TO embapi_user;
 
 -- Enable pgvector
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -520,9 +520,9 @@ Update `.env`:
 ```bash
 SERVICE_DBHOST=external-db.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 ```
 
 Then run only the embapi service or use a standalone container.

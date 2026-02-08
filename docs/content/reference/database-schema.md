@@ -470,7 +470,7 @@ ORDER BY embedding_count DESC;
 **Backup Strategy:**
 ```bash
 # Full database backup
-pg_dump -U postgres dhamps_vdb > backup.sql
+pg_dump -U postgres embapi > backup.sql
 
 # Backup encryption key separately
 echo "$ENCRYPTION_KEY" > encryption_key.backup

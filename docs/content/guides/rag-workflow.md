@@ -232,7 +232,7 @@ import requests
 
 # Configuration
 DHAMPS_API = "https://api.example.com"
-DHAMPS_KEY = "your-dhamps-api-key"
+EMBAPI_KEY = "your-embapi-key"
 OPENAI_KEY = "your-openai-key"
 
 # Initialize OpenAI
@@ -252,7 +252,7 @@ def embed_and_store(text_id, text, metadata=None):
     requests.post(
         f"{DHAMPS_API}/v1/embeddings/alice/my-documents",
         headers={
-            "Authorization": f"Bearer {DHAMPS_KEY}",
+            "Authorization": f"Bearer {EMBAPI_KEY}",
             "Content-Type": "application/json"
         },
         json={
@@ -281,7 +281,7 @@ def search_similar(query, count=5):
     result = requests.post(
         f"{DHAMPS_API}/v1/similars/alice/my-documents?count={count}",
         headers={
-            "Authorization": f"Bearer {DHAMPS_KEY}",
+            "Authorization": f"Bearer {EMBAPI_KEY}",
             "Content-Type": "application/json"
         },
         json={"vector": query_vector}
@@ -294,7 +294,7 @@ def retrieve_context(doc_ids):
     for doc_id in doc_ids:
         response = requests.get(
             f"{DHAMPS_API}/v1/embeddings/alice/my-documents/{doc_id}",
-            headers={"Authorization": f"Bearer {DHAMPS_KEY}"}
+            headers={"Authorization": f"Bearer {EMBAPI_KEY}"}
         )
         docs.append(response.json())
     return docs

@@ -169,9 +169,9 @@ Update `.env`:
 ```bash
 SERVICE_DBHOST=db.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 ```
 
 Modify `docker-compose.yml` to remove postgres service:
@@ -218,7 +218,7 @@ For high availability:
 
 ```bash
 # Automated daily backups
-0 2 * * * docker-compose exec -T postgres pg_dump -U postgres dhamps_vdb | gzip > /backups/embapi-$(date +\%Y\%m\%d).sql.gz
+0 2 * * * docker-compose exec -T postgres pg_dump -U postgres embapi | gzip > /backups/embapi-$(date +\%Y\%m\%d).sql.gz
 
 # Keep last 30 days
 find /backups -name "embapi-*.sql.gz" -mtime +30 -delete
@@ -250,7 +250,7 @@ docker stats
 docker-compose logs -f --tail=100 embapi
 
 # Check slow queries (if database is slow)
-docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT * FROM pg_stat_statements ORDER BY total_time DESC LIMIT 10;"
+docker-compose exec postgres psql -U postgres -d embapi -c "SELECT * FROM pg_stat_statements ORDER BY total_time DESC LIMIT 10;"
 ```
 
 ### Network Connectivity Issues

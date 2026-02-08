@@ -91,7 +91,7 @@ Create the database:
 
 ```sql
 -- Create database
-CREATE DATABASE dhamps_vdb;
+CREATE DATABASE embapi;
 ```
 
 ### Step 2: Create User
@@ -100,7 +100,7 @@ Create a dedicated user for embapi:
 
 ```sql
 -- Create user with password
-CREATE USER dhamps_user WITH PASSWORD 'secure_password_here';
+CREATE USER embapi_user WITH PASSWORD 'secure_password_here';
 ```
 
 **Best practices:**
@@ -114,21 +114,21 @@ Grant necessary permissions:
 
 ```sql
 -- Grant database privileges
-GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
+GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
 
 -- Connect to the database
-\c dhamps_vdb
+\c embapi
 
 -- Grant schema privileges
-GRANT ALL ON SCHEMA public TO dhamps_user;
+GRANT ALL ON SCHEMA public TO embapi_user;
 
 -- For PostgreSQL 15+, also grant:
-GRANT CREATE ON DATABASE dhamps_vdb TO dhamps_user;
+GRANT CREATE ON DATABASE embapi TO embapi_user;
 ```
 
 ### Step 4: Enable pgvector Extension
 
-Still connected to the `dhamps_vdb` database:
+Still connected to the `embapi` database:
 
 ```sql
 -- Enable pgvector extension
@@ -176,9 +176,9 @@ embapi connects using these environment variables:
 ```bash
 SERVICE_DBHOST=localhost      # Database hostname
 SERVICE_DBPORT=5432          # Database port
-SERVICE_DBUSER=dhamps_user   # Database username
+SERVICE_DBUSER=embapi_user   # Database username
 SERVICE_DBPASSWORD=password  # Database password
-SERVICE_DBNAME=dhamps_vdb    # Database name
+SERVICE_DBNAME=embapi    # Database name
 ```
 
 The connection string format used internally:
@@ -235,7 +235,7 @@ sudo apt install pgbouncer
 
 # Configure /etc/pgbouncer/pgbouncer.ini
 [databases]
-dhamps_vdb = host=localhost port=5432 dbname=dhamps_vdb
+embapi = host=localhost port=5432 dbname=embapi
 
 [pgbouncer]
 listen_addr = 127.0.0.1
@@ -275,8 +275,8 @@ Restrict access in `pg_hba.conf`:
 ```
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
-# Allow dhamps_user from application server only
-host    dhamps_vdb      dhamps_user     10.0.1.0/24            md5
+# Allow embapi_user from application server only
+host    embapi      embapi_user     10.0.1.0/24            md5
 
 # Allow localhost connections
 local   all             all                                    peer
@@ -302,10 +302,10 @@ Daily backup script:
 
 BACKUP_DIR="/backups/embapi"
 DATE=$(date +%Y%m%d_%H%M%S)
-DB_NAME="dhamps_vdb"
+DB_NAME="embapi"
 
 # Create backup
-pg_dump -U dhamps_user -h localhost $DB_NAME | gzip > "$BACKUP_DIR/embapi-$DATE.sql.gz"
+pg_dump -U embapi_user -h localhost $DB_NAME | gzip > "$BACKUP_DIR/embapi-$DATE.sql.gz"
 
 # Keep last 30 days
 find $BACKUP_DIR -name "embapi-*.sql.gz" -mtime +30 -delete
@@ -331,7 +331,7 @@ Set up cron job:
 ```bash
 # Decompress and restore
 gunzip -c /backups/embapi/embapi-20240208.sql.gz | \
-  psql -U dhamps_user -h localhost dhamps_vdb
+  psql -U embapi_user -h localhost embapi
 ```
 
 ### Point-in-Time Recovery (PITR)
@@ -350,7 +350,7 @@ archive_command = 'test ! -f /archive/%f && cp %p /archive/%f'
 
 ```sql
 -- Database size
-SELECT pg_size_pretty(pg_database_size('dhamps_vdb'));
+SELECT pg_size_pretty(pg_database_size('embapi'));
 
 -- Table sizes
 SELECT 
@@ -366,7 +366,7 @@ ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
 ```sql
 -- Active connections
-SELECT count(*) FROM pg_stat_activity WHERE datname = 'dhamps_vdb';
+SELECT count(*) FROM pg_stat_activity WHERE datname = 'embapi';
 
 -- Connection details
 SELECT 
@@ -377,7 +377,7 @@ SELECT
     state,
     query
 FROM pg_stat_activity 
-WHERE datname = 'dhamps_vdb';
+WHERE datname = 'embapi';
 ```
 
 ### Monitor Performance
@@ -411,7 +411,7 @@ sudo systemctl status postgresql
 sudo tail -f /var/log/postgresql/postgresql-16-main.log
 
 # Test connection
-psql -h localhost -U dhamps_user -d dhamps_vdb
+psql -h localhost -U embapi_user -d embapi
 ```
 
 ### pgvector Extension Not Found
@@ -428,17 +428,17 @@ SELECT * FROM pg_available_extensions WHERE name = 'vector';
 
 ```sql
 -- Reconnect as superuser
-\c dhamps_vdb postgres
+\c embapi postgres
 
 -- Re-grant privileges
-GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
-GRANT ALL ON SCHEMA public TO dhamps_user;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO dhamps_user;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO dhamps_user;
+GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
+GRANT ALL ON SCHEMA public TO embapi_user;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO embapi_user;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO embapi_user;
 
 -- For future objects
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO dhamps_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO dhamps_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO embapi_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO embapi_user;
 ```
 
 ### Out of Disk Space

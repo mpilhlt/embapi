@@ -90,7 +90,7 @@ func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.Upl
 	response := &models.UploadUserResponse{}
 	response.Body.UserHandle = u.UserHandle
 	// Return the actual API key only if it was just created
-	// When updating an existing user, don't include the VDB key in the response
+	// When updating an existing user, don't include the EmbAPI key in the response
 	if EmbAPIKey != "not changed" {
 		response.Body.EmbAPIKey = EmbAPIKey
 	} else {

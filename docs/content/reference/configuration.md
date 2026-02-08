@@ -122,9 +122,9 @@ SERVICE_PORT=8880
 # Database Configuration
 SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password_here
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 
 # Security Configuration
 SERVICE_ADMINKEY=generated_admin_key_here
@@ -173,7 +173,7 @@ services:
     environment:
       POSTGRES_USER: ${SERVICE_DBUSER:-postgres}
       POSTGRES_PASSWORD: ${SERVICE_DBPASSWORD:-postgres}
-      POSTGRES_DB: ${SERVICE_DBNAME:-dhamps_vdb}
+      POSTGRES_DB: ${SERVICE_DBNAME:-embapi}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -194,7 +194,7 @@ services:
       SERVICE_DBPORT: ${SERVICE_DBPORT:-5432}
       SERVICE_DBUSER: ${SERVICE_DBUSER:-postgres}
       SERVICE_DBPASSWORD: ${SERVICE_DBPASSWORD:-postgres}
-      SERVICE_DBNAME: ${SERVICE_DBNAME:-dhamps_vdb}
+      SERVICE_DBNAME: ${SERVICE_DBNAME:-embapi}
       SERVICE_ADMINKEY: ${SERVICE_ADMINKEY}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
     ports:
@@ -238,9 +238,9 @@ docker run -d \
   -e SERVICE_PORT=8880 \
   -e SERVICE_DBHOST=db.example.com \
   -e SERVICE_DBPORT=5432 \
-  -e SERVICE_DBUSER=dhamps_user \
+  -e SERVICE_DBUSER=embapi_user \
   -e SERVICE_DBPASSWORD=secure_password \
-  -e SERVICE_DBNAME=dhamps_vdb \
+  -e SERVICE_DBNAME=embapi \
   -e SERVICE_ADMINKEY=admin_key_here \
   -e ENCRYPTION_KEY=encryption_key_here \
   -p 8880:8880 \
@@ -255,9 +255,9 @@ Using `docker-compose.external-db.yml` for external PostgreSQL:
 # Set database connection in .env
 SERVICE_DBHOST=db.external.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 
 # Start without bundled PostgreSQL
 docker-compose -f docker-compose.external-db.yml up -d
@@ -278,7 +278,7 @@ SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=postgres
-SERVICE_DBNAME=dhamps_vdb_dev
+SERVICE_DBNAME=embapi_dev
 SERVICE_ADMINKEY=dev-admin-key-not-for-production
 ENCRYPTION_KEY=dev-encryption-key-at-least-32-chars
 ```
@@ -301,7 +301,7 @@ SERVICE_DBHOST=postgres
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=postgres
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 SERVICE_ADMINKEY=dev-admin-key
 ENCRYPTION_KEY=dev-encryption-32-chars-minimum
 ```
@@ -322,9 +322,9 @@ SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=prod-db.internal.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_prod_user
+SERVICE_DBUSER=embapi_prod_user
 SERVICE_DBPASSWORD=<from-secrets-manager>
-SERVICE_DBNAME=dhamps_vdb_prod
+SERVICE_DBNAME=embapi_prod
 SERVICE_ADMINKEY=<from-secrets-manager>
 ENCRYPTION_KEY=<from-secrets-manager>
 ```
@@ -458,9 +458,9 @@ SERVICE_HOST=localhost
 SERVICE_PORT=8880
 SERVICE_DBHOST=192.168.1.100
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=user_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 SERVICE_ADMINKEY=$(openssl rand -base64 32)
 ENCRYPTION_KEY=$(openssl rand -hex 32)
 ```
@@ -479,8 +479,8 @@ data:
   SERVICE_PORT: "8880"
   SERVICE_DBHOST: "postgres-service"
   SERVICE_DBPORT: "5432"
-  SERVICE_DBUSER: "dhamps_user"
-  SERVICE_DBNAME: "dhamps_vdb"
+  SERVICE_DBUSER: "embapi_user"
+  SERVICE_DBNAME: "embapi"
 ```
 
 Secrets:
@@ -500,18 +500,18 @@ stringData:
 
 ```bash
 # Create secrets
-echo "admin_key_here" | docker secret create dhamps_admin_key -
-echo "encryption_key" | docker secret create dhamps_encryption_key -
+echo "admin_key_here" | docker secret create embapi_admin_key -
+echo "encryption_key" | docker secret create embapi_encryption_key -
 
 # Reference in stack file
 services:
   embapi:
     secrets:
-      - dhamps_admin_key
-      - dhamps_encryption_key
+      - embapi_admin_key
+      - embapi_encryption_key
     environment:
-      SERVICE_ADMINKEY_FILE: /run/secrets/dhamps_admin_key
-      ENCRYPTION_KEY_FILE: /run/secrets/dhamps_encryption_key
+      SERVICE_ADMINKEY_FILE: /run/secrets/embapi_admin_key
+      ENCRYPTION_KEY_FILE: /run/secrets/embapi_encryption_key
 ```
 
 ## Related Documentation
