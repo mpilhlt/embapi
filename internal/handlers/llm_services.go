@@ -303,7 +303,7 @@ func shareDefinitionFunc(ctx context.Context, input *models.ShareDefinitionReque
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve definition: %v", err))
 	}
 	if definition.Owner != ctx.Value(auth.AuthUserKey).(string) {
-		return nil, huma.Error403Forbidden(fmt.Sprintf("Not authorized to share definition %s/%s", input.UserHandle, input.DefinitionHandle))
+		return nil, huma.Error403Forbidden(fmt.Sprintf("not authorized to share definition %s/%s", input.UserHandle, input.DefinitionHandle))
 	}
 
 	// Check if target user exists
@@ -353,7 +353,7 @@ func unshareDefinitionFunc(ctx context.Context, input *models.UnshareDefinitionR
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve definition: %v", err))
 	}
 	if definition.Owner != ctx.Value(auth.AuthUserKey).(string) {
-		return nil, huma.Error403Forbidden(fmt.Sprintf("Not authorized to share definition %s/%s", input.UserHandle, input.DefinitionHandle))
+		return nil, huma.Error403Forbidden(fmt.Sprintf("not authorized to share definition %s/%s", input.UserHandle, input.DefinitionHandle))
 	}
 	fmt.Printf("Definition retrieved: %s/%s (id %d)\n", definition.Owner, definition.DefinitionHandle, definition.DefinitionID)
 	fmt.Printf("Attempting to unshare with %s\n", input.UnshareWithHandle)
@@ -849,7 +849,7 @@ func shareInstanceFunc(ctx context.Context, input *models.ShareInstanceRequest) 
 	}
 	// Check if instance belongs to current user (only owner can share)
 	if instance.Owner != ctx.Value(auth.AuthUserKey).(string) {
-		return nil, huma.Error403Forbidden(fmt.Sprintf("Not authorized to share instance %s/%s", input.UserHandle, input.InstanceHandle))
+		return nil, huma.Error403Forbidden(fmt.Sprintf("not authorized to share instance %s/%s", input.UserHandle, input.InstanceHandle))
 	}
 	// Check if target user exists
 	_, err = getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.Body.ShareWithHandle})
