@@ -287,7 +287,7 @@ curl -X POST http://localhost:8880/v1/users \
   }'
 
 # Save returned embapi_key
-export USER_KEY="returned-vdb-key"
+export USER_KEY="returned-embapi-key"
 
 # User verifies access
 curl -X GET http://localhost:8880/v1/users/researcher1 \

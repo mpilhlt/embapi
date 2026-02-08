@@ -38,7 +38,7 @@ curl -X POST http://localhost:8880/v1/users \
 Save the returned `embapi_key` to a variable:
 
 ```bash
-export USER_KEY="your-returned-vdb-key"
+export USER_KEY="your-returned-embapi-key"
 ```
 
 ### Verify Authentication
@@ -338,7 +338,7 @@ curl -X DELETE http://localhost:8880/v1/embeddings/researcher1/literature-analys
 ```bash
 #!/bin/bash
 
-USER_KEY="your-vdb-key"
+USER_KEY="your-embapi-key"
 PROJECT="researcher1/literature-analysis"
 API_URL="http://localhost:8880"
 
