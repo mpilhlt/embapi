@@ -153,3 +153,24 @@ type GetProjectSharedUsersResponse struct {
 		SharedWith    []SharedUser `json:"shared_with" doc:"List of users this project is shared with"`
 	}
 }
+
+// Transfer Project Ownership
+// POST Path: "/v1/projects/{user_handle}/{project_handle}/transfer-ownership"
+
+type TransferProjectOwnershipRequest struct {
+	UserHandle    string `json:"user_handle" path:"user_handle" maxLength:"20" minLength:"3" example:"alice" doc:"Current project owner handle"`
+	ProjectHandle string `json:"project_handle" path:"project_handle" maxLength:"20" minLength:"3" example:"my-project" doc:"Project handle"`
+	Body          struct {
+		NewOwnerHandle string `json:"new_owner_handle" minLength:"3" maxLength:"20" example:"bob" doc:"User handle of the new owner"`
+	}
+}
+
+type TransferProjectOwnershipResponse struct {
+	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
+	Body   struct {
+		ProjectID      int    `json:"project_id" doc:"Project ID"`
+		ProjectHandle  string `json:"project_handle" doc:"Project handle"`
+		OldOwner       string `json:"old_owner" doc:"Previous project owner"`
+		NewOwner       string `json:"new_owner" doc:"New project owner"`
+	}
+}

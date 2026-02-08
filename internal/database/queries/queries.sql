@@ -204,6 +204,14 @@ FROM users_projects
 WHERE "user_handle" = $1
 AND "project_id" = $2;
 
+-- name: TransferProjectOwnership :one
+UPDATE projects
+SET "owner" = $2,
+    "updated_at" = NOW()
+WHERE "owner" = $1
+AND "project_handle" = $3
+RETURNING "project_id", "owner", "project_handle";
+
 
 -- === LLM Service Definitions (user-shared templates) ===
 

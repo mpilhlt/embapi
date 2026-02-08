@@ -570,6 +570,125 @@ func getProjectSharedUsersFunc(ctx context.Context, input *models.GetProjectShar
 	return response, nil
 }
 
+// Transfer project ownership to another user
+func transferProjectOwnershipFunc(ctx context.Context, input *models.TransferProjectOwnershipRequest) (*models.TransferProjectOwnershipResponse, error) {
+	// Get the database connection pool from the context
+	pool, err := GetDBPool(ctx)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("database connection error: %v", err)
+	}
+	queries := database.New(pool)
+
+	// Get the requesting user from context (set by auth middleware)
+	requestingUser := ctx.Value(auth.AuthUserKey)
+	if requestingUser == nil {
+		return nil, huma.Error500InternalServerError("unable to get requesting user from context")
+	}
+
+	// Validate that new owner is different from current owner
+	if input.Body.NewOwnerHandle == input.UserHandle {
+		return nil, huma.Error400BadRequest("new owner must be different from current owner")
+	}
+
+	// Check if project exists and belongs to current user (only owner can transfer)
+	project, err := queries.RetrieveProject(ctx, database.RetrieveProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: input.ProjectHandle,
+	})
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s not found", input.UserHandle, input.ProjectHandle))
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve project %s/%s: %v", input.UserHandle, input.ProjectHandle, err))
+	}
+
+	// Check if project belongs to requesting user (only owner can transfer)
+	if project.Owner != requestingUser.(string) {
+		return nil, huma.Error403Forbidden(fmt.Sprintf("only the project owner can transfer ownership of project %s/%s", input.UserHandle, input.ProjectHandle))
+	}
+
+	// Check if new owner exists
+	_, err = queries.RetrieveUser(ctx, input.Body.NewOwnerHandle)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, huma.Error404NotFound(fmt.Sprintf("new owner user %s not found", input.Body.NewOwnerHandle))
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to verify new owner user %s: %v", input.Body.NewOwnerHandle, err))
+	}
+
+	// Check if new owner already has a project with the same handle
+	_, err = queries.RetrieveProject(ctx, database.RetrieveProjectParams{
+		Owner:         input.Body.NewOwnerHandle,
+		ProjectHandle: input.ProjectHandle,
+	})
+	if err == nil {
+		return nil, huma.Error409Conflict(fmt.Sprintf("new owner %s already has a project with handle %s", input.Body.NewOwnerHandle, input.ProjectHandle))
+	} else if err.Error() != "no rows in result set" {
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to check for conflicting project: %v", err))
+	}
+
+	// Execute ownership transfer within a transaction
+	var transferredProject database.TransferProjectOwnershipRow
+	err = database.WithTransaction(ctx, pool, func(tx pgx.Tx) error {
+		queries := database.New(tx)
+
+		// 1. Transfer ownership in projects table
+		transferred, err := queries.TransferProjectOwnership(ctx, database.TransferProjectOwnershipParams{
+			Owner:         input.UserHandle,
+			Owner_2:       input.Body.NewOwnerHandle,
+			ProjectHandle: input.ProjectHandle,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to transfer project ownership: %v", err)
+		}
+		transferredProject = transferred
+
+		// 2. Remove old owner from users_projects table
+		err = queries.UnlinkProjectFromUser(ctx, database.UnlinkProjectFromUserParams{
+			UserHandle: input.UserHandle,
+			ProjectID:  project.ProjectID,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to unlink old owner from project: %v", err)
+		}
+
+		// 3. If new owner was previously shared with the project (as editor/reader), remove that entry first
+		err = queries.UnlinkProjectFromUser(ctx, database.UnlinkProjectFromUserParams{
+			UserHandle: input.Body.NewOwnerHandle,
+			ProjectID:  project.ProjectID,
+		})
+		// Ignore error if the entry doesn't exist
+		if err != nil && err.Error() != "no rows in result set" {
+			return fmt.Errorf("unable to clean up new owner's previous access: %v", err)
+		}
+
+		// 4. Add new owner to users_projects table with owner role
+		_, err = queries.LinkProjectToUser(ctx, database.LinkProjectToUserParams{
+			UserHandle: input.Body.NewOwnerHandle,
+			ProjectID:  project.ProjectID,
+			Role:       "owner",
+		})
+		if err != nil {
+			return fmt.Errorf("unable to link new owner to project: %v", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, huma.Error500InternalServerError(err.Error())
+	}
+
+	// Build response
+	response := &models.TransferProjectOwnershipResponse{}
+	response.Body.ProjectID = int(transferredProject.ProjectID)
+	response.Body.ProjectHandle = transferredProject.ProjectHandle
+	response.Body.OldOwner = input.UserHandle
+	response.Body.NewOwner = transferredProject.Owner
+
+	return response, nil
+}
+
 // RegisterProjectRoutes registers all the project routes with the API
 func RegisterProjectsRoutes(pool *pgxpool.Pool, api huma.API) error {
 	// Define huma.Operations for each route
@@ -667,6 +786,18 @@ func RegisterProjectsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		},
 		Tags: []string{"projects"},
 	}
+	transferProjectOwnershipOp := huma.Operation{
+		OperationID:   "transferProjectOwnership",
+		Method:        http.MethodPost,
+		Path:          "/v1/projects/{user_handle}/{project_handle}/transfer-ownership",
+		DefaultStatus: http.StatusOK,
+		Summary:       "Transfer ownership of a project to another user",
+		Security: []map[string][]string{
+			{"adminAuth": []string{"admin"}},
+			{"ownerAuth": []string{"owner"}},
+		},
+		Tags: []string{"projects"},
+	}
 
 	huma.Register(api, putProjectOp, addPoolToContext(pool, putProjectFunc))
 	huma.Register(api, postProjectOp, addPoolToContext(pool, postProjectFunc))
@@ -676,5 +807,6 @@ func RegisterProjectsRoutes(pool *pgxpool.Pool, api huma.API) error {
 	huma.Register(api, shareProjectOp, addPoolToContext(pool, shareProjectFunc))
 	huma.Register(api, unshareProjectOp, addPoolToContext(pool, unshareProjectFunc))
 	huma.Register(api, getProjectSharedUsersOp, addPoolToContext(pool, getProjectSharedUsersFunc))
+	huma.Register(api, transferProjectOwnershipOp, addPoolToContext(pool, transferProjectOwnershipFunc))
 	return nil
 }
