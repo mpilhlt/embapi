@@ -501,4 +501,4 @@ When uploading embeddings, metadata will be validated against this schema. Inval
 - [LLM Services](llm-services/) - Managing LLM service instances
 - [Embeddings](embeddings/) - Adding and retrieving embeddings
 - [Similars](similars/) - Similarity search
-- [Public Access](/docs/PUBLIC_ACCESS.md) - Public project configuration
+- [Public Projects Guide](../../guides/public-projects/) - Public project configuration

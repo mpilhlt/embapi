@@ -13,11 +13,13 @@ embapi is a vector database designed for Retrieval Augmented Generation (RAG) wo
 
 ## Key Components
 
-- **Users** - Individual accounts with authentication
-- **Projects** - Containers for embeddings with access control
-- **Embeddings** - Vector representations of text with metadata
-- **LLM Services** - Configurations for embedding models
-- **Similarity Search** - Find similar documents using vector distance
+- **[Users](users-and-auth/)** - Individual accounts with authentication
+- **[Projects](projects/)** - Containers for embeddings with access control
+- **[Embeddings](embeddings/)** - Vector representations of text with metadata
+- **[LLM Services](llm-services/)** - Configurations for embedding models
+- **[Similarity Search](similarity-search/)** - Find similar documents using vector distance
+- **[Metadata](metadata/)** - Structured data with validation and filtering
+- **[Architecture](architecture/)** - Technical architecture and design
 
 ## Architecture
 

@@ -158,7 +158,7 @@ Projects can be made publicly accessible by setting `public_read: true` when cre
 - Embeddings
 - Similarity search
 
-See [Public Access Documentation](/docs/PUBLIC_ACCESS.md) for details.
+See [Public Projects Guide](../../guides/public-projects/) for details.
 
 ## Security Best Practices
 
