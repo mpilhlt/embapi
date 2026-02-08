@@ -5,11 +5,11 @@ weight: 4
 
 # Security Best Practices
 
-Comprehensive guide for securing your dhamps-vdb production deployment.
+Comprehensive guide for securing your embapi production deployment.
 
 ## Security Overview
 
-dhamps-vdb handles sensitive data including embeddings, metadata, and API credentials. This guide covers essential security measures for production deployments.
+embapi handles sensitive data including embeddings, metadata, and API credentials. This guide covers essential security measures for production deployments.
 
 ## HTTPS/TLS Configuration
 
@@ -21,7 +21,7 @@ dhamps-vdb handles sensitive data including embeddings, metadata, and API creden
 
 ### Using a Reverse Proxy
 
-**Never expose dhamps-vdb directly to the internet.** Always use a reverse proxy with TLS termination.
+**Never expose embapi directly to the internet.** Always use a reverse proxy with TLS termination.
 
 #### Nginx with Let's Encrypt
 
@@ -31,10 +31,10 @@ Install Certbot:
 sudo apt install nginx certbot python3-certbot-nginx
 ```
 
-Configure nginx (`/etc/nginx/sites-available/dhamps-vdb`):
+Configure nginx (`/etc/nginx/sites-available/embapi`):
 
 ```nginx
-upstream dhamps_backend {
+upstream embapi_backend {
     server 127.0.0.1:8880;
     keepalive 32;
 }
@@ -73,7 +73,7 @@ server {
 
     # Proxy settings
     location / {
-        proxy_pass http://dhamps_backend;
+        proxy_pass http://embapi_backend;
         proxy_http_version 1.1;
         
         proxy_set_header Host $host;
@@ -102,7 +102,7 @@ server {
 Enable site and get certificate:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/dhamps-vdb /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/embapi /etc/nginx/sites-enabled/
 sudo certbot --nginx -d api.example.com
 sudo systemctl reload nginx
 ```
@@ -141,18 +141,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
 
-  dhamps-vdb:
+  embapi:
     build: .
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dhamps-vdb.rule=Host(`api.example.com`)"
-      - "traefik.http.routers.dhamps-vdb.entrypoints=websecure"
-      - "traefik.http.routers.dhamps-vdb.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.embapi.rule=Host(`api.example.com`)"
+      - "traefik.http.routers.embapi.entrypoints=websecure"
+      - "traefik.http.routers.embapi.tls.certresolver=letsencrypt"
       # Redirect HTTP to HTTPS
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.dhamps-vdb-http.rule=Host(`api.example.com`)"
-      - "traefik.http.routers.dhamps-vdb-http.entrypoints=web"
-      - "traefik.http.routers.dhamps-vdb-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.embapi-http.rule=Host(`api.example.com`)"
+      - "traefik.http.routers.embapi-http.entrypoints=web"
+      - "traefik.http.routers.embapi-http.middlewares=redirect-to-https"
 ```
 
 #### Caddy (Automatic HTTPS)
@@ -313,7 +313,7 @@ Document and test recovery procedure:
    ```sql
    -- In pg_hba.conf
    # Allow only from application server
-   host    dhamps_vdb    dhamps_user    10.0.1.0/24    md5
+   host    embapi    embapi_user    10.0.1.0/24    md5
    ```
 
 2. **Firewall rules:**
@@ -339,8 +339,8 @@ Document and test recovery procedure:
 2. **Dedicated user:**
    ```sql
    -- Not superuser
-   CREATE USER dhamps_user WITH PASSWORD 'secure_password';
-   GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
+   CREATE USER embapi_user WITH PASSWORD 'secure_password';
+   GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
    ```
 
 3. **SSL/TLS connections:**
@@ -362,7 +362,7 @@ Document and test recovery procedure:
 2. **Backup encryption:**
    ```bash
    # Encrypt backup
-   pg_dump -U postgres dhamps_vdb | gzip | \
+   pg_dump -U postgres embapi | gzip | \
      gpg --encrypt --recipient admin@example.com > backup.sql.gz.gpg
    ```
 
@@ -417,7 +417,7 @@ Internet
     ↓
 [Reverse Proxy] ← (DMZ/Public subnet)
     ↓
-[dhamps-vdb]    ← (Application subnet)
+[embapi]    ← (Application subnet)
     ↓
 [PostgreSQL]    ← (Database subnet)
 ```
@@ -439,7 +439,7 @@ server {
     location /v1/ {
         limit_req zone=api_limit burst=20 nodelay;
         limit_req_status 429;
-        proxy_pass http://dhamps_backend;
+        proxy_pass http://embapi_backend;
     }
 }
 ```
@@ -456,13 +456,13 @@ server {
 1. **Automated daily backups:**
    ```bash
    #!/bin/bash
-   # /usr/local/bin/backup-dhamps.sh
+   # /usr/local/bin/backup-embapi.sh
    
    DATE=$(date +%Y%m%d_%H%M%S)
-   BACKUP_DIR="/backups/dhamps-vdb"
+   BACKUP_DIR="/backups/embapi"
    
    # Create backup
-   pg_dump -U dhamps_user dhamps_vdb | gzip > \
+   pg_dump -U embapi_user embapi | gzip > \
      "$BACKUP_DIR/db-$DATE.sql.gz"
    
    # Encrypt backup
@@ -477,7 +477,7 @@ server {
    
    # Upload to offsite storage
    aws s3 cp "$BACKUP_DIR/db-$DATE.sql.gz.gpg" \
-     s3://backups/dhamps-vdb/ --storage-class GLACIER
+     s3://backups/embapi/ --storage-class GLACIER
    
    # Cleanup old local backups (keep 7 days)
    find $BACKUP_DIR -name "db-*.sql.gz.gpg" -mtime +7 -delete
@@ -485,7 +485,7 @@ server {
 
 2. **Cron schedule:**
    ```cron
-   0 2 * * * /usr/local/bin/backup-dhamps.sh
+   0 2 * * * /usr/local/bin/backup-embapi.sh
    ```
 
 3. **Test restores regularly:**

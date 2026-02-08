@@ -11,15 +11,15 @@ import (
 	the "_system" account for all users to use, the Instances provide fully
 	specified connectionInstance details, including personal or project API keys for
 	Embedding service providers and can - as soon as the
-	respective function is implemented - be used to have the VDB forward texts to
+	respective function is implemented - be used to have EmbAPI forward texts to
 	the embedding platform. This can be useful either to create the embeddings to
-	store in the VDB in the first place, or to encode unseen data that
+	store in EmbAPI in the first place, or to encode unseen data that
 	similarities of stored embeddings can then be calculated against.
 
 	Both Definitions and Instances can be shared with other users. API keys are
 	recorded only for Instances, saved only in an encrypted way and never
-	displayed in any output of the VDB. (Thus, make sure to keep your own backup
-	copy in some secure location, don't rely on the VDB to be able to tell you
+	displayed in any output of EmbAPI. (Thus, make sure to keep your own backup
+	copy in some secure location, don't rely on EmbAPI to be able to tell you
 	your API key in case you forget it.)
 
 	With regard to terminology, the following models involve "owner" and "user_handle":

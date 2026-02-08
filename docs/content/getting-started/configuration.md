@@ -5,7 +5,7 @@ weight: 2
 
 # Configuration
 
-Configure dhamps-vdb using environment variables or command-line options.
+Configure embapi using environment variables or command-line options.
 
 ## Environment Variables
 
@@ -49,9 +49,9 @@ SERVICE_PORT=8880
 # Database Configuration
 SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 
 # Security
 SERVICE_ADMINKEY=your-secure-admin-key-here
@@ -63,14 +63,14 @@ ENCRYPTION_KEY=your-32-character-encryption-key-minimum
 You can also provide configuration via command-line flags:
 
 ```bash
-./dhamps-vdb \
+./embapi \
   --debug \
   -p 8880 \
   --db-host localhost \
   --db-port 5432 \
-  --db-user dhamps_user \
+  --db-user embapi_user \
   --db-password secure_password \
-  --db-name dhamps_vdb \
+  --db-name embapi \
   --admin-key your-admin-key
 ```
 
@@ -122,7 +122,7 @@ SERVICE_DBHOST=localhost
 SERVICE_DBPORT=5432
 SERVICE_DBUSER=postgres
 SERVICE_DBPASSWORD=password
-SERVICE_DBNAME=dhamps_vdb_dev
+SERVICE_DBNAME=embapi_dev
 SERVICE_ADMINKEY=dev-admin-key-change-me
 ENCRYPTION_KEY=dev-encryption-key-32-chars-min
 ```
@@ -136,9 +136,9 @@ SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=prod-db.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_prod
+SERVICE_DBUSER=embapi_prod
 SERVICE_DBPASSWORD=$(cat /run/secrets/db_password)
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 SERVICE_ADMINKEY=$(cat /run/secrets/admin_key)
 ENCRYPTION_KEY=$(cat /run/secrets/encryption_key)
 ```

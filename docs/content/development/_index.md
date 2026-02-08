@@ -5,7 +5,7 @@ weight: 6
 
 # Development Guide
 
-Information for developers contributing to dhamps-vdb.
+Information for developers contributing to embapi.
 
 ## Getting Started with Development
 
@@ -20,7 +20,7 @@ This section covers:
 ## Project Structure
 
 ```
-dhamps-vdb/
+embapi/
 ├── main.go                    # Application entry point
 ├── internal/
 │   ├── auth/                  # Authentication logic
@@ -36,7 +36,7 @@ dhamps-vdb/
 1. Make changes to code
 2. Generate sqlc code if database queries changed: `sqlc generate`
 3. Run tests: `go test -v ./...`
-4. Build: `go build -o dhamps-vdb main.go`
+4. Build: `go build -o embapi main.go`
 5. Submit pull request
 
 ## Resources

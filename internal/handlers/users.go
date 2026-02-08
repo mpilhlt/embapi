@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -51,21 +51,21 @@ func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.Upl
 	// Create API key if user does not exist
 	// storeKey := make([]byte, 64)
 	var storeKey string
-	VDBKey := ""
+	EmbAPIKey := ""
 	if u.UserHandle == input.UserHandle {
 		// User exists, so don't create API key
-		storeKey = u.VDBKey
+		storeKey = u.EmbAPIKey
 		fmt.Printf("        User %s already exists, stored key hash is %s.\n", input.UserHandle, storeKey)
 		// fmt.Printf("        User %s already exists: %v.\n", input.UserHandle, u)
-		// fmt.Printf("        User %s. Stored key hash: '%s'.\n", input.UserHandle, u.VDBKey)
-		VDBKey = "not changed"
+		// fmt.Printf("        User %s. Stored key hash: '%s'.\n", input.UserHandle, u.EmbAPIKey)
+		EmbAPIKey = "not changed"
 	} else {
 		// User does not exist, so create a new API key
-		VDBKey, err = keyGen.RandomKey(32)
+		EmbAPIKey, err = keyGen.RandomKey(32)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to create API key for user %s. %v", input.UserHandle, err))
 		}
-		hash := sha256.Sum256([]byte(VDBKey))
+		hash := sha256.Sum256([]byte(EmbAPIKey))
 		storeKey = hex.EncodeToString(hash[:])
 		// fmt.Printf("        Created user %s: API key %s (store hash: %s)\n", input.UserHandle, APIKey, storeKey)
 	}
@@ -73,7 +73,7 @@ func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.Upl
 		UserHandle: input.UserHandle,
 		Name:       pgtype.Text{String: input.Body.Name, Valid: true},
 		Email:      input.Body.Email,
-		VDBKey:     storeKey,
+		EmbAPIKey:     storeKey,
 	}
 
 	// Run the query
@@ -90,11 +90,11 @@ func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.Upl
 	response := &models.UploadUserResponse{}
 	response.Body.UserHandle = u.UserHandle
 	// Return the actual API key only if it was just created
-	// When updating an existing user, don't include the VDB key in the response
-	if VDBKey != "not changed" {
-		response.Body.VDBKey = VDBKey
+	// When updating an existing user, don't include the EmbAPI key in the response
+	if EmbAPIKey != "not changed" {
+		response.Body.EmbAPIKey = EmbAPIKey
 	} else {
-		response.Body.VDBKey = "not changed"
+		response.Body.EmbAPIKey = "not changed"
 	}
 
 	return response, nil
@@ -229,7 +229,7 @@ func getUserFunc(ctx context.Context, input *models.GetUserRequest) (*models.Get
 		UserHandle: u.UserHandle,
 		Name:       u.Name.String,
 		Email:      u.Email,
-		VDBKey:     u.VDBKey,
+		EmbAPIKey:     u.EmbAPIKey,
 		Projects:   projects,
 		Instances:  imemberships,
 	}

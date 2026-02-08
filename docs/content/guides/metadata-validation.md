@@ -9,7 +9,7 @@ This guide explains how to use JSON Schema validation to ensure consistent metad
 
 ## Overview
 
-dhamps-vdb supports optional metadata validation using JSON Schema. When you define a metadata schema for a project, the API automatically validates all embedding metadata against that schema, ensuring data quality and consistency.
+embapi supports optional metadata validation using JSON Schema. When you define a metadata schema for a project, the API automatically validates all embedding metadata against that schema, ensuring data quality and consistency.
 
 Benefits:
 - Enforce consistent metadata structure across all embeddings

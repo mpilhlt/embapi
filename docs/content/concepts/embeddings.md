@@ -5,7 +5,7 @@ weight: 4
 
 # Embeddings
 
-Embeddings are vector representations of text stored in dhamps-vdb for similarity search and retrieval.
+Embeddings are vector representations of text stored in embapi for similarity search and retrieval.
 
 ## What are Embeddings?
 

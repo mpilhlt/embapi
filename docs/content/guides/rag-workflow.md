@@ -5,20 +5,20 @@ weight: 1
 
 # Complete RAG Workflow Guide
 
-This guide demonstrates a complete Retrieval Augmented Generation (RAG) workflow using dhamps-vdb as your vector database.
+This guide demonstrates a complete Retrieval Augmented Generation (RAG) workflow using embapi as your vector database.
 
 ## Overview
 
 A typical RAG workflow involves:
 1. Generate embeddings from your text content (using an external LLM service)
-2. Upload embeddings to dhamps-vdb
+2. Upload embeddings to embapi
 3. Search for similar documents based on a query
 4. Retrieve the relevant context
 5. Use the context with an LLM to generate responses
 
 ## Prerequisites
 
-- Access to dhamps-vdb API with a valid API key
+- Access to embapi API with a valid API key
 - An external LLM service for generating embeddings (e.g., OpenAI, Cohere)
 - Text content you want to process
 
@@ -45,7 +45,7 @@ embedding_vector = response.data[0].embedding
 
 ## Step 2: Create LLM Service Instance
 
-Before uploading embeddings, create an LLM service instance in dhamps-vdb that matches your embedding configuration:
+Before uploading embeddings, create an LLM service instance in embapi that matches your embedding configuration:
 
 ```bash
 curl -X PUT "https://api.example.com/v1/llm-services/alice/my-openai" \
@@ -88,7 +88,7 @@ curl -X PUT "https://api.example.com/v1/projects/alice/my-documents" \
   }'
 ```
 
-## Step 4: Upload Embeddings to dhamps-vdb
+## Step 4: Upload Embeddings to embapi
 
 Upload your pre-generated embeddings along with metadata and optional text content:
 
@@ -232,14 +232,14 @@ import requests
 
 # Configuration
 DHAMPS_API = "https://api.example.com"
-DHAMPS_KEY = "your-dhamps-api-key"
+EMBAPI_KEY = "your-embapi-key"
 OPENAI_KEY = "your-openai-key"
 
 # Initialize OpenAI
 client = openai.OpenAI(api_key=OPENAI_KEY)
 
 def embed_and_store(text_id, text, metadata=None):
-    """Generate embedding and store in dhamps-vdb"""
+    """Generate embedding and store in embapi"""
     # Generate embedding
     response = client.embeddings.create(
         model="text-embedding-3-large",
@@ -248,11 +248,11 @@ def embed_and_store(text_id, text, metadata=None):
     )
     vector = response.data[0].embedding
     
-    # Upload to dhamps-vdb
+    # Upload to embapi
     requests.post(
         f"{DHAMPS_API}/v1/embeddings/alice/my-documents",
         headers={
-            "Authorization": f"Bearer {DHAMPS_KEY}",
+            "Authorization": f"Bearer {EMBAPI_KEY}",
             "Content-Type": "application/json"
         },
         json={
@@ -277,11 +277,11 @@ def search_similar(query, count=5):
     )
     query_vector = response.data[0].embedding
     
-    # Search in dhamps-vdb
+    # Search in embapi
     result = requests.post(
         f"{DHAMPS_API}/v1/similars/alice/my-documents?count={count}",
         headers={
-            "Authorization": f"Bearer {DHAMPS_KEY}",
+            "Authorization": f"Bearer {EMBAPI_KEY}",
             "Content-Type": "application/json"
         },
         json={"vector": query_vector}
@@ -294,7 +294,7 @@ def retrieve_context(doc_ids):
     for doc_id in doc_ids:
         response = requests.get(
             f"{DHAMPS_API}/v1/embeddings/alice/my-documents/{doc_id}",
-            headers={"Authorization": f"Bearer {DHAMPS_KEY}"}
+            headers={"Authorization": f"Bearer {EMBAPI_KEY}"}
         )
         docs.append(response.json())
     return docs

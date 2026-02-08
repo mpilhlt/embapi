@@ -5,7 +5,7 @@ weight: 7
 
 # Batch Operations Guide
 
-This guide explains how to efficiently upload multiple embeddings, manage large datasets, and implement best practices for batch operations in dhamps-vdb.
+This guide explains how to efficiently upload multiple embeddings, manage large datasets, and implement best practices for batch operations in embapi.
 
 ## Overview
 

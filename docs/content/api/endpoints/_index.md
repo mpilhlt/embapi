@@ -5,7 +5,7 @@ weight: 1
 
 # API Endpoints
 
-Complete reference for all dhamps-vdb API endpoints.
+Complete reference for all embapi API endpoints.
 
 ## Endpoint Categories
 

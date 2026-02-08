@@ -5,7 +5,7 @@ weight: 1
 
 # Installation
 
-Install dhamps-vdb by compiling from source.
+Install embapi by compiling from source.
 
 ## Prerequisites
 
@@ -17,15 +17,15 @@ Install dhamps-vdb by compiling from source.
 
 ```bash
 # Clone the repository
-git clone https://github.com/mpilhlt/dhamps-vdb.git
-cd dhamps-vdb
+git clone https://github.com/mpilhlt/embapi.git
+cd embapi
 
 # Install dependencies and generate code
 go get ./...
 sqlc generate --no-remote
 
 # Build the binary
-go build -o build/dhamps-vdb main.go
+go build -o build/embapi main.go
 ```
 
 ## Detailed Steps
@@ -53,10 +53,10 @@ This creates Go code from SQL queries in `internal/database/queries/`.
 Compile the application:
 
 ```bash
-go build -o build/dhamps-vdb main.go
+go build -o build/embapi main.go
 ```
 
-The binary will be created at `build/dhamps-vdb`.
+The binary will be created at `build/embapi`.
 
 ## Running Without Building
 
@@ -73,7 +73,7 @@ This is useful during development but slower than running a pre-built binary.
 Check that the binary was created successfully:
 
 ```bash
-./build/dhamps-vdb --help
+./build/embapi --help
 ```
 
 You should see the available command-line options.
@@ -116,7 +116,7 @@ Clean the build cache if you encounter issues:
 
 ```bash
 go clean -cache
-go build -o build/dhamps-vdb main.go
+go build -o build/embapi main.go
 ```
 
 ### Missing Dependencies

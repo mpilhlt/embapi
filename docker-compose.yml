@@ -2,11 +2,11 @@ services:
   # PostgreSQL with pgvector extension
   postgres:
     image: pgvector/pgvector:0.7.4-pg16
-    container_name: dhamps-postgres
+    container_name: embapi-postgres
     environment:
       POSTGRES_USER: ${SERVICE_DBUSER:-postgres}
       POSTGRES_PASSWORD: ${SERVICE_DBPASSWORD:-postgres}
-      POSTGRES_DB: ${SERVICE_DBNAME:-dhamps_vdb}
+      POSTGRES_DB: ${SERVICE_DBNAME:-embapi}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -17,14 +17,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dhamps-network
+      - embapi-network
 
-  # dhamps-vdb middleware
-  dhamps-vdb:
+  # embapi middleware
+  embapi:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dhamps-vdb
+    container_name: embapi
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
       SERVICE_DBPORT: ${SERVICE_DBPORT:-5432}
       SERVICE_DBUSER: ${SERVICE_DBUSER:-postgres}
       SERVICE_DBPASSWORD: ${SERVICE_DBPASSWORD:-postgres}
-      SERVICE_DBNAME: ${SERVICE_DBNAME:-dhamps_vdb}
+      SERVICE_DBNAME: ${SERVICE_DBNAME:-embapi}
       
       # Security configuration
       SERVICE_ADMINKEY: ${SERVICE_ADMINKEY}
@@ -47,12 +47,12 @@ services:
     ports:
       - "${API_PORT:-8880}:8880"
     networks:
-      - dhamps-network
+      - embapi-network
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  dhamps-network:
+  embapi-network:
     driver: bridge

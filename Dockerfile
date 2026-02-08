@@ -22,7 +22,7 @@ RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
     sqlc generate --no-remote
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dhamps-vdb main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o embapi main.go
 
 # Runtime stage
 FROM alpine:3.21
@@ -38,7 +38,7 @@ RUN addgroup -g 1000 appuser && \
 WORKDIR /app
 
 # Copy binary from builder
-COPY --from=builder /build/dhamps-vdb .
+COPY --from=builder /build/embapi .
 
 # Copy migrations (needed for database schema management)
 COPY --from=builder /build/internal/database/migrations ./internal/database/migrations
@@ -57,4 +57,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8880/docs || exit 1
 
 # Run the application
-CMD ["./dhamps-vdb"]
+CMD ["./embapi"]

@@ -17,4 +17,4 @@ Technical reference materials and specifications.
 
 - **OpenAPI Specification**: Available at `/openapi.yaml` on any running instance
 - **Go Package Documentation**: Coming soon
-- **Source Code**: [github.com/mpilhlt/dhamps-vdb](https://github.com/mpilhlt/dhamps-vdb)
+- **Source Code**: [github.com/mpilhlt/embapi](https://github.com/mpilhlt/embapi)

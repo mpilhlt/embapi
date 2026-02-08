@@ -1,6 +1,6 @@
-# docker-compose configuration for dhamps-vdb connecting to an external database
+# docker-compose configuration for embapi connecting to an external database
 # 
-# This example shows how to run dhamps-vdb as a standalone container
+# This example shows how to run embapi as a standalone container
 # that connects to an external PostgreSQL database with pgvector.
 #
 # Prerequisites:
@@ -14,12 +14,12 @@
 # 3. Run: docker-compose up -d
 
 services:
-  # dhamps-vdb middleware connecting to external database
-  dhamps-vdb:
+  # embapi middleware connecting to external database
+  embapi:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dhamps-vdb
+    container_name: embapi
     environment:
       # Service configuration
       SERVICE_DEBUG: ${SERVICE_DEBUG:-false}

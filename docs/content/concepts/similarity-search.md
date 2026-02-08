@@ -130,7 +130,7 @@ Value to **exclude** from results.
 
 ### Cosine Similarity
 
-dhamps-vdb uses cosine similarity:
+embapi uses cosine similarity:
 
 ```
 similarity = 1 - cosine_distance

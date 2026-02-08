@@ -1,4 +1,4 @@
-module github.com/mpilhlt/dhamps-vdb
+module github.com/mpilhlt/embapi
 
 go 1.24.0
 

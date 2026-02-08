@@ -41,7 +41,7 @@ func TestProjectsFunc(t *testing.T) {
 	}
 
 	// Create LLM Service Instance to be used in embeddings tests
-	instanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the dhamps-vdb code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
+	instanceJSON := `{ "instance_handle": "embedding1", "endpoint": "https://api.foo.bar/v1/embed", "description": "An LLM Service just for testing if the embapi code is working", "api_standard": "openai", "model": "embed-test1", "dimensions": 5}`
 	_, err = createInstance(t, instanceJSON, "alice", aliceAPIKey)
 	if err != nil {
 		t.Fatalf("Error creating LLM service embedding1 for testing: %v\n", err)

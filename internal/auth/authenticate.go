@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,25 +24,25 @@ const (
 // Config is the security scheme configuration for the API.
 var Config = map[string]*huma.SecurityScheme{
 	"adminAuth": {
-		Type:   "VDBKey",
+		Type:   "EmbAPIKey",
 		In:     "header",
 		Scheme: "bearer",
 		Name:   "Authorization",
 	},
 	"ownerAuth": {
-		Type:   "VDBKey",
+		Type:   "EmbAPIKey",
 		In:     "header",
 		Scheme: "bearer",
 		Name:   "Authorization",
 	},
 	"readerAuth": {
-		Type:   "VDBKey",
+		Type:   "EmbAPIKey",
 		In:     "header",
 		Scheme: "bearer",
 		Name:   "Authorization",
 	},
 	"editorAuth": {
-		Type:   "VDBKey",
+		Type:   "EmbAPIKey",
 		In:     "header",
 		Scheme: "bearer",
 		Name:   "Authorization",
@@ -82,10 +82,10 @@ func AuthTermination(api huma.API) func(ctx huma.Context, next func(huma.Context
 	}
 }
 
-// VDBKey... functions return a middleware function that checks for a valid API key.
+// EmbAPIKey... functions return a middleware function that checks for a valid API key.
 
-// VDBKeyAdminAuth checks for an admin API key in the Authorization header.
-func VDBKeyAdminAuth(api huma.API, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
+// EmbAPIKeyAdminAuth checks for an admin API key in the Authorization header.
+func EmbAPIKeyAdminAuth(api huma.API, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 
 		// Check if adminAuth is applicable
@@ -116,8 +116,8 @@ func VDBKeyAdminAuth(api huma.API, options *models.Options) func(ctx huma.Contex
 	}
 }
 
-// VDBKeyOwnerAuth checks for an owner API key in the Authorization header.
-func VDBKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
+// EmbAPIKeyOwnerAuth checks for an owner API key in the Authorization header.
+func EmbAPIKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 
 		// Check if ownerAuth is applicable
@@ -164,7 +164,7 @@ func VDBKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) 
 		}
 
 		// fmt.Printf("        check owner hash against API token: %s/%s ...\n", storedHash, token)
-		if VDBKeyIsValid(token, storedHash) {
+		if EmbAPIKeyIsValid(token, storedHash) {
 			ctx = huma.WithValue(ctx, IsOwnerKey, true)
 			ctx = huma.WithValue(ctx, AuthUserKey, owner)
 			fmt.Printf("        Owner authentication successful: %s\n", owner)
@@ -176,8 +176,8 @@ func VDBKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) 
 	}
 }
 
-// VDBKeyReaderAuth checks for a reader API key in the Authorization header.
-func VDBKeyReaderAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
+// EmbAPIKeyReaderAuth checks for a reader API key in the Authorization header.
+func EmbAPIKeyReaderAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		// Check if readerAuth is applicable
 		isAuthorizationRequired := false
@@ -275,9 +275,9 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 				return
 			}
 			for _, authKey := range allowedKeys {
-				storedHash := authKey.VDBKey
+				storedHash := authKey.EmbAPIKey
 
-				if VDBKeyIsValid(token, storedHash) {
+				if EmbAPIKeyIsValid(token, storedHash) {
 					fmt.Print("        Reader authentication successful\n")
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
@@ -314,9 +314,9 @@ func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 				return
 			}
 			for _, authKey := range allowedKeys {
-				storedHash := authKey.VDBKey
+				storedHash := authKey.EmbAPIKey
 
-				if VDBKeyIsValid(token, storedHash) {
+				if EmbAPIKeyIsValid(token, storedHash) {
 					fmt.Print("        Reader authentication successful\n")
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
@@ -353,9 +353,9 @@ func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 				return
 			}
 			for _, authKey := range allowedKeys {
-				storedHash := authKey.VDBKey
+				storedHash := authKey.EmbAPIKey
 
-				if VDBKeyIsValid(token, storedHash) {
+				if EmbAPIKeyIsValid(token, storedHash) {
 					fmt.Print("        Reader authentication successful\n")
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
@@ -368,9 +368,9 @@ func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 	}
 }
 
-// VDBKeyEditorAuth checks for an editor API key in the Authorization header.
+// EmbAPIKeyEditorAuth checks for an editor API key in the Authorization header.
 // This allows users with "editor" or "owner" role to authenticate.
-func VDBKeyEditorAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
+func EmbAPIKeyEditorAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		// Check if editorAuth is applicable
 		isAuthorizationRequired := false
@@ -452,9 +452,9 @@ func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 			if authKey.Role != "editor" && authKey.Role != "owner" {
 				continue
 			}
-			storedHash := authKey.VDBKey
+			storedHash := authKey.EmbAPIKey
 
-			if VDBKeyIsValid(token, storedHash) {
+			if EmbAPIKeyIsValid(token, storedHash) {
 				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
@@ -490,9 +490,9 @@ func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 			return
 		}
 		for _, authKey := range allowedKeys {
-			storedHash := authKey.VDBKey
+			storedHash := authKey.EmbAPIKey
 
-			if VDBKeyIsValid(token, storedHash) {
+			if EmbAPIKeyIsValid(token, storedHash) {
 				fmt.Print("        Editor authentication successful\n")
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
@@ -530,9 +530,9 @@ func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 			if authKey.Role != "editor" && authKey.Role != "owner" {
 				continue
 			}
-			storedHash := authKey.VDBKey
+			storedHash := authKey.EmbAPIKey
 
-			if VDBKeyIsValid(token, storedHash) {
+			if EmbAPIKeyIsValid(token, storedHash) {
 				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
@@ -544,8 +544,8 @@ func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 	}
 }
 
-// VDBKeyIsValid checks if the given API key is valid
-func VDBKeyIsValid(rawKey string, storedHash string) bool {
+// EmbAPIKeyIsValid checks if the given API key is valid
+func EmbAPIKeyIsValid(rawKey string, storedHash string) bool {
 	hash := sha256.Sum256([]byte(rawKey))
 	hashedKey := hex.EncodeToString(hash[:])
 

@@ -5,7 +5,7 @@ weight: 1
 
 # Docker Deployment
 
-This guide covers production-focused Docker deployment for dhamps-vdb.
+This guide covers production-focused Docker deployment for embapi.
 
 ## Overview
 
@@ -23,8 +23,8 @@ For detailed Docker setup instructions, see [Getting Started with Docker](../../
 
 ```bash
 # Clone repository
-git clone https://github.com/mpilhlt/dhamps-vdb.git
-cd dhamps-vdb
+git clone https://github.com/mpilhlt/embapi.git
+cd embapi
 
 # Generate secure keys
 ./docker-setup.sh
@@ -50,7 +50,7 @@ Always run behind a reverse proxy (nginx, Traefik, Caddy) for:
 Example nginx configuration:
 
 ```nginx
-upstream dhamps-vdb {
+upstream embapi {
     server localhost:8880;
 }
 
@@ -62,7 +62,7 @@ server {
     ssl_certificate_key /path/to/key.pem;
 
     location / {
-        proxy_pass http://dhamps-vdb;
+        proxy_pass http://embapi;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -77,7 +77,7 @@ Set resource limits in `docker-compose.yml`:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     deploy:
       resources:
         limits:
@@ -107,8 +107,8 @@ services:
   postgres:
     image: pgvector/pgvector:0.7.4-pg16  # Specific version
   
-  dhamps-vdb:
-    image: dhamps-vdb:v0.1.0  # Tag your builds
+  embapi:
+    image: embapi:v0.1.0  # Tag your builds
 ```
 
 ### Health Monitoring
@@ -117,10 +117,10 @@ The image includes health checks. Monitor with:
 
 ```bash
 # Check health status
-docker inspect --format='{{.State.Health.Status}}' dhamps-vdb
+docker inspect --format='{{.State.Health.Status}}' embapi
 
 # View health check logs
-docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' dhamps-vdb
+docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' embapi
 
 # Integrate with monitoring (Prometheus, etc.)
 ```
@@ -131,7 +131,7 @@ Configure logging drivers in `docker-compose.yml`:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     logging:
       driver: "json-file"
       options:
@@ -143,7 +143,7 @@ Or use centralized logging:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     logging:
       driver: "syslog"
       options:
@@ -169,16 +169,16 @@ Update `.env`:
 ```bash
 SERVICE_DBHOST=db.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 ```
 
 Modify `docker-compose.yml` to remove postgres service:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     build: .
     ports:
       - "8880:8880"
@@ -194,7 +194,7 @@ Run multiple instances behind a load balancer:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     build: .
     deploy:
       replicas: 3
@@ -218,17 +218,17 @@ For high availability:
 
 ```bash
 # Automated daily backups
-0 2 * * * docker-compose exec -T postgres pg_dump -U postgres dhamps_vdb | gzip > /backups/dhamps-vdb-$(date +\%Y\%m\%d).sql.gz
+0 2 * * * docker-compose exec -T postgres pg_dump -U postgres embapi | gzip > /backups/embapi-$(date +\%Y\%m\%d).sql.gz
 
 # Keep last 30 days
-find /backups -name "dhamps-vdb-*.sql.gz" -mtime +30 -delete
+find /backups -name "embapi-*.sql.gz" -mtime +30 -delete
 ```
 
 ### Volume Backups
 
 ```bash
 # Backup Docker volume
-docker run --rm -v dhamps-vdb_postgres_data:/data -v /backups:/backup alpine tar czf /backup/postgres-data-$(date +\%Y\%m\%d).tar.gz /data
+docker run --rm -v embapi_postgres_data:/data -v /backups:/backup alpine tar czf /backup/postgres-data-$(date +\%Y\%m\%d).tar.gz /data
 ```
 
 ### Environment Configuration Backups
@@ -247,23 +247,23 @@ gpg --encrypt --recipient admin@example.com .env > .env.gpg
 docker stats
 
 # Check container logs
-docker-compose logs -f --tail=100 dhamps-vdb
+docker-compose logs -f --tail=100 embapi
 
 # Check slow queries (if database is slow)
-docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT * FROM pg_stat_statements ORDER BY total_time DESC LIMIT 10;"
+docker-compose exec postgres psql -U postgres -d embapi -c "SELECT * FROM pg_stat_statements ORDER BY total_time DESC LIMIT 10;"
 ```
 
 ### Network Connectivity Issues
 
 ```bash
 # Test database connection from container
-docker-compose exec dhamps-vdb nc -zv postgres 5432
+docker-compose exec embapi nc -zv postgres 5432
 
 # Check DNS resolution
-docker-compose exec dhamps-vdb nslookup postgres
+docker-compose exec embapi nslookup postgres
 
 # Test API from inside container
-docker-compose exec dhamps-vdb wget -O- http://localhost:8880/docs
+docker-compose exec embapi wget -O- http://localhost:8880/docs
 ```
 
 ### Update and Rollback

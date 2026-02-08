@@ -2,7 +2,7 @@
 
 ## Summary
 
-Created **50 markdown files** with **17,102 lines** of comprehensive Hugo documentation for dhamps-vdb.
+Created **50 markdown files** with **17,102 lines** of comprehensive Hugo documentation for embapi.
 
 ## Directory Structure
 

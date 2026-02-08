@@ -5,11 +5,11 @@ weight: 3
 
 # User Guides
 
-Step-by-step guides for common tasks and workflows with dhamps-vdb.
+Step-by-step guides for common tasks and workflows with embapi.
 
 ## Available Guides
 
-This section contains practical guides for using dhamps-vdb in real-world scenarios:
+This section contains practical guides for using embapi in real-world scenarios:
 
 - **RAG Workflows** - Implement Retrieval Augmented Generation
 - **Project Sharing** - Collaborate with other users

@@ -1,9 +1,9 @@
-baseURL = 'https://mpilhlt.github.io/dhamps-vdb/'
+baseURL = 'https://mpilhlt.github.io/embapi/'
 languageCode = 'en-us'
-title = 'dhamps-vdb Documentation'
+title = 'EmbAPI Documentation'
 theme = 'book'
 
 [params]
-  BookRepo = 'https://github.com/mpilhlt/dhamps-vdb'
+  BookRepo = 'https://github.com/mpilhlt/embapi'
   BookEditPath = 'edit/main'
   BookSearch = true

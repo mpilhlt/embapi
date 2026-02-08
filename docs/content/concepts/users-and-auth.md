@@ -5,7 +5,7 @@ weight: 2
 
 # Users and Authentication
 
-dhamps-vdb uses token-based authentication with API keys for all operations.
+embapi uses token-based authentication with API keys for all operations.
 
 ## User Model
 
@@ -14,7 +14,7 @@ dhamps-vdb uses token-based authentication with API keys for all operations.
 - **user_handle**: Unique identifier (3-20 characters, alphanumeric + underscore)
 - **name**: Full name (optional)
 - **email**: Email address (unique, required)
-- **vdb_key**: API key (SHA-256 hash, 64 characters)
+- **embapi_key**: API key (SHA-256 hash, 64 characters)
 - **created_at**: Timestamp of creation
 - **updated_at**: Timestamp of last update
 
@@ -82,12 +82,12 @@ Authorization: Bearer ADMIN_KEY
   "user_handle": "researcher1",
   "name": "Research User",
   "email": "researcher@example.com",
-  "vdb_key": "024v2013621509245f2e24abcdef...",
+  "embapi_key": "024v2013621509245f2e24abcdef...",
   "created_at": "2024-01-15T10:30:00Z"
 }
 ```
 
-**Important:** Save the `vdb_key` immediately - it cannot be recovered later.
+**Important:** Save the `embapi_key` immediately - it cannot be recovered later.
 
 ### User Handle Restrictions
 
@@ -104,7 +104,7 @@ Users can view their own information:
 
 ```bash
 GET /v1/users/alice
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Admins can view any user:
@@ -131,7 +131,7 @@ Users can update their own information:
 
 ```bash
 PATCH /v1/users/alice
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 
 {
   "name": "Alice Smith-Jones",
@@ -145,7 +145,7 @@ Users can delete their own account:
 
 ```bash
 DELETE /v1/users/alice
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Admins can delete any user:
@@ -218,9 +218,9 @@ Users own three types of resources:
 
 ### User Key vs. LLM API Keys
 
-dhamps-vdb handles two types of keys:
+embapi handles two types of keys:
 
-1. **User API keys** (`vdb_key`): Authenticate users to dhamps-vdb
+1. **User API keys** (`embapi_key`): Authenticate users to embapi
    - Stored as SHA-256 hash in database
    - Never encrypted (one-way hash)
    - Returned only once on user creation
@@ -286,8 +286,8 @@ curl -X POST http://localhost:8880/v1/users \
     "name": "Research User"
   }'
 
-# Save returned vdb_key
-export USER_KEY="returned-vdb-key"
+# Save returned embapi_key
+export USER_KEY="returned-embapi-key"
 
 # User verifies access
 curl -X GET http://localhost:8880/v1/users/researcher1 \

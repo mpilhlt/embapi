@@ -16,7 +16,7 @@ API standards are referenced by LLM service instances to determine how to authen
 - **Google Gemini**: API key as query parameter
 - **Ollama**: No authentication required
 
-Pre-seeded standards are available for common providers. See [testdata/valid_api_standard_*.json](https://github.com/mpilhlt/dhamps-vdb/tree/main/testdata) for examples.
+Pre-seeded standards are available for common providers. See [testdata/valid_api_standard_*.json](https://github.com/mpilhlt/embapi/tree/main/testdata) for examples.
 
 ---
 
@@ -454,4 +454,4 @@ curl -X PUT "https://api.example.com/v1/llm-services/alice/my-vllm" \
 
 - [LLM Services](llm-services/) - LLM service instances reference API standards
 - [Authentication](../authentication/) - User authentication methods
-- [Testdata Examples](https://github.com/mpilhlt/dhamps-vdb/tree/main/testdata) - Example API standard definitions
+- [Testdata Examples](https://github.com/mpilhlt/embapi/tree/main/testdata) - Example API standard definitions

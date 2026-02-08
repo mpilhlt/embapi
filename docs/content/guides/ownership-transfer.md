@@ -5,7 +5,7 @@ weight: 4
 
 # Ownership Transfer Guide
 
-This guide explains how to transfer project ownership between users in dhamps-vdb.
+This guide explains how to transfer project ownership between users in embapi.
 
 ## Overview
 

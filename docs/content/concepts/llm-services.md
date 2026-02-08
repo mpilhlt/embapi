@@ -9,7 +9,7 @@ LLM Services configure embedding generation, defining models, dimensions, and AP
 
 ## Architecture
 
-dhamps-vdb separates LLM services into two concepts:
+embapi separates LLM services into two concepts:
 
 ### LLM Service Definitions
 
@@ -48,7 +48,7 @@ The `_system` user provides default definitions:
 
 ```bash
 GET /v1/llm-services/_system
-Authorization: Bearer user_vdb_key
+Authorization: Bearer user_embapi_key
 ```
 
 Returns list of available system definitions.
@@ -159,7 +159,7 @@ List all accessible instances (owned + shared):
 
 ```bash
 GET /v1/llm-services/alice
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Returns instances where alice is owner or has been granted access.
@@ -168,7 +168,7 @@ Returns instances where alice is owner or has been granted access.
 
 ```bash
 GET /v1/llm-services/alice/my-openai
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Returns instance configuration (API key not included).
@@ -190,7 +190,7 @@ Only owner can update instances.
 
 ```bash
 DELETE /v1/llm-services/alice/my-openai
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 **Constraints:**
@@ -310,8 +310,8 @@ Planned features:
 Users must generate embeddings externally:
 
 1. Generate embeddings using LLM API (OpenAI, Cohere, etc.)
-2. Upload pre-generated embeddings to dhamps-vdb
-3. Use dhamps-vdb for storage and similarity search
+2. Upload pre-generated embeddings to embapi
+3. Use embapi for storage and similarity search
 
 ## Common Patterns
 

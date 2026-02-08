@@ -5,16 +5,16 @@ weight: 2
 
 # Docker Deployment
 
-Deploy dhamps-vdb using Docker containers. This is the recommended approach for most users.
+Deploy embapi using Docker containers. This is the recommended approach for most users.
 
 ## Quick Start
 
-The fastest way to get dhamps-vdb running with Docker:
+The fastest way to get embapi running with Docker:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mpilhlt/dhamps-vdb.git
-cd dhamps-vdb
+git clone https://github.com/mpilhlt/embapi.git
+cd embapi
 
 # Run automated setup (generates secure keys)
 ./docker-setup.sh
@@ -23,7 +23,7 @@ cd dhamps-vdb
 docker-compose up -d
 
 # Check logs
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 
 # Access the API
 curl http://localhost:8880/docs
@@ -33,7 +33,7 @@ curl http://localhost:8880/docs
 
 The Docker Compose setup includes:
 
-- **dhamps-vdb**: The vector database API service
+- **embapi**: The vector database API service
 - **PostgreSQL 16**: Database with pgvector extension
 - **Persistent storage**: Named volume for database data
 
@@ -77,7 +77,7 @@ services:
     image: pgvector/pgvector:0.7.4-pg16
     # PostgreSQL with pgvector support
     
-  dhamps-vdb:
+  embapi:
     build: .
     # The API service
     depends_on:
@@ -107,24 +107,24 @@ docker-compose up -d
 
 ### Option 2: Standalone Container with External Database
 
-Run only the dhamps-vdb container:
+Run only the embapi container:
 
 ```bash
 # Build the image
-docker build -t dhamps-vdb:latest .
+docker build -t embapi:latest .
 
 # Run the container
 docker run -d \
-  --name dhamps-vdb \
+  --name embapi \
   -p 8880:8880 \
   -e SERVICE_DBHOST=your-db-host \
   -e SERVICE_DBPORT=5432 \
   -e SERVICE_DBUSER=dbuser \
   -e SERVICE_DBPASSWORD=dbpass \
-  -e SERVICE_DBNAME=dhamps_vdb \
+  -e SERVICE_DBNAME=embapi \
   -e SERVICE_ADMINKEY=admin-key \
   -e ENCRYPTION_KEY=encryption-key \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 **Use when:**
@@ -138,7 +138,7 @@ Modify `docker-compose.yml` to remove the postgres service:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     build: .
     ports:
       - "${API_PORT:-8880}:8880"
@@ -152,19 +152,19 @@ services:
 ### Standard Build
 
 ```bash
-docker build -t dhamps-vdb:latest .
+docker build -t embapi:latest .
 ```
 
 ### Custom Tag
 
 ```bash
-docker build -t dhamps-vdb:v0.1.0 .
+docker build -t embapi:v0.1.0 .
 ```
 
 ### Clean Build (No Cache)
 
 ```bash
-docker build --no-cache -t dhamps-vdb:latest .
+docker build --no-cache -t embapi:latest .
 ```
 
 ### Multi-Stage Build Details
@@ -201,7 +201,7 @@ docker-compose logs
 docker-compose logs -f
 
 # Specific service
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 docker-compose logs -f postgres
 ```
 
@@ -225,7 +225,7 @@ docker-compose down -v
 docker-compose restart
 
 # Restart specific service
-docker-compose restart dhamps-vdb
+docker-compose restart embapi
 ```
 
 ## Data Persistence
@@ -250,17 +250,17 @@ docker volume ls
 ### Inspect Volume
 
 ```bash
-docker volume inspect dhamps-vdb_postgres_data
+docker volume inspect embapi_postgres_data
 ```
 
 ### Backup Database
 
 ```bash
 # Create backup
-docker-compose exec postgres pg_dump -U postgres dhamps_vdb > backup.sql
+docker-compose exec postgres pg_dump -U postgres embapi > backup.sql
 
 # Restore from backup
-docker-compose exec -T postgres psql -U postgres dhamps_vdb < backup.sql
+docker-compose exec -T postgres psql -U postgres embapi < backup.sql
 ```
 
 ## Networking
@@ -278,7 +278,7 @@ http://localhost:8880
 Use the service name as hostname:
 
 ```
-http://dhamps-vdb:8880
+http://embapi:8880
 ```
 
 ### Custom Network
@@ -348,7 +348,7 @@ curl http://localhost:8880/docs
 
 ```bash
 # Connect to PostgreSQL
-docker-compose exec postgres psql -U postgres -d dhamps_vdb
+docker-compose exec postgres psql -U postgres -d embapi
 
 # Check pgvector extension
 \dx
@@ -374,7 +374,7 @@ curl -X POST http://localhost:8880/v1/users \
 
 Check logs:
 ```bash
-docker-compose logs dhamps-vdb
+docker-compose logs embapi
 ```
 
 Common issues:
@@ -392,7 +392,7 @@ docker-compose ps
 docker-compose logs postgres
 
 # Test connection
-docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT 1;"
+docker-compose exec postgres psql -U postgres -d embapi -c "SELECT 1;"
 ```
 
 ### Can't Connect to API
@@ -402,10 +402,10 @@ docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT 1;"
 docker ps
 
 # Check port mapping
-docker port dhamps-vdb
+docker port embapi
 
 # Test from inside container
-docker-compose exec dhamps-vdb wget -O- http://localhost:8880/docs
+docker-compose exec embapi wget -O- http://localhost:8880/docs
 
 # Test from host
 curl http://localhost:8880/docs
@@ -417,7 +417,7 @@ The container runs as non-root user `appuser` (UID 1000). If you have permission
 
 ```bash
 # Check volume permissions
-docker volume inspect dhamps-vdb_postgres_data
+docker volume inspect embapi_postgres_data
 ```
 
 ### Reset Everything
@@ -427,7 +427,7 @@ docker volume inspect dhamps-vdb_postgres_data
 docker-compose down -v
 
 # Remove images
-docker rmi dhamps-vdb:latest
+docker rmi embapi:latest
 docker rmi pgvector/pgvector:0.7.4-pg16
 
 # Start fresh
@@ -440,7 +440,7 @@ If Docker build fails with network errors:
 
 ```bash
 # Try with host network
-docker build --network=host -t dhamps-vdb:latest .
+docker build --network=host -t embapi:latest .
 ```
 
 ## Advanced Configuration
@@ -451,7 +451,7 @@ Add to `docker-compose.yml`:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     deploy:
       resources:
         limits:
@@ -474,7 +474,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 View health status:
 
 ```bash
-docker inspect --format='{{.State.Health.Status}}' dhamps-vdb
+docker inspect --format='{{.State.Health.Status}}' embapi
 ```
 
 ### Custom Dockerfile Builds
@@ -484,7 +484,7 @@ You can customize the build:
 ```bash
 docker build \
   --build-arg GO_VERSION=1.24 \
-  -t dhamps-vdb:custom .
+  -t embapi:custom .
 ```
 
 ## External Database Setup
@@ -495,37 +495,37 @@ If using an external PostgreSQL database:
 
 ```sql
 -- Create database
-CREATE DATABASE dhamps_vdb;
+CREATE DATABASE embapi;
 
 -- Create user
-CREATE USER dhamps_user WITH PASSWORD 'secure_password';
+CREATE USER embapi_user WITH PASSWORD 'secure_password';
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE dhamps_vdb TO dhamps_user;
+GRANT ALL PRIVILEGES ON DATABASE embapi TO embapi_user;
 
 -- Connect to database
-\c dhamps_vdb
+\c embapi
 
 -- Grant schema permissions
-GRANT ALL ON SCHEMA public TO dhamps_user;
+GRANT ALL ON SCHEMA public TO embapi_user;
 
 -- Enable pgvector
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-### Configure dhamps-vdb
+### Configure embapi
 
 Update `.env`:
 
 ```bash
 SERVICE_DBHOST=external-db.example.com
 SERVICE_DBPORT=5432
-SERVICE_DBUSER=dhamps_user
+SERVICE_DBUSER=embapi_user
 SERVICE_DBPASSWORD=secure_password
-SERVICE_DBNAME=dhamps_vdb
+SERVICE_DBNAME=embapi
 ```
 
-Then run only the dhamps-vdb service or use a standalone container.
+Then run only the embapi service or use a standalone container.
 
 ## Next Steps
 

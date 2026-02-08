@@ -5,11 +5,11 @@ weight: 1
 
 # Testing Guide
 
-This guide covers how to run and write tests for dhamps-vdb.
+This guide covers how to run and write tests for embapi.
 
 ## Running Tests
 
-dhamps-vdb uses integration tests that spin up real PostgreSQL containers using [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/). This approach ensures tests run against actual database instances with pgvector support.
+embapi uses integration tests that spin up real PostgreSQL containers using [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/). This approach ensures tests run against actual database instances with pgvector support.
 
 ### Prerequisites
 
@@ -124,7 +124,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
+	"github.com/mpilhlt/embapi/internal/database"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -719,7 +719,7 @@ type GetKeysByDefinitionParams struct {
 
 type GetKeysByDefinitionRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
-	VDBKey     string `db:"vdb_key" json:"vdb_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByDefinition(ctx context.Context, arg GetKeysByDefinitionParams) ([]GetKeysByDefinitionRow, error) {
@@ -736,7 +736,7 @@ func (q *Queries) GetKeysByDefinition(ctx context.Context, arg GetKeysByDefiniti
 	var items []GetKeysByDefinitionRow
 	for rows.Next() {
 		var i GetKeysByDefinitionRow
-		if err := rows.Scan(&i.UserHandle, &i.VDBKey); err != nil {
+		if err := rows.Scan(&i.UserHandle, &i.EmbAPIKey); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -769,7 +769,7 @@ type GetKeysByInstanceParams struct {
 type GetKeysByInstanceRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
 	Role       string `db:"role" json:"role"`
-	VDBKey     string `db:"vdb_key" json:"vdb_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByInstance(ctx context.Context, arg GetKeysByInstanceParams) ([]GetKeysByInstanceRow, error) {
@@ -786,7 +786,7 @@ func (q *Queries) GetKeysByInstance(ctx context.Context, arg GetKeysByInstancePa
 	var items []GetKeysByInstanceRow
 	for rows.Next() {
 		var i GetKeysByInstanceRow
-		if err := rows.Scan(&i.UserHandle, &i.Role, &i.VDBKey); err != nil {
+		if err := rows.Scan(&i.UserHandle, &i.Role, &i.EmbAPIKey); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -819,7 +819,7 @@ type GetKeysByProjectParams struct {
 type GetKeysByProjectRow struct {
 	UserHandle string `db:"user_handle" json:"user_handle"`
 	Role       string `db:"role" json:"role"`
-	VDBKey     string `db:"vdb_key" json:"vdb_key"`
+	EmbAPIKey  string `db:"vdb_key" json:"vdb_key"`
 }
 
 func (q *Queries) GetKeysByProject(ctx context.Context, arg GetKeysByProjectParams) ([]GetKeysByProjectRow, error) {
@@ -836,7 +836,7 @@ func (q *Queries) GetKeysByProject(ctx context.Context, arg GetKeysByProjectPara
 	var items []GetKeysByProjectRow
 	for rows.Next() {
 		var i GetKeysByProjectRow
-		if err := rows.Scan(&i.UserHandle, &i.Role, &i.VDBKey); err != nil {
+		if err := rows.Scan(&i.UserHandle, &i.Role, &i.EmbAPIKey); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -2165,7 +2165,7 @@ func (q *Queries) RetrieveUser(ctx context.Context, userHandle string) (User, er
 		&i.UserHandle,
 		&i.Name,
 		&i.Email,
-		&i.VDBKey,
+		&i.EmbAPIKey,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -2614,7 +2614,7 @@ type UpsertUserParams struct {
 	UserHandle string      `db:"user_handle" json:"user_handle"`
 	Name       pgtype.Text `db:"name" json:"name"`
 	Email      string      `db:"email" json:"email"`
-	VDBKey     string      `db:"vdb_key" json:"vdb_key"`
+	EmbAPIKey  string      `db:"vdb_key" json:"vdb_key"`
 }
 
 // Generate go code with: sqlc generate
@@ -2637,7 +2637,7 @@ func (q *Queries) UpsertUser(ctx context.Context, arg UpsertUserParams) (string,
 		arg.UserHandle,
 		arg.Name,
 		arg.Email,
-		arg.VDBKey,
+		arg.EmbAPIKey,
 	)
 	var user_handle string
 	err := row.Scan(&user_handle)

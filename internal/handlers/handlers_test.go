@@ -14,10 +14,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/auth"
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/handlers"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/auth"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/handlers"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	huma "github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
@@ -184,10 +184,10 @@ func startTestServer(t *testing.T, pool *pgxpool.Pool, keyGen handlers.RandomKey
 	config.Components.SecuritySchemes = auth.Config
 	router := http.NewServeMux()
 	api := humago.New(router, config)
-	api.UseMiddleware(auth.VDBKeyAdminAuth(api, &options))
-	api.UseMiddleware(auth.VDBKeyOwnerAuth(api, pool, &options))
-	api.UseMiddleware(auth.VDBKeyEditorAuth(api, pool, &options))
-	api.UseMiddleware(auth.VDBKeyReaderAuth(api, pool, &options))
+	api.UseMiddleware(auth.EmbAPIKeyAdminAuth(api, &options))
+	api.UseMiddleware(auth.EmbAPIKeyOwnerAuth(api, pool, &options))
+	api.UseMiddleware(auth.EmbAPIKeyEditorAuth(api, pool, &options))
+	api.UseMiddleware(auth.EmbAPIKeyReaderAuth(api, pool, &options))
 	api.UseMiddleware(auth.AuthTermination(api))
 
 	err := handlers.AddRoutes(pool, keyGen, api)
@@ -309,14 +309,14 @@ func createUser(t *testing.T, userJSON string) (string, error) {
 		return "", err
 	}
 	assert.NoError(t, err)
-	fmt.Printf("        Successfully created user (handle: \"%s\", VDBKey: \"%s\").\n", userInfo.UserHandle, userInfo.VDBKey)
+	fmt.Printf("        Successfully created user (handle: \"%s\", EmbAPIKey: \"%s\").\n", userInfo.UserHandle, userInfo.EmbAPIKey)
 	// fmt.Printf("        User info: %v\n", userInfo)
-	return userInfo.VDBKey, nil
+	return userInfo.EmbAPIKey, nil
 }
 
 // createProject creates a project and returns the project ID and an error value
 // it accepts a JSON string encoding the project object as input
-func createProject(t *testing.T, projectJSON string, user string, VDBKey string) (int, error) {
+func createProject(t *testing.T, projectJSON string, user string, EmbAPIKey string) (int, error) {
 	fmt.Print("    Creating project ")
 	jsonInput := &struct {
 		Handle         string `json:"project_handle" doc:"Handle of created or updated project"`
@@ -336,7 +336,7 @@ func createProject(t *testing.T, projectJSON string, user string, VDBKey string)
 	requestURL := fmt.Sprintf("http://%s:%d/v1/projects/%s/%s", options.Host, options.Port, user, jsonInput.Handle)
 	requestBody := bytes.NewReader([]byte(projectJSON))
 	req, err := http.NewRequest(http.MethodPut, requestURL, requestBody)
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
+	req.Header.Set("Authorization", "Bearer "+EmbAPIKey)
 	assert.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -366,7 +366,7 @@ func createProject(t *testing.T, projectJSON string, user string, VDBKey string)
 
 // createAPIStandard creates an API standard definition for testing and returns the handle and an error value
 // it accepts a JSON string encoding the API standard object as input
-func createAPIStandard(t *testing.T, apiStandardJSON string, VDBKey string) (string, error) {
+func createAPIStandard(t *testing.T, apiStandardJSON string, EmbAPIKey string) (string, error) {
 	fmt.Print("    Creating API standard ")
 	jsonInput := &struct {
 		APIStandardHandle string `json:"api_standard_handle" doc:"Handle of created or updated api standard"`
@@ -384,7 +384,7 @@ func createAPIStandard(t *testing.T, apiStandardJSON string, VDBKey string) (str
 	requestURL := fmt.Sprintf("http://%s:%d/v1/api-standards/%s", options.Host, options.Port, jsonInput.APIStandardHandle)
 	requestBody := bytes.NewReader([]byte(apiStandardJSON))
 	req, err := http.NewRequest(http.MethodPut, requestURL, requestBody)
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
+	req.Header.Set("Authorization", "Bearer "+EmbAPIKey)
 	assert.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -412,7 +412,7 @@ func createAPIStandard(t *testing.T, apiStandardJSON string, VDBKey string) (str
 // it accepts a JSON string encoding the LLM service instance object as input
 // NOTE: This function is kept for backward compatibility with existing tests
 // It creates an LLM Service Instance (not a Definition)
-func createInstance(t *testing.T, instanceJSON string, user string, VDBKey string) (string, error) {
+func createInstance(t *testing.T, instanceJSON string, user string, EmbAPIKey string) (string, error) {
 	fmt.Print("    Creating LLM service instance ")
 
 	// Parse JSON to extract handle - support both old and new field names
@@ -432,7 +432,7 @@ func createInstance(t *testing.T, instanceJSON string, user string, VDBKey strin
 	requestURL := fmt.Sprintf("http://%s:%d/v1/llm-instances/%s/%s", options.Host, options.Port, user, handle)
 	requestBody := bytes.NewReader([]byte(instanceJSON))
 	req, err := http.NewRequest(http.MethodPut, requestURL, requestBody)
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
+	req.Header.Set("Authorization", "Bearer "+EmbAPIKey)
 	assert.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -466,7 +466,7 @@ func createInstance(t *testing.T, instanceJSON string, user string, VDBKey strin
 
 // createDefinition creates an LLM service definition for testing and returns the handle and an error value
 // it accepts a JSON string encoding the LLM service definition object as input
-func createDefinition(t *testing.T, DefinitionJSON string, user string, VDBKey string) (int32, error) {
+func createDefinition(t *testing.T, DefinitionJSON string, user string, EmbAPIKey string) (int32, error) {
 	fmt.Print("    Creating LLM service definition ")
 	jsonInput := &struct {
 		Owner            string `json:"owner" doc:"User handle of the service definition owner"`
@@ -489,7 +489,7 @@ func createDefinition(t *testing.T, DefinitionJSON string, user string, VDBKey s
 	requestURL := fmt.Sprintf("http://%s:%d/v1/llm-definitions/%s/%s", options.Host, options.Port, user, jsonInput.DefinitionHandle)
 	requestBody := bytes.NewReader([]byte(DefinitionJSON))
 	req, err := http.NewRequest(http.MethodPut, requestURL, requestBody)
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
+	req.Header.Set("Authorization", "Bearer "+EmbAPIKey)
 	assert.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -519,7 +519,7 @@ func createDefinition(t *testing.T, DefinitionJSON string, user string, VDBKey s
 
 // createEmbeddings creates some embeddings entries for testing and returns an error value
 // it accepts a JSON string encording the embeddings db entries
-func createEmbeddings(t *testing.T, embeddings []byte, user string, Instance string, VDBKey string) error {
+func createEmbeddings(t *testing.T, embeddings []byte, user string, Instance string, EmbAPIKey string) error {
 	fmt.Print("    Creating Embeddings for testing ...\n")
 
 	// Upload embeddings for similars testing
@@ -528,7 +528,7 @@ func createEmbeddings(t *testing.T, embeddings []byte, user string, Instance str
 	if err != nil {
 		fmt.Printf("Error creating request for uploading embeddings: %v\n", err)
 	}
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
+	req.Header.Set("Authorization", "Bearer "+EmbAPIKey)
 	req.Header.Set("Content-Type", "application/json")
 	assert.NoError(t, err)
 

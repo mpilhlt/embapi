@@ -3,13 +3,13 @@ title: "Getting Started"
 weight: 1
 ---
 
-# Getting Started with dhamps-vdb
+# Getting Started with embapi
 
-This section helps you get dhamps-vdb up and running quickly. Whether you're using Docker or compiling from source, you'll find everything you need to start using the vector database API.
+This section helps you get embapi up and running quickly. Whether you're using Docker or compiling from source, you'll find everything you need to start using the vector database API.
 
 ## What You'll Learn
 
-- How to install and run dhamps-vdb
+- How to install and run embapi
 - How to configure the service for your environment
 - Basic usage patterns and workflows
 - Creating your first project and embeddings
@@ -24,7 +24,7 @@ Before you begin, ensure you have:
 
 ## Quick Links
 
-- [Installation](installation/) - Compile and install dhamps-vdb
+- [Installation](installation/) - Compile and install embapi
 - [Docker Deployment](docker/) - Run with Docker (recommended)
 - [Configuration](configuration/) - Environment variables and options
 - [Quick Start](quick-start/) - Your first API requests

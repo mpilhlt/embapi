@@ -5,7 +5,7 @@ weight: 4
 
 # API Reference
 
-Complete reference for the dhamps-vdb REST API.
+Complete reference for the embapi REST API.
 
 ## API Version
 

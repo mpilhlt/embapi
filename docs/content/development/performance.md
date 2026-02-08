@@ -5,7 +5,7 @@ weight: 4
 
 # Performance Optimization Guide
 
-This guide covers performance optimization strategies for dhamps-vdb, including query optimization, indexing, caching, and performance testing.
+This guide covers performance optimization strategies for embapi, including query optimization, indexing, caching, and performance testing.
 
 ## Query Optimization
 
