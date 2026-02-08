@@ -670,20 +670,19 @@ dhamps-vdb/
 
 - [ ] Revisit all **documentation**
   - [ ] Add documentation for metadata filtering of similars (the GET query parameters are called `metadata_path` and `metadata_value` as in: `https://xy.org/vdb-api/v1/similars/sal/sal-openai-large/https%3A%2F%2Fid.myproject.net%2Ftexts%2FW0011%3A1.3.1.3.1?threshold=0.7&limit=5&metadata_path=author_id&metadata_value=A0083`)
-- [ ] **Transfer** of projects from one owner to another as new operation
-- [ ] Make sure **pagination** is supported consistently
-- [ ] Allow to request **verbose** information even in list outputs (with a verbose=yes query parameter?)
-- [ ] **Dockerization**
-- [ ] **Batch mode**
-- [ ] Prevent acceptance of requests as user "_system"
-- [ ] Add API standards for anthropic, mistral, llama.cpp, ollama, vllm, llmstudio
 - [ ] Network connectivity
   - [ ] Implement and make consequent use of **max_idle** (5), **max_concurr** (5), **timeouts**, and **cancellations**
   - [ ] **Concurrency** (leaky bucket approach) and **Rate limiting** (redis, sliding window, implement headers). See  <https://huma.rocks/features/request-limits/> for limiting.
-- [ ] Add possiblity to use PATCH method to change existing resources
-- [ ] Proper **logging** with `--verbose` and `--quiet` modes
-- [ ] Caching
+  - [ ] Caching
+- [ ] Add API standards for anthropic, mistral, llama.cpp, ollama, vllm, llmstudio
 - [ ] HTML UI?
+- [ ] Allow to request verbose information even in list outputs (with a verbose=yes query parameter?)
+- [ ] Add possiblity to use PATCH method to change existing resources
+- [ ] Proper logging with `--verbose` and `--quiet` modes
+- [x] Transfer of projects from one owner to another as new operation
+- [x] Make sure pagination is supported consistently
+- [x] Dockerization
+- [x] Prevent acceptance of requests as user "_system"
 - [x] Tests
   - [x] When testing, check cleanup by adding a new query/function to see if all tables are empty
   - [x] Make sure input is validated consistently
