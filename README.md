@@ -82,9 +82,80 @@ postgres=# CREATE EXTENSION IF NOT EXISTS vector;
 
 ### Client Authentication
 
-Clients should communicate the API key in the `Authorization` header with a `Bearer` prefix, e.g. `Bearer 024v2013621509245f2e24`. Most operations can only be done by the (admin or the) owner of the resource in question. For projects and their embeddings, you can define other user accounts that should be authorized as readers, too. 
+Clients should communicate the API key in the `Authorization` header with a `Bearer` prefix, e.g. `Bearer 024v2013621509245f2e24`. Most operations can only be done by the (admin or the) owner of the resource in question. 
 
-**Public Access**: Projects can be made publicly accessible (allowing unauthenticated read access to embeddings and similars) by including `"*"` in the `shared_with` array when creating or updating the project. See [docs/PUBLIC_ACCESS.md](./docs/PUBLIC_ACCESS.md) for details.
+**Project Sharing**: Projects can be shared with specific users for read or edit access. See the [Project Sharing](#project-sharing) section below for details on sharing projects with individual users.
+
+**Public Access**: Projects can also be made publicly accessible (allowing unauthenticated read access to embeddings and similars) by setting the `public_read` field to `true` when creating or updating the project. See [docs/PUBLIC_ACCESS.md](./docs/PUBLIC_ACCESS.md) for details.
+
+## Project Sharing
+
+Projects can be shared with other users to enable collaboration. The project owner can grant two levels of access:
+
+- **reader**: Read-only access to embeddings and similar documents
+- **editor**: Read and write access to embeddings (can add/modify/delete embeddings)
+
+### Sharing During Project Creation
+
+When creating a project, you can specify users to share with using the `shared_with` field:
+
+```json
+{
+  "project_handle": "my-project",
+  "description": "A collaborative project",
+  "instance_owner": "alice",
+  "instance_handle": "embedding1",
+  "shared_with": [
+    {
+      "user_handle": "bob",
+      "role": "reader"
+    },
+    {
+      "user_handle": "charlie",
+      "role": "editor"
+    }
+  ]
+}
+```
+
+### Managing Sharing After Creation
+
+The project owner can manage sharing through dedicated endpoints:
+
+**Share a project with a user:**
+```bash
+POST /v1/projects/{owner}/{project}/share
+{
+  "share_with_handle": "bob",
+  "role": "reader"
+}
+```
+
+**Unshare a project from a user:**
+```bash
+DELETE /v1/projects/{owner}/{project}/share/{user_handle}
+```
+
+**List users a project is shared with:**
+```bash
+GET /v1/projects/{owner}/{project}/shared-with
+```
+
+Only the project owner can view the list of shared users and manage sharing. Users who have been granted access to a project cannot see which other users also have access.
+
+### Shared User Access
+
+Once a project is shared with a user, they can:
+- View project metadata
+- Retrieve embeddings (reader and editor)
+- Search for similar documents (reader and editor)
+- Add, modify, or delete embeddings (editor only)
+
+Shared users **cannot**:
+- Delete the project
+- Change project settings
+- Manage sharing (add/remove other users)
+- View the list of other users the project is shared with
 
 ## Data Validation
 
@@ -270,6 +341,9 @@ For a more detailed, and always up-to-date documentation of the endpoints, inclu
 | /projects/\<username\>/\<projectname\> | GET | Get project information for \<username\>'s project \<projectname\> | admin, \<username\>, authorized readers |
 | /projects/\<username\>/\<projectname\> | PUT | Register a new project calles \<projectname\> for user \<username\> | admin, \<username\> |
 | /projects/\<username\>/\<projectname\> | DELETE | Delete \<username\>'s project \<projectname\> | admin, \<username\> |
+| /projects/\<username\>/\<projectname\>/share | POST | Share \<username\>'s project \<projectname\> with another user | admin, \<username\> |
+| /projects/\<username\>/\<projectname\>/share/\<shared_user\> | DELETE | Unshare \<username\>'s project \<projectname\> from \<shared_user\> | admin, \<username\> |
+| /projects/\<username\>/\<projectname\>/shared-with | GET | Get list of users \<username\>'s project \<projectname\> is shared with | admin, \<username\> |
 | /llm-services/\<username\> | GET  | Get all LLM services (objects) for user \<username\> | admin, \<username\> |
 | /llm-services/\<username\> | POST | Register a new LLM service for user \<username\> | admin, \<username\> |
 | /llm-services/\<username\>/<llm_servicename> | GET | Get information about LLM service <llm_servicename> of user \<username\> | admin, \<username\> |
@@ -538,7 +612,7 @@ dhamps-vdb/
 - [ ] Implement and make consequent use of **max_idle** (5), **max_concurr** (5), **timeouts**, and **cancellations**
 - [ ] **Concurrency** (leaky bucket approach) and **Rate limiting** (redis, sliding window, implement headers)
 - [ ] Always use specific error messages
-- [ ] Add project sharing/unsharing functions & API paths
+- [x] Add project sharing/unsharing functions & API paths
 - [ ] Add definition creation/listing/deletion functions & paths
 - [ ] Allow to request verbose information even in list outputs (with a verbose=yes query parameter?)
 - [ ] Add possiblity to use PATCH method to change existing resources
