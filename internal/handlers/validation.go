@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/mpilhlt/dhamps-vdb/internal/models"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -94,6 +95,15 @@ func ValidateEmbeddingMetadataAgainstProjectSchema(metadata json.RawMessage, sch
 	err := ValidateMetadataAgainstSchema(metadata, schemaStr, isUpdate, existingMetadata)
 	if err != nil {
 		return fmt.Errorf("text_id '%s': %v", textID, err)
+	}
+	return nil
+}
+
+// ValidateNotSystemUser checks if a user handle is "_system" and returns an error if so
+// The _system user is read-only and cannot send requests
+func ValidateNotSystemUser(userHandle string) error {
+	if userHandle == "_system" {
+		return huma.Error403Forbidden("_system user cannot send requests - this is a read-only account")
 	}
 	return nil
 }

@@ -27,6 +27,11 @@ const (
 
 // Create a new project
 func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*models.UploadProjectResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	if input.ProjectHandle != input.Body.ProjectHandle {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("project handle in URL (%s) does not match project handle in body (%s)", input.ProjectHandle, input.Body.ProjectHandle))
 	}
@@ -354,6 +359,11 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 }
 
 func deleteProjectFunc(ctx context.Context, input *models.DeleteProjectRequest) (*models.DeleteProjectResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if user exists
 	if _, err := getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.UserHandle}); err != nil {
 		return nil, err

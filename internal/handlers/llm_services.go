@@ -30,6 +30,11 @@ func getEncryptionKey() *crypto.EncryptionKey {
 // === Sharing LLM Service Definitions ===
 
 func putDefinitionFunc(ctx context.Context, input *models.PutDefinitionRequest) (*models.UploadDefinitionResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	if input.DefinitionHandle != input.Body.DefinitionHandle {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("definition handle in URL (\"%s\") does not match definition handle in body (\"%s\")", input.DefinitionHandle, input.Body.DefinitionHandle))
 	}
@@ -234,6 +239,10 @@ func getUserDefinitionsFunc(ctx context.Context, input *models.GetUserDefinition
 }
 
 func deleteDefinitionFunc(ctx context.Context, input *models.DeleteDefinitionRequest) (*models.DeleteDefinitionResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
 
 	// Check if user exists
 	u, err := getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.UserHandle})
@@ -400,6 +409,11 @@ func getDefinitionSharedUsersFunc(ctx context.Context, input *models.GetDefiniti
 
 // Create a llm service instance (with a handle being present in the URL)
 func putInstanceFunc(ctx context.Context, input *models.PutInstanceRequest) (*models.UploadInstanceResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	if input.InstanceHandle != input.Body.InstanceHandle {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("instance handle in URL (\"%s\") does not match instance handle in body (\"%s\")", input.InstanceHandle, input.Body.InstanceHandle))
 	}
@@ -485,6 +499,11 @@ func postInstanceFunc(ctx context.Context, input *models.PostInstanceRequest) (*
 
 // Create a llm service instance based on a definition
 func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInstanceFromDefinitionRequest) (*models.UploadInstanceResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	if input.UserHandle != input.Body.UserHandle {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("user handle in URL (\"%s\") does not match user handle in body (\"%s\")", input.UserHandle, input.Body.UserHandle))
 	}
@@ -756,6 +775,11 @@ func getUserInstancesFunc(ctx context.Context, input *models.GetUserInstancesReq
 }
 
 func deleteInstanceFunc(ctx context.Context, input *models.DeleteInstanceRequest) (*models.DeleteInstanceResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if user exists
 	u, err := getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.UserHandle})
 	if err != nil {
