@@ -25,7 +25,7 @@ instances (user-specific)
   └── can be shared with other users
 ```
 
-For complete details, see [LLM Service Refactoring Documentation](/docs/LLM_SERVICE_REFACTORING.md).
+For complete details, see [Database Schema Reference](../../reference/database-schema/) and [LLM Services Concepts](../../concepts/llm-services/).
 
 ---
 
@@ -515,4 +515,5 @@ When an instance is shared:
 
 - [API Standards](api-standards/) - Managing API standard definitions
 - [Projects](projects/) - Projects require an LLM service instance
-- [LLM Service Refactoring](/docs/LLM_SERVICE_REFACTORING.md) - Complete architecture documentation
+- [LLM Services Concepts](../../concepts/llm-services/) - LLM service architecture and design
+- [Database Schema](../../reference/database-schema/) - Complete database schema documentation
