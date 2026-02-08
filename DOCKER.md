@@ -19,6 +19,24 @@ This guide explains how to deploy dhamps-vdb using Docker containers.
 
 The fastest way to get started with dhamps-vdb using Docker:
 
+### Automated Setup (Recommended)
+
+```bash
+# Run the quick setup script (generates secure keys automatically)
+./docker-setup.sh
+
+# Start the services
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f dhamps-vdb
+
+# Access the API
+curl http://localhost:8880/docs
+```
+
+### Manual Setup
+
 ```bash
 # 1. Copy the environment template
 cp .env.docker.template .env

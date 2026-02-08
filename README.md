@@ -34,10 +34,8 @@ The easiest way to run dhamps-vdb is using Docker. See [DOCKER.md](./DOCKER.md) 
 Quick start with Docker:
 
 ```bash
-# Copy environment template
-cp .env.docker.template .env
-
-# Edit .env and set SERVICE_ADMINKEY and ENCRYPTION_KEY
+# Automated setup (generates secure keys)
+./docker-setup.sh
 
 # Start with docker-compose (includes PostgreSQL with pgvector)
 docker-compose up -d

@@ -1,0 +1,42 @@
+# docker-compose configuration for dhamps-vdb connecting to an external database
+# 
+# This example shows how to run dhamps-vdb as a standalone container
+# that connects to an external PostgreSQL database with pgvector.
+#
+# Prerequisites:
+# 1. External PostgreSQL database with pgvector extension installed
+# 2. Database and user created (see DOCKER.md for SQL commands)
+# 3. Network access from container to database
+#
+# Usage:
+# 1. Copy this file: cp docker-compose.external-db.yml docker-compose.yml
+# 2. Create .env file with your database credentials (see .env.docker.template)
+# 3. Run: docker-compose up -d
+
+services:
+  # dhamps-vdb middleware connecting to external database
+  dhamps-vdb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dhamps-vdb
+    environment:
+      # Service configuration
+      SERVICE_DEBUG: ${SERVICE_DEBUG:-false}
+      SERVICE_HOST: ${SERVICE_HOST:-0.0.0.0}
+      SERVICE_PORT: ${SERVICE_PORT:-8880}
+      
+      # External database configuration
+      # Set these in your .env file to match your external database
+      SERVICE_DBHOST: ${SERVICE_DBHOST}
+      SERVICE_DBPORT: ${SERVICE_DBPORT:-5432}
+      SERVICE_DBUSER: ${SERVICE_DBUSER}
+      SERVICE_DBPASSWORD: ${SERVICE_DBPASSWORD}
+      SERVICE_DBNAME: ${SERVICE_DBNAME}
+      
+      # Security configuration
+      SERVICE_ADMINKEY: ${SERVICE_ADMINKEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    ports:
+      - "${API_PORT:-8880}:8880"
+    restart: unless-stopped
