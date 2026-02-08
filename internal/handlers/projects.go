@@ -437,7 +437,7 @@ func shareProjectFunc(ctx context.Context, input *models.ShareProjectRequest) (*
 	}
 	// Check if project belongs to current user (only owner can share)
 	if project.Owner != ctx.Value(auth.AuthUserKey).(string) {
-		return nil, huma.Error401Unauthorized(fmt.Sprintf("not authorized to share project %s/%s", input.UserHandle, input.ProjectHandle))
+		return nil, huma.Error403Forbidden(fmt.Sprintf("not authorized to share project %s/%s", input.UserHandle, input.ProjectHandle))
 	}
 	// Check if target user exists
 	_, err = getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.Body.ShareWithHandle})

@@ -265,8 +265,8 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			requestPath:  "/v1/llm-instances/bob/from-definition",
 			bodyJSON:     `{"user_handle": "bob", "instance_handle": "bob-instance1", "definition_owner": "alice", "definition_handle": "openai-large", "endpoint": "https://api.openai.com/v1/embeddings", "description": "Bob's instance based on Alice's definition"}`,
 			VDBKey:       bobAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Unauthorized\",\n  \"status\": 401,\n  \"detail\": \"user does not have access to definition alice/openai-large\"\n}\n",
-			expectStatus: http.StatusUnauthorized,
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Forbidden\",\n  \"status\": 403,\n  \"detail\": \"user does not have access to definition alice/openai-large\"\n}\n",
+			expectStatus: http.StatusForbidden,
 		},
 		{
 			name:         "Create an instance based on a nonexistent definition - should fail",
