@@ -91,7 +91,7 @@ func TestSimilarsFunc(t *testing.T) {
 			requestPath:  "/v1/similars/alice/test1/https%3A%2F%2Fid.salamanca.school%2Ftexts%2FW0001%3Avol1.1.1.1.1",
 			bodyPath:     "",
 			apiKey:       aliceAPIKey,
-			expectBody:   "",  // Will validate structure programmatically
+			expectBody:   "", // Will validate structure programmatically
 			expectStatus: http.StatusOK,
 		},
 		{
@@ -100,7 +100,7 @@ func TestSimilarsFunc(t *testing.T) {
 			requestPath:  "/v1/similars/alice/test1/https%3A%2F%2Fid.salamanca.school%2Ftexts%2FW0001%3Avol1.1.1.1.1?metadata_path=author&metadata_value=Immanuel%20Kant",
 			bodyPath:     "",
 			apiKey:       options.AdminKey,
-			expectBody:   "",  // Will validate structure programmatically
+			expectBody:   "", // Will validate structure programmatically
 			expectStatus: http.StatusOK,
 		},
 	}
@@ -145,14 +145,14 @@ func TestSimilarsFunc(t *testing.T) {
 
 			respBody, err := io.ReadAll(resp.Body) // response body is []byte
 			assert.NoError(t, err)
-			
+
 			// Parse and validate JSON structure
 			if v.expectBody == "" && resp.StatusCode == http.StatusOK {
 				// Validate that response has correct structure with results array
 				var result map[string]interface{}
 				err = json.Unmarshal(respBody, &result)
 				assert.NoError(t, err)
-				
+
 				// Check results field exists and is an array
 				results, ok := result["results"].([]interface{})
 				if !ok {
@@ -212,7 +212,7 @@ func TestSimilarsFunc(t *testing.T) {
 		shutDownServer()
 	})
 
-	fmt.Printf("\n\n\n\n")
+	fmt.Printf("\n")
 }
 
 // TestPostSimilar tests the POST similar functionality.
@@ -296,11 +296,11 @@ func TestPostSimilar(t *testing.T) {
 		expectError  bool
 	}{
 		{
-			name:        "POST similar with valid 5D vector",
-			method:      http.MethodPost,
-			requestPath: "/v1/similars/alice/test1",
-			body:        `{"vector": [-0.02085085, 0.01852216, 0.05327000, 0.07138438, 0.02000308]}`,
-			apiKey:      aliceAPIKey,
+			name:         "POST similar with valid 5D vector",
+			method:       http.MethodPost,
+			requestPath:  "/v1/similars/alice/test1",
+			body:         `{"vector": [-0.02085085, 0.01852216, 0.05327000, 0.07138438, 0.02000308]}`,
+			apiKey:       aliceAPIKey,
 			expectStatus: http.StatusOK,
 			expectIDs: []string{
 				"https%3A%2F%2Fid.salamanca.school%2Ftexts%2FW0001%3Avol1.1.1.1.1",
@@ -310,11 +310,11 @@ func TestPostSimilar(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name:        "POST similar with valid 5D vector and metadata filter",
-			method:      http.MethodPost,
-			requestPath: "/v1/similars/alice/test1?metadata_path=author&metadata_value=Immanuel%20Kant",
-			body:        `{"vector": [-0.02085085, 0.01852216, 0.05327000, 0.07138438, 0.02000308]}`,
-			apiKey:      aliceAPIKey,
+			name:         "POST similar with valid 5D vector and metadata filter",
+			method:       http.MethodPost,
+			requestPath:  "/v1/similars/alice/test1?metadata_path=author&metadata_value=Immanuel%20Kant",
+			body:         `{"vector": [-0.02085085, 0.01852216, 0.05327000, 0.07138438, 0.02000308]}`,
+			apiKey:       aliceAPIKey,
 			expectStatus: http.StatusOK,
 			expectIDs: []string{
 				"https%3A%2F%2Fid.salamanca.school%2Ftexts%2FW0001%3Avol2",
@@ -425,7 +425,7 @@ func TestPostSimilar(t *testing.T) {
 							continue
 						}
 						actualIDs[i] = id.(string)
-						
+
 						// Verify similarity field exists and is a number
 						similarity, hasSim := resultItem["similarity"]
 						if !hasSim {
@@ -434,7 +434,7 @@ func TestPostSimilar(t *testing.T) {
 							t.Errorf("Result item %d 'similarity' is not a number", i)
 						}
 					}
-					
+
 					// Check that all expected IDs are present (order doesn't matter for similar items)
 					for _, expectedID := range v.expectIDs {
 						found := false
@@ -474,5 +474,5 @@ func TestPostSimilar(t *testing.T) {
 		shutDownServer()
 	})
 
-	fmt.Printf("\n\n\n\n")
+	fmt.Printf("\n")
 }

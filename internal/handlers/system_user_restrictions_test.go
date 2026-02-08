@@ -24,7 +24,6 @@ func TestSystemUserRestrictions(t *testing.T) {
 	// Start the server
 	err, shutDownServer := startTestServer(t, pool, mockKeyGen)
 	assert.NoError(t, err)
-	defer shutDownServer()
 
 	// Create a regular user (alice) for testing
 	aliceJSON := `{"user_handle": "alice", "name": "Alice Doe", "email": "alice@foo.bar"}`
@@ -195,4 +194,23 @@ func TestSystemUserRestrictions(t *testing.T) {
 			}
 		})
 	}
+
+	// Cleanup
+	t.Cleanup(func() {
+		fmt.Print("\n\nRunning cleanup ...\n\n")
+
+		requestURL := fmt.Sprintf("http://%s:%d/v1/admin/footgun", options.Host, options.Port)
+		req, err := http.NewRequest(http.MethodGet, requestURL, nil)
+		assert.NoError(t, err)
+		req.Header.Set("Authorization", "Bearer "+options.AdminKey)
+		_, err = http.DefaultClient.Do(req)
+		if err != nil && err.Error() != "no rows in result set" {
+			t.Fatalf("Error sending request: %v\n", err)
+		}
+		assert.NoError(t, err)
+
+		fmt.Print("Shutting down server\n\n")
+		shutDownServer()
+	})
+
 }

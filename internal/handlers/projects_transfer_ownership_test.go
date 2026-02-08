@@ -183,7 +183,7 @@ func TestProjectTransferOwnershipFunc(t *testing.T) {
 
 			// Build the request URL
 			requestURL := fmt.Sprintf("http://%s:%d%s", options.Host, options.Port, tc.requestPath)
-			
+
 			// Create the request
 			req, err := http.NewRequest(tc.method, requestURL, bodyReader)
 			if err != nil {
@@ -319,8 +319,24 @@ func TestProjectTransferOwnershipFunc(t *testing.T) {
 		assert.Equal(t, "owner", response["role"])
 	})
 
-	// Cleanup - shutdown the server
-	defer shutDownServer()
+	// Cleanup
+	t.Cleanup(func() {
+		fmt.Print("\n\nRunning cleanup ...\n\n")
+
+		requestURL := fmt.Sprintf("http://%s:%d/v1/admin/footgun", options.Host, options.Port)
+		req, err := http.NewRequest(http.MethodGet, requestURL, nil)
+		assert.NoError(t, err)
+		req.Header.Set("Authorization", "Bearer "+options.AdminKey)
+		_, err = http.DefaultClient.Do(req)
+		if err != nil && err.Error() != "no rows in result set" {
+			t.Fatalf("Error sending request: %v\n", err)
+		}
+		assert.NoError(t, err)
+
+		fmt.Print("Shutting down server\n\n")
+		shutDownServer()
+	})
+
 }
 
 // Helper function to share a project

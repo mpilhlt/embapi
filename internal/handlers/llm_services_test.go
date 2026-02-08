@@ -14,7 +14,7 @@ import (
 
 func TestInstancesFunc(t *testing.T) {
 
-	fmt.Printf("\n\n\n\n")
+	fmt.Printf("\n")
 
 	// Get the database connection pool from package variable
 	pool := connPool

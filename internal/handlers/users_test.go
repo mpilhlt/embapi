@@ -250,5 +250,5 @@ func TestUserFunc(t *testing.T) {
 		shutDownServer()
 	})
 
-	fmt.Printf("\n\n\n\n")
+	fmt.Printf("\n")
 }

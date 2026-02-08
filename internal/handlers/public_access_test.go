@@ -209,7 +209,7 @@ func TestPublicAccess(t *testing.T) {
 		shutDownServer()
 	})
 
-	fmt.Printf("\n\n\n\n")
+	fmt.Printf("\n")
 }
 
 // Helper function to post embeddings
