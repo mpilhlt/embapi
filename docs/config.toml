@@ -1,0 +1,9 @@
+baseURL = 'https://mpilhlt.github.io/dhamps-vdb/'
+languageCode = 'en-us'
+title = 'dhamps-vdb Documentation'
+theme = 'book'
+
+[params]
+  BookRepo = 'https://github.com/mpilhlt/dhamps-vdb'
+  BookEditPath = 'edit/main'
+  BookSearch = true
