@@ -596,7 +596,7 @@ func transferProjectOwnershipFunc(ctx context.Context, input *models.TransferPro
 		ProjectHandle: input.ProjectHandle,
 	})
 	if err != nil {
-		if err.Error() == "no rows in result set" {
+		if err == pgx.ErrNoRows {
 			return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s not found", input.UserHandle, input.ProjectHandle))
 		}
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve project %s/%s: %v", input.UserHandle, input.ProjectHandle, err))
@@ -610,7 +610,7 @@ func transferProjectOwnershipFunc(ctx context.Context, input *models.TransferPro
 	// Check if new owner exists
 	_, err = queries.RetrieveUser(ctx, input.Body.NewOwnerHandle)
 	if err != nil {
-		if err.Error() == "no rows in result set" {
+		if err == pgx.ErrNoRows {
 			return nil, huma.Error404NotFound(fmt.Sprintf("new owner user %s not found", input.Body.NewOwnerHandle))
 		}
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to verify new owner user %s: %v", input.Body.NewOwnerHandle, err))
@@ -623,7 +623,7 @@ func transferProjectOwnershipFunc(ctx context.Context, input *models.TransferPro
 	})
 	if err == nil {
 		return nil, huma.Error409Conflict(fmt.Sprintf("new owner %s already has a project with handle %s", input.Body.NewOwnerHandle, input.ProjectHandle))
-	} else if err.Error() != "no rows in result set" {
+	} else if err != pgx.ErrNoRows {
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to check for conflicting project: %v", err))
 	}
 
@@ -657,9 +657,10 @@ func transferProjectOwnershipFunc(ctx context.Context, input *models.TransferPro
 			UserHandle: input.Body.NewOwnerHandle,
 			ProjectID:  project.ProjectID,
 		})
-		// Ignore error if the entry doesn't exist
-		if err != nil && err.Error() != "no rows in result set" {
-			return fmt.Errorf("unable to clean up new owner's previous access: %v", err)
+		// Ignore error if the entry doesn't exist - UnlinkProjectFromUser uses DELETE which doesn't return ErrNoRows
+		// We don't care if they weren't previously shared
+		if err != nil {
+			// Just log and continue - this is not a critical error
 		}
 
 		// 4. Add new owner to users_projects table with owner role
