@@ -55,10 +55,25 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 		instanceID = pgtype.Int4{Int32: int32(instance.InstanceID), Valid: true}
 	}
 
-	// NOTE: For the time being, we establish all sharing only subsequent to project
-	//       creation. In other words, it is not possible to submit a list of users
-	//       to share the project with upon project creation. Instead, each share must
-	//       be created individually via API calls by the project owner.
+	// - validate shared users exist and roles are valid
+	for _, sharedUser := range input.Body.SharedWith {
+		// Check that we're not sharing with the owner
+		if sharedUser.UserHandle == input.UserHandle {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("cannot share project with owner %s", input.UserHandle))
+		}
+		// Check if role is valid
+		if sharedUser.Role != "editor" && sharedUser.Role != "reader" {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("invalid role %s for user %s. Role must be either \"editor\" or \"reader\"", sharedUser.Role, sharedUser.UserHandle))
+		}
+		// Check if target user exists
+		_, err := queries.RetrieveUser(ctx, sharedUser.UserHandle)
+		if err != nil {
+			if err.Error() == "no rows in result set" {
+				return nil, huma.Error400BadRequest(fmt.Sprintf("shared user %s does not exist", sharedUser.UserHandle))
+			}
+			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to validate user %s: %v", sharedUser.UserHandle, err))
+		}
+	}
 
 	// release queries so that they can be used in the transaction below (to link project to users)
 	queries = nil
@@ -96,16 +111,18 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 			return fmt.Errorf("unable to link project to owner %s. %v", input.UserHandle, err)
 		}
 
-		// 3. Link project and other shared users (if any) - we'll perhaps implement/activate this in the future
-		/*
-			for reader := range sharedUsers {
-				params := database.LinkProjectToUserParams{ProjectID: projectID, UserHandle: reader, Role: sharedUsers[reader]}
-				_, err := queries.LinkProjectToUser(ctx, params)
-				if err != nil {
-					return fmt.Errorf("unable to upload project reader %s. %v", reader, err)
-				}
+		// 3. Link project and other shared users (if any)
+		for _, sharedUser := range input.Body.SharedWith {
+			params := database.LinkProjectToUserParams{
+				ProjectID:  projectID,
+				UserHandle: sharedUser.UserHandle,
+				Role:       sharedUser.Role,
 			}
-		*/
+			_, err := queries.LinkProjectToUser(ctx, params)
+			if err != nil {
+				return fmt.Errorf("unable to link project to shared user %s. %v", sharedUser.UserHandle, err)
+			}
+		}
 
 		return nil
 	}) // end transaction

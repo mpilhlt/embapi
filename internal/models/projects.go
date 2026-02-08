@@ -25,12 +25,13 @@ type ProjectBrief struct {
 }
 
 type ProjectSubmission struct {
-	ProjectHandle  string `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
-	Description    string `json:"description,omitempty" maxLength:"255" doc:"Description of the project."`
-	MetadataScheme string `json:"metadataScheme,omitempty" doc:"Metadata json scheme used in the project."`
-	InstanceOwner  string `json:"instance_owner,omitempty" doc:"User handle of the owner of the LLM Service Instance used in the project."`
-	InstanceHandle string `json:"instance_handle,omitempty" doc:"Handle of the LLM Service Instance used in the project"`
-	PublicRead     bool   `json:"public_read,omitempty", default:"false" doc:"Whether the project is public or not"`
+	ProjectHandle  string       `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
+	Description    string       `json:"description,omitempty" maxLength:"255" doc:"Description of the project."`
+	MetadataScheme string       `json:"metadataScheme,omitempty" doc:"Metadata json scheme used in the project."`
+	InstanceOwner  string       `json:"instance_owner,omitempty" doc:"User handle of the owner of the LLM Service Instance used in the project."`
+	InstanceHandle string       `json:"instance_handle,omitempty" doc:"Handle of the LLM Service Instance used in the project"`
+	PublicRead     bool         `json:"public_read,omitempty", default:"false" doc:"Whether the project is public or not"`
+	SharedWith     []SharedUser `json:"shared_with,omitempty" doc:"List of users to share the project with upon creation"`
 }
 
 // Request and Response structs for the project administration API
