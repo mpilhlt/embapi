@@ -1,0 +1,13 @@
+{
+  "project_handle": "shared-project",
+  "description": "A project shared at creation",
+  "instance_owner": "alice",
+  "instance_handle": "embedding1",
+  "public_read": false,
+  "shared_with": [
+    {
+      "user_handle": "bob",
+      "role": "reader"
+    }
+  ]
+}

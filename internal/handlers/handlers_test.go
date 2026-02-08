@@ -181,6 +181,7 @@ func startTestServer(t *testing.T, pool *pgxpool.Pool, keyGen handlers.RandomKey
 	api := humago.New(router, config)
 	api.UseMiddleware(auth.VDBKeyAdminAuth(api, &options))
 	api.UseMiddleware(auth.VDBKeyOwnerAuth(api, pool, &options))
+	api.UseMiddleware(auth.VDBKeyEditorAuth(api, pool, &options))
 	api.UseMiddleware(auth.VDBKeyReaderAuth(api, pool, &options))
 	api.UseMiddleware(auth.AuthTermination(api))
 

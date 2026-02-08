@@ -15,6 +15,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const (
+	// maxSharedUsersPerQuery is the maximum number of shared users to retrieve in a single query
+	// This prevents memory issues when a project is shared with many users
+	maxSharedUsersPerQuery = 1000
+)
+
 // Create a new project
 func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*models.UploadProjectResponse, error) {
 	if input.ProjectHandle != input.Body.ProjectHandle {
@@ -49,10 +55,25 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 		instanceID = pgtype.Int4{Int32: int32(instance.InstanceID), Valid: true}
 	}
 
-	// NOTE: For the time being, we establish all sharing only subsequent to project
-	//       creation. In other words, it is not possible to submit a list of users
-	//       to share the project with upon project creation. Instead, each share must
-	//       be created individually via API calls by the project owner.
+	// - validate shared users exist and roles are valid
+	for _, sharedUser := range input.Body.SharedWith {
+		// Check that we're not sharing with the owner
+		if sharedUser.UserHandle == input.UserHandle {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("cannot share project with owner %s", input.UserHandle))
+		}
+		// Check if role is valid
+		if sharedUser.Role != "editor" && sharedUser.Role != "reader" {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("invalid role %s for user %s. Role must be either \"editor\" or \"reader\"", sharedUser.Role, sharedUser.UserHandle))
+		}
+		// Check if target user exists
+		_, err := queries.RetrieveUser(ctx, sharedUser.UserHandle)
+		if err != nil {
+			if err.Error() == "no rows in result set" {
+				return nil, huma.Error400BadRequest(fmt.Sprintf("shared user %s does not exist", sharedUser.UserHandle))
+			}
+			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to validate user %s: %v", sharedUser.UserHandle, err))
+		}
+	}
 
 	// release queries so that they can be used in the transaction below (to link project to users)
 	queries = nil
@@ -90,16 +111,18 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 			return fmt.Errorf("unable to link project to owner %s. %v", input.UserHandle, err)
 		}
 
-		// 3. Link project and other shared users (if any) - we'll perhaps implement/activate this in the future
-		/*
-			for reader := range sharedUsers {
-				params := database.LinkProjectToUserParams{ProjectID: projectID, UserHandle: reader, Role: sharedUsers[reader]}
-				_, err := queries.LinkProjectToUser(ctx, params)
-				if err != nil {
-					return fmt.Errorf("unable to upload project reader %s. %v", reader, err)
-				}
+		// 3. Link project and other shared users (if any)
+		for _, sharedUser := range input.Body.SharedWith {
+			params := database.LinkProjectToUserParams{
+				ProjectID:  projectID,
+				UserHandle: sharedUser.UserHandle,
+				Role:       sharedUser.Role,
 			}
-		*/
+			_, err := queries.LinkProjectToUser(ctx, params)
+			if err != nil {
+				return fmt.Errorf("unable to link project to shared user %s. %v", sharedUser.UserHandle, err)
+			}
+		}
 
 		return nil
 	}) // end transaction
@@ -371,6 +394,180 @@ func deleteProjectFunc(ctx context.Context, input *models.DeleteProjectRequest) 
 	return response, nil
 }
 
+// Share a project with another user
+func shareProjectFunc(ctx context.Context, input *models.ShareProjectRequest) (*models.ShareProjectResponse, error) {
+
+	// Get the database connection pool from the context
+	pool, err := GetDBPool(ctx)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("database connection error: %v", err)
+	}
+	queries := database.New(pool)
+
+	// Check if ShareWithUser is identical to owner (no need to share if sharing with self)
+	if input.Body.ShareWithHandle == input.UserHandle {
+		return nil, huma.Error400BadRequest("cannot share project with owner")
+	}
+	// Check if role is valid
+	if input.Body.Role != "editor" && input.Body.Role != "reader" {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("invalid role %s. Role must be either \"editor\" or \"reader\"", input.Body.Role))
+	}
+	// Check if project exists
+	project, err := queries.RetrieveProject(ctx, database.RetrieveProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: input.ProjectHandle,
+	})
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s not found", input.UserHandle, input.ProjectHandle))
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve project %s/%s: %v", input.UserHandle, input.ProjectHandle, err))
+	}
+	// Check if project belongs to current user (only owner can share)
+	if project.Owner != ctx.Value(auth.AuthUserKey).(string) {
+		return nil, huma.Error401Unauthorized(fmt.Sprintf("not authorized to share project %s/%s", input.UserHandle, input.ProjectHandle))
+	}
+	// Check if target user exists
+	_, err = getUserFunc(ctx, &models.GetUserRequest{UserHandle: input.Body.ShareWithHandle})
+	if err != nil {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("target user %s does not exist: %v", input.Body.ShareWithHandle, err))
+	}
+
+	// Share the project
+	_, err = queries.LinkProjectToUser(ctx, database.LinkProjectToUserParams{
+		UserHandle: input.Body.ShareWithHandle,
+		ProjectID:  project.ProjectID,
+		Role:       input.Body.Role,
+	})
+	if err != nil {
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to share project: %v", err))
+	}
+
+	// Build response - simple acknowledgment with the shared user info
+	response := &models.ShareProjectResponse{}
+	response.Body.Owner = input.UserHandle
+	response.Body.ProjectHandle = input.ProjectHandle
+	response.Body.ProjectID = int(project.ProjectID)
+	response.Body.SharedWithHandle = input.Body.ShareWithHandle
+	response.Body.SharedWithRole = input.Body.Role
+
+	return response, nil
+}
+
+// Unshare a project from a user
+func unshareProjectFunc(ctx context.Context, input *models.UnshareProjectRequest) (*models.UnshareProjectResponse, error) {
+	// Get the database connection pool from the context
+	pool, err := GetDBPool(ctx)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("database connection error: %v", err)
+	}
+	queries := database.New(pool)
+
+	// Check if project exists and belongs to owner
+	project, err := queries.RetrieveProject(ctx, database.RetrieveProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: input.ProjectHandle,
+	})
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s not found", input.UserHandle, input.ProjectHandle))
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve project: %v", err))
+	}
+
+	// Check if target user exists and is currently shared
+	sharedUsers, err := queries.GetUsersByProject(ctx, database.GetUsersByProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: input.ProjectHandle,
+		Limit:         maxSharedUsersPerQuery,
+		Offset:        0,
+	})
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s is not shared with user %s", input.UserHandle, input.ProjectHandle, input.UnshareWithHandle))
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve shared users for project: %v", err))
+	}
+	for _, su := range sharedUsers {
+		if su.UserHandle == input.UnshareWithHandle {
+			// Unshare the project
+			err = queries.UnlinkProjectFromUser(ctx, database.UnlinkProjectFromUserParams{
+				UserHandle: input.UnshareWithHandle,
+				ProjectID:  project.ProjectID,
+			})
+			if err != nil {
+				return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to unshare project %s/%s from user %s: %v", input.UserHandle, input.ProjectHandle, input.UnshareWithHandle, err))
+			}
+			// Build response
+			response := &models.UnshareProjectResponse{}
+			return response, nil
+		}
+	}
+	// If we get here, the target user exists but is not currently shared
+	return nil, huma.Error404NotFound(fmt.Sprintf("project %s/%s is not shared with user %s", input.UserHandle, input.ProjectHandle, input.UnshareWithHandle))
+}
+
+// Get all users a project is shared with
+func getProjectSharedUsersFunc(ctx context.Context, input *models.GetProjectSharedUsersRequest) (*models.GetProjectSharedUsersResponse, error) {
+
+	// Get the database connection pool from the context
+	pool, err := GetDBPool(ctx)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("database connection error: %v", err)
+	}
+	queries := database.New(pool)
+
+	// Get the requesting user from context (set by auth middleware)
+	requestingUser := ctx.Value(auth.AuthUserKey)
+	if requestingUser == nil {
+		return nil, huma.Error500InternalServerError("unable to get requesting user from context")
+	}
+
+	// Only the project owner can see the list of shared users
+	if requestingUser.(string) != input.UserHandle {
+		return nil, huma.Error403Forbidden(fmt.Sprintf("only the project owner can view shared users list"))
+	}
+
+	// Get shared users
+	sharedUsers, err := queries.GetUsersByProject(ctx, database.GetUsersByProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: input.ProjectHandle,
+		Limit:         maxSharedUsersPerQuery,
+		Offset:        0,
+	})
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			// Return empty list instead of error
+			response := &models.GetProjectSharedUsersResponse{}
+			response.Body.SharedWith = []models.SharedUser{}
+			response.Body.Owner = input.UserHandle
+			response.Body.ProjectHandle = input.ProjectHandle
+			return response, nil
+		}
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve shared users: %v", err))
+	}
+
+	// Build response
+	users := []models.SharedUser{}
+	for _, su := range sharedUsers {
+		// Skip the owner - only include shared users
+		if su.UserHandle == input.UserHandle {
+			continue
+		}
+		users = append(users, models.SharedUser{
+			UserHandle: su.UserHandle,
+			Role:       su.Role,
+		})
+	}
+
+	response := &models.GetProjectSharedUsersResponse{}
+	response.Body.Owner = input.UserHandle
+	response.Body.ProjectHandle = input.ProjectHandle
+	response.Body.SharedWith = users
+
+	return response, nil
+}
+
 // TODO: Add project sharing/unsharing/shares_listing routes
 // (add user to project with reader role and to instance sharedUsers if project has an instance assigned)
 
@@ -436,11 +633,49 @@ func RegisterProjectsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		},
 		Tags: []string{"admin", "projects"},
 	}
+	shareProjectOp := huma.Operation{
+		OperationID:   "shareProject",
+		Method:        http.MethodPost,
+		Path:          "/v1/projects/{user_handle}/{project_handle}/share",
+		DefaultStatus: http.StatusCreated,
+		Summary:       "Share a project with another user",
+		Security: []map[string][]string{
+			{"adminAuth": []string{"admin"}},
+			{"ownerAuth": []string{"owner"}},
+		},
+		Tags: []string{"projects"},
+	}
+	unshareProjectOp := huma.Operation{
+		OperationID:   "unshareProject",
+		Method:        http.MethodDelete,
+		Path:          "/v1/projects/{user_handle}/{project_handle}/share/{unshare_with_handle}",
+		DefaultStatus: http.StatusNoContent,
+		Summary:       "Unshare a project from a user",
+		Security: []map[string][]string{
+			{"adminAuth": []string{"admin"}},
+			{"ownerAuth": []string{"owner"}},
+		},
+		Tags: []string{"projects"},
+	}
+	getProjectSharedUsersOp := huma.Operation{
+		OperationID: "getProjectSharedUsers",
+		Method:      http.MethodGet,
+		Path:        "/v1/projects/{user_handle}/{project_handle}/shared-with",
+		Summary:     "Get all users a project is shared with",
+		Security: []map[string][]string{
+			{"adminAuth": []string{"admin"}},
+			{"ownerAuth": []string{"owner"}},
+		},
+		Tags: []string{"projects"},
+	}
 
 	huma.Register(api, putProjectOp, addPoolToContext(pool, putProjectFunc))
 	huma.Register(api, postProjectOp, addPoolToContext(pool, postProjectFunc))
 	huma.Register(api, getProjectsOp, addPoolToContext(pool, getProjectsFunc))
 	huma.Register(api, getProjectOp, addPoolToContext(pool, getProjectFunc))
 	huma.Register(api, deleteProjectOp, addPoolToContext(pool, deleteProjectFunc))
+	huma.Register(api, shareProjectOp, addPoolToContext(pool, shareProjectFunc))
+	huma.Register(api, unshareProjectOp, addPoolToContext(pool, unshareProjectFunc))
+	huma.Register(api, getProjectSharedUsersOp, addPoolToContext(pool, getProjectSharedUsersFunc))
 	return nil
 }

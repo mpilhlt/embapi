@@ -25,12 +25,13 @@ type ProjectBrief struct {
 }
 
 type ProjectSubmission struct {
-	ProjectHandle  string `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
-	Description    string `json:"description,omitempty" maxLength:"255" doc:"Description of the project."`
-	MetadataScheme string `json:"metadataScheme,omitempty" doc:"Metadata json scheme used in the project."`
-	InstanceOwner  string `json:"instance_owner,omitempty" doc:"User handle of the owner of the LLM Service Instance used in the project."`
-	InstanceHandle string `json:"instance_handle,omitempty" doc:"Handle of the LLM Service Instance used in the project"`
-	PublicRead     bool   `json:"public_read,omitempty", default:"false" doc:"Whether the project is public or not"`
+	ProjectHandle  string       `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
+	Description    string       `json:"description,omitempty" maxLength:"255" doc:"Description of the project."`
+	MetadataScheme string       `json:"metadataScheme,omitempty" doc:"Metadata json scheme used in the project."`
+	InstanceOwner  string       `json:"instance_owner,omitempty" doc:"User handle of the owner of the LLM Service Instance used in the project."`
+	InstanceHandle string       `json:"instance_handle,omitempty" doc:"Handle of the LLM Service Instance used in the project"`
+	PublicRead     bool         `json:"public_read,omitempty", default:"false" doc:"Whether the project is public or not"`
+	SharedWith     []SharedUser `json:"shared_with,omitempty" doc:"List of users to share the project with upon creation"`
 }
 
 // Request and Response structs for the project administration API
@@ -115,9 +116,11 @@ type ShareProjectRequest struct {
 type ShareProjectResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
 	Body   struct {
-		Owner         string       `json:"owner" doc:"Instance owner"`
-		ProjectHandle string       `json:"project_handle" doc:"Project handle"`
-		SharedWith    []SharedUser `json:"shared_with" doc:"Users this project is shared with"`
+		Owner              string `json:"owner" doc:"Project owner"`
+		ProjectHandle      string `json:"project_handle" doc:"Project handle"`
+		ProjectID          int    `json:"project_id" doc:"Project ID"`
+		SharedWithHandle   string `json:"shared_with_handle" doc:"User handle that was granted access"`
+		SharedWithRole     string `json:"shared_with_role" doc:"Role granted to the user"`
 	}
 }
 
@@ -126,7 +129,7 @@ type ShareProjectResponse struct {
 
 type UnshareProjectRequest struct {
 	UserHandle        string `json:"user_handle" path:"user_handle" maxLength:"20" minLength:"3" example:"alice" doc:"Project owner handle"`
-	ProjectHandle     string `json:"instance_handle" path:"instance_handle" maxLength:"20" minLength:"3" example:"my-openai" doc:"Instance handle"`
+	ProjectHandle     string `json:"project_handle" path:"project_handle" maxLength:"20" minLength:"3" example:"my-project" doc:"Project handle"`
 	UnshareWithHandle string `json:"unshare_with_handle" path:"unshare_with_handle" maxLength:"20" minLength:"3" example:"bob" doc:"User handle to unshare from"`
 }
 
@@ -139,14 +142,14 @@ type UnshareProjectResponse struct {
 
 type GetProjectSharedUsersRequest struct {
 	UserHandle    string `json:"user_handle" path:"user_handle" maxLength:"20" minLength:"3" example:"alice" doc:"Project owner handle"`
-	ProjectHandle string `json:"project_handle" path:"project_handle" maxLength:"20" minLength:"3" example:"my-openai" doc:"Project handle"`
+	ProjectHandle string `json:"project_handle" path:"project_handle" maxLength:"20" minLength:"3" example:"my-project" doc:"Project handle"`
 }
 
 type GetProjectSharedUsersResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
 	Body   struct {
 		Owner         string       `json:"owner" doc:"Project owner"`
-		ProjectHandle string       `json:"instance_handle" doc:"Project handle"`
+		ProjectHandle string       `json:"project_handle" doc:"Project handle"`
 		SharedWith    []SharedUser `json:"shared_with" doc:"List of users this project is shared with"`
 	}
 }

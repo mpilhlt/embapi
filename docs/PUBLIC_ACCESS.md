@@ -2,19 +2,37 @@
 
 ## Overview
 
-Projects can be configured to allow unauthenticated (public) read access to embeddings and similar documents by including the special value `"*"` in the `shared_with` array when creating or updating a project.
+Projects can be configured to allow unauthenticated (public) read access to embeddings and similar documents by setting the `public_read` field to `true` when creating or updating a project.
+
+**Note**: The `shared_with` field is used for sharing projects with specific users. For public access, use the `public_read` boolean field. See the main [README.md](../README.md#project-sharing) for details on sharing with specific users.
 
 ## Usage
 
 ### Creating a Public Project
 
-When creating or updating a project, include `"*"` in the `shared_with` field:
+When creating or updating a project, set `public_read` to `true`:
 
 ```json
 {
   "project_handle": "my-public-project",
   "description": "A publicly accessible project",
-  "shared_with": ["*"]
+  "public_read": true
+}
+```
+
+You can also combine public access with user-specific sharing:
+
+```json
+{
+  "project_handle": "my-project",
+  "description": "A public project with additional editors",
+  "public_read": true,
+  "shared_with": [
+    {
+      "user_handle": "bob",
+      "role": "editor"
+    }
+  ]
 }
 ```
 
@@ -50,17 +68,14 @@ A `public_read` boolean flag is stored in the `projects` table to indicate wheth
 
 ### Backwards Compatibility
 
-For backwards compatibility, when `"*"` is included in `shared_with`:
-- The `public_read` flag is set to true (enabling unauthenticated access)
-- All existing users are still added to the `users_projects` table as readers
-- This ensures that existing authentication mechanisms continue to work
+The `public_read` flag defaults to `false`, so existing projects continue to require authentication for read operations unless explicitly updated.
 
 ### Project Metadata Display
 
 When a project has `public_read` enabled:
-- The `shared_with` field will display `["*"]` instead of an expanded list of all users
-- This makes it clear that the project is publicly accessible
-- Anonymous users can view project metadata including owner, description, and the `["*"]` indicator
+- The project is accessible without authentication for read operations
+- The `public_read` flag will be set to `true` in the project metadata
+- Anonymous users can view project metadata including owner and description
 
 ## Security Considerations
 
@@ -76,7 +91,7 @@ When a project has `public_read` enabled:
 ```bash
 # Get project metadata without authentication
 curl http://localhost:8080/v1/projects/alice/public-project
-# Returns: {"project_handle": "public-project", "owner": "alice", "shared_with": ["*"], ...}
+# Returns: {"project_handle": "public-project", "owner": "alice", "public_read": true, ...}
 
 # Get all embeddings without authentication
 curl http://localhost:8080/v1/embeddings/alice/public-project
@@ -105,4 +120,4 @@ curl -X POST http://localhost:8080/v1/embeddings/alice/public-project \
 
 ## Migration
 
-Existing projects are not affected. The `public_read` flag defaults to `false`, so all existing projects continue to require authentication for read operations unless explicitly updated to include `"*"` in their `shared_with`.
+Existing projects are not affected. The `public_read` flag defaults to `false`, so all existing projects continue to require authentication for read operations unless explicitly updated to set `public_read: true`.
