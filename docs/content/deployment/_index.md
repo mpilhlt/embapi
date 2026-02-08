@@ -5,11 +5,11 @@ weight: 5
 
 # Deployment Guide
 
-Deploy dhamps-vdb to production environments.
+Deploy embapi to production environments.
 
 ## Deployment Options
 
-dhamps-vdb can be deployed in several ways:
+embapi can be deployed in several ways:
 
 - **Docker Compose** - Simplest option, includes PostgreSQL
 - **Docker with External Database** - Production-ready setup

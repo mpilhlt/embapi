@@ -1,6 +1,6 @@
 # Docker Deployment Guide
 
-This guide explains how to deploy dhamps-vdb using Docker containers.
+This guide explains how to deploy embapi using Docker containers.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This guide explains how to deploy dhamps-vdb using Docker containers.
 
 ## Quick Start
 
-The fastest way to get started with dhamps-vdb using Docker:
+The fastest way to get started with embapi using Docker:
 
 ### Automated Setup (Recommended)
 
@@ -29,7 +29,7 @@ The fastest way to get started with dhamps-vdb using Docker:
 docker-compose up -d
 
 # Check logs
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 
 # Access the API
 curl http://localhost:8880/docs
@@ -50,7 +50,7 @@ cp .env.docker.template .env
 docker-compose up -d
 
 # 4. Check logs
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 
 # 5. Access the API
 curl http://localhost:8880/docs
@@ -90,7 +90,7 @@ All configuration is done via environment variables. You can set them:
 
 ### Option 1: Docker Compose with Included PostgreSQL (Recommended)
 
-This is the easiest option for getting started. It includes both dhamps-vdb and a PostgreSQL database with pgvector support.
+This is the easiest option for getting started. It includes both embapi and a PostgreSQL database with pgvector support.
 
 ```bash
 docker-compose up -d
@@ -98,21 +98,21 @@ docker-compose up -d
 
 This will:
 - Start a PostgreSQL 16 container with pgvector extension
-- Build and start the dhamps-vdb container
+- Build and start the embapi container
 - Set up networking between the containers
 - Persist database data in a Docker volume
 
 ### Option 2: Standalone Container with External Database
 
-If you have an existing PostgreSQL database with pgvector support, you can run just the dhamps-vdb container:
+If you have an existing PostgreSQL database with pgvector support, you can run just the embapi container:
 
 ```bash
 # Build the image
-docker build -t dhamps-vdb:latest .
+docker build -t embapi:latest .
 
 # Run the container
 docker run -d \
-  --name dhamps-vdb \
+  --name embapi \
   -p 8880:8880 \
   -e SERVICE_DBHOST=your-db-host \
   -e SERVICE_DBPORT=5432 \
@@ -121,7 +121,7 @@ docker run -d \
   -e SERVICE_DBNAME=your-db-name \
   -e SERVICE_ADMINKEY=your-admin-key \
   -e ENCRYPTION_KEY=your-encryption-key \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 ### Option 3: Docker Compose with External Database
@@ -135,7 +135,7 @@ Modify `docker-compose.yml` to comment out or remove the `postgres` service, the
 #     ...
 
 services:
-  dhamps-vdb:
+  embapi:
     # ... rest of the configuration
     environment:
       SERVICE_DBHOST: external-db.example.com  # Your external database
@@ -148,13 +148,13 @@ To build the Docker image manually:
 
 ```bash
 # Build with default tag
-docker build -t dhamps-vdb:latest .
+docker build -t embapi:latest .
 
 # Build with specific tag
-docker build -t dhamps-vdb:v0.1.0 .
+docker build -t embapi:v0.1.0 .
 
 # Build with no cache (clean build)
-docker build --no-cache -t dhamps-vdb:latest .
+docker build --no-cache -t embapi:latest .
 ```
 
 The Dockerfile uses a multi-stage build:
@@ -186,7 +186,7 @@ docker-compose logs
 docker-compose logs -f
 
 # View logs for specific service
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 docker-compose logs -f postgres
 ```
 
@@ -210,7 +210,7 @@ docker-compose down -v
 docker-compose restart
 
 # Restart specific service
-docker-compose restart dhamps-vdb
+docker-compose restart embapi
 ```
 
 ## Running Standalone Container
@@ -219,17 +219,17 @@ docker-compose restart dhamps-vdb
 
 ```bash
 docker run -d \
-  --name dhamps-vdb \
+  --name embapi \
   -p 8880:8880 \
   --env-file .env \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 ### Run with Individual Environment Variables
 
 ```bash
 docker run -d \
-  --name dhamps-vdb \
+  --name embapi \
   -p 8880:8880 \
   -e SERVICE_DEBUG=false \
   -e SERVICE_HOST=0.0.0.0 \
@@ -241,17 +241,17 @@ docker run -d \
   -e SERVICE_DBNAME=dhamps_vdb \
   -e SERVICE_ADMINKEY=admin-key \
   -e ENCRYPTION_KEY=encryption-key-32-chars-min \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 ### Interactive Run (for debugging)
 
 ```bash
 docker run -it --rm \
-  --name dhamps-vdb \
+  --name embapi \
   -p 8880:8880 \
   --env-file .env \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 ## Connecting to External Database
@@ -288,7 +288,7 @@ GRANT ALL ON SCHEMA public TO dhamps_user;
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-### Configure dhamps-vdb
+### Configure embapi
 
 In your `.env` file:
 
@@ -309,7 +309,7 @@ For docker-compose with external database, you can either:
    #     ...
    ```
 
-2. **Or skip docker-compose** and run just the dhamps-vdb container with `docker run`.
+2. **Or skip docker-compose** and run just the embapi container with `docker run`.
 
 ## Data Persistence
 
@@ -329,7 +329,7 @@ docker volume ls
 
 Inspect volume:
 ```bash
-docker volume inspect dhamps-vdb_postgres_data
+docker volume inspect embapi_postgres_data
 ```
 
 ### Backup Database
@@ -373,7 +373,7 @@ For Docker Swarm:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     secrets:
       - admin_key
       - encryption_key
@@ -394,8 +394,8 @@ secrets:
 
 Check logs:
 ```bash
-docker-compose logs dhamps-vdb
-docker logs dhamps-vdb
+docker-compose logs embapi
+docker logs embapi
 ```
 
 Common issues:
@@ -423,10 +423,10 @@ docker-compose exec postgres psql -U postgres -d dhamps_vdb -c "SELECT 1;"
 docker ps
 
 # Check port mapping
-docker port dhamps-vdb
+docker port embapi
 
 # Test from inside container
-docker-compose exec dhamps-vdb wget -O- http://localhost:8880/docs
+docker-compose exec embapi wget -O- http://localhost:8880/docs
 
 # Test from host
 curl http://localhost:8880/docs
@@ -445,7 +445,7 @@ If you see permission errors, check:
 docker-compose down -v
 
 # Remove images
-docker rmi dhamps-vdb:latest
+docker rmi embapi:latest
 docker rmi pgvector/pgvector:0.7.4-pg16
 
 # Start fresh
@@ -456,10 +456,10 @@ docker-compose up -d --build
 
 ```bash
 # Check health status
-docker inspect --format='{{.State.Health.Status}}' dhamps-vdb
+docker inspect --format='{{.State.Health.Status}}' embapi
 
 # View health check logs
-docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' dhamps-vdb
+docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' embapi
 ```
 
 ### Docker build fails with network/TLS errors
@@ -468,13 +468,13 @@ If you encounter errors like "TLS: unspecified error" or "Permission denied" whe
 
 ```bash
 # Try building with host network mode
-docker build --network=host -t dhamps-vdb:latest .
+docker build --network=host -t embapi:latest .
 
 # Or use a different mirror
-docker build --build-arg ALPINE_MIRROR=http://dl-2.alpinelinux.org/alpine/ -t dhamps-vdb:latest .
+docker build --build-arg ALPINE_MIRROR=http://dl-2.alpinelinux.org/alpine/ -t embapi:latest .
 
 # Or pull a pre-built image if available
-docker pull <registry>/dhamps-vdb:latest
+docker pull <registry>/embapi:latest
 ```
 
 These errors typically indicate network restrictions or firewall issues in the build environment. The Docker files are correct and will work in standard environments.
@@ -486,7 +486,7 @@ These errors typically indicate network restrictions or firewall issues in the b
 ```bash
 docker build \
   --build-arg GO_VERSION=1.24 \
-  -t dhamps-vdb:custom .
+  -t embapi:custom .
 ```
 
 ### Resource Limits
@@ -495,7 +495,7 @@ Add to docker-compose.yml:
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     deploy:
       resources:
         limits:
@@ -516,7 +516,7 @@ docker network create app-network
 
 ```yaml
 services:
-  dhamps-vdb:
+  embapi:
     networks:
       - app-network
 
@@ -582,7 +582,7 @@ curl -X POST http://localhost:8880/v1/users \
 
 ### Common Issues
 
-1. **Container won't start**: Check logs with `docker-compose logs dhamps-vdb`
+1. **Container won't start**: Check logs with `docker-compose logs embapi`
 2. **Can't connect to database**: Verify postgres is healthy with `docker-compose ps`
 3. **API returns 401**: Check that SERVICE_ADMINKEY is set correctly
 4. **Port already in use**: Change API_PORT or POSTGRES_PORT in .env file

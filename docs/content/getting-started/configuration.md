@@ -5,7 +5,7 @@ weight: 2
 
 # Configuration
 
-Configure dhamps-vdb using environment variables or command-line options.
+Configure embapi using environment variables or command-line options.
 
 ## Environment Variables
 
@@ -63,7 +63,7 @@ ENCRYPTION_KEY=your-32-character-encryption-key-minimum
 You can also provide configuration via command-line flags:
 
 ```bash
-./dhamps-vdb \
+./embapi \
   --debug \
   -p 8880 \
   --db-host localhost \

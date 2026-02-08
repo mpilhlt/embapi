@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/handlers"
+	"github.com/mpilhlt/embapi/internal/handlers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +30,7 @@ func TestAdminFunc(t *testing.T) {
 		method       string
 		requestPath  string
 		bodyPath     string
-		VDBKey       string
+		EmbAPIKey       string
 		expectBody   string
 		expectStatus int16
 	}{
@@ -39,7 +39,7 @@ func TestAdminFunc(t *testing.T) {
 			method:       http.MethodGet,
 			requestPath:  "/v1/admin/footgun",
 			bodyPath:     "",
-			VDBKey:       "",
+			EmbAPIKey:       "",
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Unauthorized\",\n  \"status\": 401,\n  \"detail\": \"Authentication failed. Perhaps a missing or incorrect API key?\"\n}\n",
 			expectStatus: http.StatusUnauthorized,
 		},
@@ -48,7 +48,7 @@ func TestAdminFunc(t *testing.T) {
 			method:       http.MethodGet,
 			requestPath:  "/v1/admin/footgun",
 			bodyPath:     "",
-			VDBKey:       options.AdminKey,
+			EmbAPIKey:       options.AdminKey,
 			expectBody:   "",
 			expectStatus: http.StatusNoContent,
 		},
@@ -78,7 +78,7 @@ func TestAdminFunc(t *testing.T) {
 			requestURL := fmt.Sprintf("http://%v:%d%v", options.Host, options.Port, v.requestPath)
 			req, err := http.NewRequest(v.method, requestURL, reqBody)
 			assert.NoError(t, err)
-			req.Header.Set("Authorization", "Bearer "+v.VDBKey)
+			req.Header.Set("Authorization", "Bearer "+v.EmbAPIKey)
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
 				t.Errorf("Error sending request: %v\n", err)

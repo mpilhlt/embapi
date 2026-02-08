@@ -34,7 +34,7 @@ paths:
                   type: string
                 email:
                   type: string
-                VDBKey:
+                EmbAPIKey:
                   type: string
       responses:
         "200":
@@ -107,7 +107,7 @@ paths:
                   type: string
                 email:
                   type: string
-                VDBKey:
+                EmbAPIKey:
                   type: string
       responses:
         "200":
@@ -308,7 +308,7 @@ components:
         email:
           type: string
           format: email
-        VDBKey:
+        EmbAPIKey:
           type: string
           minLength: 32
           maxLength: 32
@@ -321,7 +321,7 @@ components:
       required:
         - handle
         - email
-        - VDBKey
+        - EmbAPIKey
     project:
       type: object
       properties:

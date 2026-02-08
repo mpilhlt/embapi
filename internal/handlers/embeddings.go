@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgtype"

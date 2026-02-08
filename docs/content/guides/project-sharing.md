@@ -5,7 +5,7 @@ weight: 2
 
 # Project Sharing Guide
 
-This guide explains how to share projects with specific users for collaborative work in dhamps-vdb.
+This guide explains how to share projects with specific users for collaborative work in embapi.
 
 ## Overview
 

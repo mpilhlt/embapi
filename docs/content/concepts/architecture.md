@@ -5,7 +5,7 @@ weight: 1
 
 # Architecture
 
-dhamps-vdb is a vector database API designed for RAG (Retrieval Augmented Generation) workflows in Digital Humanities research.
+embapi is a vector database API designed for RAG (Retrieval Augmented Generation) workflows in Digital Humanities research.
 
 ## System Overview
 
@@ -17,7 +17,7 @@ dhamps-vdb is a vector database API designed for RAG (Retrieval Augmented Genera
        │ HTTP/REST
        │
 ┌──────▼──────────────────────────┐
-│      dhamps-vdb API Server      │
+│      embapi API Server      │
 │  ┌──────────────────────────┐   │
 │  │   Authentication Layer   │   │
 │  └────────┬─────────────────┘   │

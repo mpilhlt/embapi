@@ -62,7 +62,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 		method       string
 		requestPath  string
 		bodyJSON     string
-		VDBKey       string
+		EmbAPIKey       string
 		expectBody   string
 		expectStatus int16
 	}{
@@ -71,7 +71,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/alice/embedding1/share",
 			bodyJSON:     `{"share_with_handle": "charlie", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Bad Request\",\n  \"status\": 400,\n  \"detail\": \"target user charlie does not exist: user charlie not found\"\n}\n",
 			expectStatus: http.StatusBadRequest,
 		},
@@ -80,7 +80,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/alice/nonexistent/share",
 			bodyJSON:     `{"share_with_handle": "bob", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Not Found\",\n  \"status\": 404,\n  \"detail\": \"instance alice/nonexistent not found\"\n}\n",
 			expectStatus: http.StatusNotFound,
 		},
@@ -89,7 +89,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/alice/embedding1/share",
 			bodyJSON:     `{"share_with_handle": "alice", "role": "editor"}`,
-			VDBKey:       bobAPIKey,
+			EmbAPIKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Unauthorized\",\n  \"status\": 401,\n  \"detail\": \"Authentication failed. Perhaps a missing or incorrect API key?\"\n}\n",
 			expectStatus: http.StatusUnauthorized,
 		},
@@ -98,7 +98,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/alice/embedding1/share",
 			bodyJSON:     `{"share_with_handle": "bob", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareInstanceResponseBody.json\",\n  \"owner\": \"alice\",\n  \"instance_handle\": \"embedding1\",\n  \"shared_with\": [\n    {\n      \"user_handle\": \"bob\",\n      \"role\": \"reader\"\n    }\n  ]\n}\n",
 			expectStatus: http.StatusCreated,
 		},
@@ -107,7 +107,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodGet,
 			requestPath:  "/v1/llm-instances/alice/embedding1/shared-with",
 			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetInstanceSharedUsersResponseBody.json\",\n  \"owner\": \"alice\",\n  \"instance_handle\": \"embedding1\",\n  \"shared_with\": [\n    {\n      \"user_handle\": \"bob\",\n      \"role\": \"reader\"\n    }\n  ]\n}\n",
 			expectStatus: http.StatusOK,
 		},
@@ -116,7 +116,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodDelete,
 			requestPath:  "/v1/llm-instances/alice/embedding1/share/bob",
 			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "",
 			expectStatus: http.StatusNoContent,
 		},
@@ -125,7 +125,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			method:       http.MethodGet,
 			requestPath:  "/v1/llm-instances/alice/embedding1/shared-with",
 			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetInstanceSharedUsersResponseBody.json\",\n  \"owner\": \"alice\",\n  \"instance_handle\": \"embedding1\",\n  \"shared_with\": []\n}\n",
 			expectStatus: http.StatusOK,
 		},
@@ -144,7 +144,7 @@ func TestInstanceSharingFunc(t *testing.T) {
 			assert.NoError(t, err)
 
 			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+v.VDBKey)
+			req.Header.Set("Authorization", "Bearer "+v.EmbAPIKey)
 
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
@@ -255,7 +255,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 		method       string
 		requestPath  string
 		bodyJSON     string
-		VDBKey       string
+		EmbAPIKey       string
 		expectBody   string
 		expectStatus int16
 	}{
@@ -264,7 +264,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/bob/from-definition",
 			bodyJSON:     `{"user_handle": "bob", "instance_handle": "bob-instance1", "definition_owner": "alice", "definition_handle": "openai-large", "endpoint": "https://api.openai.com/v1/embeddings", "description": "Bob's instance based on Alice's definition"}`,
-			VDBKey:       bobAPIKey,
+			EmbAPIKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Forbidden\",\n  \"status\": 403,\n  \"detail\": \"user does not have access to definition alice/openai-large\"\n}\n",
 			expectStatus: http.StatusForbidden,
 		},
@@ -273,7 +273,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/bob/from-definition",
 			bodyJSON:     `{"user_handle": "bob", "instance_handle": "bob-instance1", "definition_owner": "alice", "definition_handle": "nonexistant", "endpoint": "https://api.openai.com/v1/embeddings", "description": "Bob's instance based on Alice's definition"}`,
-			VDBKey:       bobAPIKey,
+			EmbAPIKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Not Found\",\n  \"status\": 404,\n  \"detail\": \"definition alice/nonexistant not found\"\n}\n",
 			expectStatus: http.StatusNotFound,
 		},
@@ -282,7 +282,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-instances/bob/from-definition",
 			bodyJSON:     `{"user_handle": "bob", "instance_handle": "bob-instance1", "definition_owner": "_system", "definition_handle": "openai-large", "endpoint": "https://api.openai.com/v1/embeddings", "description": "Bob's instance based on _system's definition"}`,
-			VDBKey:       bobAPIKey,
+			EmbAPIKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/UploadInstanceResponseBody.json\",\n  \"owner\": \"bob\",\n  \"instance_handle\": \"bob-instance1\",\n  \"instance_id\": 1\n}\n",
 			expectStatus: http.StatusOK,
 		},
@@ -291,7 +291,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodPost,
 			requestPath:  "/v1/llm-definitions/alice/openai-large/share",
 			bodyJSON:     `{"share_with_handle": "bob"}`,
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareDefinitionResponseBody.json\",\n  \"owner\": \"alice\",\n  \"definition_handle\": \"openai-large\",\n  \"shared_with\": [\n    \"bob\"\n  ]\n}\n",
 			expectStatus: http.StatusCreated,
 		},
@@ -300,7 +300,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodGet,
 			requestPath:  "/v1/llm-definitions/alice/openai-large/shared-with",
 			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "[\n  \"bob\"\n]\n",
 			expectStatus: http.StatusOK,
 		},
@@ -309,7 +309,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			method:       http.MethodDelete,
 			requestPath:  "/v1/llm-definitions/alice/openai-large/share/bob",
 			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			EmbAPIKey:       aliceAPIKey,
 			expectBody:   "",
 			expectStatus: http.StatusNoContent,
 		},
@@ -328,7 +328,7 @@ func TestDefinitionSharingFunc(t *testing.T) {
 			assert.NoError(t, err)
 
 			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+v.VDBKey)
+			req.Header.Set("Authorization", "Bearer "+v.EmbAPIKey)
 
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {

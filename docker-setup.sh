@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Quick setup script for dhamps-vdb Docker deployment
+# Quick setup script for embapi Docker deployment
 #
 # This script helps you quickly set up environment variables for Docker deployment.
 #
@@ -8,7 +8,7 @@
 set -e
 
 echo "====================================="
-echo "dhamps-vdb Docker Quick Setup"
+echo "embapi Docker Quick Setup"
 echo "====================================="
 echo ""
 

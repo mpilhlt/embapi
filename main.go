@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/auth"
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/handlers"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/auth"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/handlers"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/danielgtaylor/huma/v2/autopatch"
@@ -108,10 +108,10 @@ func main() {
 
 		api := humago.New(router, config)
 		api.UseMiddleware(auth.CORSMiddleware(api))
-		api.UseMiddleware(auth.VDBKeyAdminAuth(api, options))
-		api.UseMiddleware(auth.VDBKeyOwnerAuth(api, pool, options))
-		api.UseMiddleware(auth.VDBKeyEditorAuth(api, pool, options))
-		api.UseMiddleware(auth.VDBKeyReaderAuth(api, pool, options))
+		api.UseMiddleware(auth.EmbAPIKeyAdminAuth(api, options))
+		api.UseMiddleware(auth.EmbAPIKeyOwnerAuth(api, pool, options))
+		api.UseMiddleware(auth.EmbAPIKeyEditorAuth(api, pool, options))
+		api.UseMiddleware(auth.EmbAPIKeyReaderAuth(api, pool, options))
 		api.UseMiddleware(auth.AuthTermination(api))
 
 		// Add routes to the API

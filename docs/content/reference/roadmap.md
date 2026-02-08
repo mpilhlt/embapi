@@ -5,11 +5,11 @@ weight: 3
 
 # Product Roadmap
 
-Development roadmap for dhamps-vdb, tracking completed features, in-progress work, and planned enhancements.
+Development roadmap for embapi, tracking completed features, in-progress work, and planned enhancements.
 
 ## Overview
 
-This roadmap outlines the development priorities for dhamps-vdb. Items marked with [x] are completed, items in progress are noted, and planned features are listed by priority.
+This roadmap outlines the development priorities for embapi. Items marked with [x] are completed, items in progress are noted, and planned features are listed by priority.
 
 ## Completed Features
 
@@ -329,9 +329,9 @@ Contributions are welcome! See the main repository for:
 
 We value your feedback! Please share:
 
-- **Feature requests** - What would make dhamps-vdb more useful?
+- **Feature requests** - What would make embapi more useful?
 - **Bug reports** - Help us improve quality
-- **Use cases** - How are you using dhamps-vdb?
+- **Use cases** - How are you using embapi?
 - **Documentation** - What needs clarification?
 
 Open an issue on GitHub or contact the maintainers directly.
@@ -343,4 +343,4 @@ Open an issue on GitHub or contact the maintainers directly.
 - [Deployment Guide](../../deployment/)
 - [Reference - Configuration](configuration/)
 - [Reference - Database Schema](database-schema/)
-- [GitHub Repository](https://github.com/mpilhlt/dhamps-vdb)
+- [GitHub Repository](https://github.com/mpilhlt/embapi)

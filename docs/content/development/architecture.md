@@ -5,12 +5,12 @@ weight: 3
 
 # Technical Architecture
 
-This document provides a technical deep-dive into dhamps-vdb's architecture for developers who want to understand or modify the codebase.
+This document provides a technical deep-dive into embapi's architecture for developers who want to understand or modify the codebase.
 
 ## Project Structure
 
 ```
-dhamps-vdb/
+embapi/
 ├── main.go                        # Application entry point
 ├── go.mod                         # Go module definition
 ├── go.sum                         # Dependency checksums
@@ -111,7 +111,7 @@ func main() {
 		
 		// 4. Create HTTP router and Huma API
 		router := http.NewServeMux()
-		api := humago.New(router, huma.DefaultConfig("dhamps-vdb", "0.1.0"))
+		api := humago.New(router, huma.DefaultConfig("embapi", "0.1.0"))
 		
 		// 5. Register all routes
 		handlers.AddRoutes(pool, keyGen, api)
@@ -291,7 +291,7 @@ Migration files are numbered sequentially:
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     user_handle TEXT UNIQUE NOT NULL,
-    vdb_key TEXT UNIQUE NOT NULL,
+    embapi_key TEXT UNIQUE NOT NULL,
     ...
 );
 
@@ -315,7 +315,7 @@ Write SQL, generate type-safe Go code:
 ```sql
 -- name: UpsertUser :one
 INSERT INTO users (
-  user_handle, name, email, vdb_key, created_at, updated_at
+  user_handle, name, email, embapi_key, created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4, NOW(), NOW()
 )
@@ -500,7 +500,7 @@ func Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 
 ## Huma Framework Integration
 
-dhamps-vdb uses [Huma](https://huma.rocks/) for API development:
+embapi uses [Huma](https://huma.rocks/) for API development:
 
 ### Benefits
 
@@ -658,8 +658,8 @@ if err != nil {
 Go's `internal/` directory enforces package privacy:
 
 ```go
-// This import works within dhamps-vdb
-import "github.com/mpilhlt/dhamps-vdb/internal/database"
+// This import works within embapi
+import "github.com/mpilhlt/embapi/internal/database"
 
 // This import would FAIL from external projects
 // Enforced by Go compiler
@@ -766,13 +766,13 @@ See [Testing Guide](../testing/) for comprehensive testing documentation.
 
 ```bash
 # Development build
-go build -o dhamps-vdb main.go
+go build -o embapi main.go
 
 # Production build with optimizations
-go build -ldflags="-s -w" -o dhamps-vdb main.go
+go build -ldflags="-s -w" -o embapi main.go
 
 # Cross-compilation
-GOOS=linux GOARCH=amd64 go build -o dhamps-vdb-linux main.go
+GOOS=linux GOARCH=amd64 go build -o embapi-linux main.go
 ```
 
 ### Docker Build
@@ -786,15 +786,15 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -ldflags="-s -w" -o dhamps-vdb main.go
+RUN go build -ldflags="-s -w" -o embapi main.go
 
 # Runtime stage
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
-COPY --from=builder /app/dhamps-vdb .
+COPY --from=builder /app/embapi .
 EXPOSE 8880
-CMD ["./dhamps-vdb"]
+CMD ["./embapi"]
 ```
 
 ### Configuration

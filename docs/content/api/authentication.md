@@ -53,7 +53,7 @@ Set the admin key via environment variable when launching the service:
 
 ```bash
 export ADMIN_KEY="your-secure-admin-key-here"
-./dhamps-vdb
+./embapi
 ```
 
 ### User Key

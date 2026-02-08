@@ -34,9 +34,9 @@ sql:
           api_standard_handle: "APIStandardHandle"
           api_key_encrypted: "APIKeyEncrypted"
           has_api_key: "HasAPIKey"
-          vdb_key: "VDBKey"
+          vdb_key: "EmbAPIKey"
           # - column: "users.vdb_key"
           #   go_type:
           #     type: "[]byte"
         # rename:
-        #   decode: "VDBKey"
+        #   decode: "EmbAPIKey"

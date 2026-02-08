@@ -8,6 +8,8 @@
 *.so
 *.dylib
 build/*
+dhamps-vdb
+embapi
 
 # Test binary, built with `go test -c`
 *.test

@@ -5,11 +5,11 @@ weight: 3
 
 # Environment Variables
 
-Complete reference for all environment variables used by dhamps-vdb.
+Complete reference for all environment variables used by embapi.
 
 ## Overview
 
-dhamps-vdb is configured entirely through environment variables. These can be set:
+embapi is configured entirely through environment variables. These can be set:
 
 1. **In a `.env` file** (recommended for Docker)
 2. **As system environment variables**
@@ -17,7 +17,7 @@ dhamps-vdb is configured entirely through environment variables. These can be se
 
 ## Required Variables
 
-These variables **must** be set for dhamps-vdb to function:
+These variables **must** be set for embapi to function:
 
 ### SERVICE_ADMINKEY
 
@@ -359,15 +359,15 @@ docker run -d \
   -e SERVICE_ADMINKEY=admin-key \
   -e ENCRYPTION_KEY=encryption-key \
   -e SERVICE_DBHOST=db-host \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 With docker-compose.yml:
 
 ```yaml
 services:
-  dhamps-vdb:
-    image: dhamps-vdb:latest
+  embapi:
+    image: embapi:latest
     environment:
       SERVICE_DEBUG: "false"
       SERVICE_HOST: "0.0.0.0"
@@ -382,7 +382,7 @@ services:
 Some variables support command-line flags:
 
 ```bash
-./dhamps-vdb \
+./embapi \
   --debug \
   --host 0.0.0.0 \
   --port 8880 \
@@ -440,7 +440,7 @@ Error: failed to connect to database
 
 ```bash
 # Start service with debug logging
-SERVICE_DEBUG=true ./dhamps-vdb
+SERVICE_DEBUG=true ./embapi
 
 # Check if service starts successfully
 curl http://localhost:8880/docs

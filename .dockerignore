@@ -17,7 +17,7 @@ testdata/
 
 # Build artifacts
 build/
-dhamps-vdb
+embapi
 
 # Go workspace
 go.work

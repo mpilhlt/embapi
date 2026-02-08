@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/mpilhlt/dhamps-vdb/internal/crypto"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/crypto"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -198,7 +198,7 @@ func InitializeSystemUserKey(ctx context.Context, conn *pgx.Conn) error {
 	// Check if _system user has the placeholder key
 	var currentKey string
 	err = conn.QueryRow(ctx, 
-		"SELECT vdb_key FROM users WHERE user_handle = '_system'").Scan(&currentKey)
+		"SELECT embapi_key FROM users WHERE user_handle = '_system'").Scan(&currentKey)
 	if err != nil {
 		// User doesn't exist or other error, skip silently
 		return nil
@@ -223,7 +223,7 @@ func InitializeSystemUserKey(ctx context.Context, conn *pgx.Conn) error {
 		}
 
 		_, err = conn.Exec(ctx, `
-			UPDATE users SET vdb_key = $1, updated_at = NOW() WHERE user_handle = '_system'
+			UPDATE users SET embapi_key = $1, updated_at = NOW() WHERE user_handle = '_system'
 		`, apiKey)
 		if err != nil {
 			// Don't expose the key in error messages

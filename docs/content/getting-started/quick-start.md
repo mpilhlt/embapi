@@ -9,7 +9,7 @@ Complete walkthrough from installation to searching similar documents using curl
 
 ## Prerequisites
 
-- dhamps-vdb installed and running
+- embapi installed and running
 - Admin API key configured
 - PostgreSQL with pgvector ready
 
@@ -35,12 +35,12 @@ curl -X POST http://localhost:8880/v1/users \
   "user_handle": "alice",
   "name": "Alice Smith",
   "email": "alice@example.com",
-  "vdb_key": "024v2013621509245f2e24...",
+  "embapi_key": "024v2013621509245f2e24...",
   "created_at": "2024-01-15T10:30:00Z"
 }
 ```
 
-**Save the `vdb_key`** - it cannot be recovered later.
+**Save the `embapi_key`** - it cannot be recovered later.
 
 ## 2. Create an LLM Service Instance
 
@@ -48,7 +48,7 @@ Create an LLM service configuration:
 
 ```bash
 curl -X PUT http://localhost:8880/v1/llm-services/alice/my-openai \
-  -H "Authorization: Bearer alice_vdb_key" \
+  -H "Authorization: Bearer alice_embapi_key" \
   -H "Content-Type: application/json" \
   -d '{
     "endpoint": "https://api.openai.com/v1/embeddings",
@@ -79,7 +79,7 @@ Create a project to organize your embeddings:
 
 ```bash
 curl -X POST http://localhost:8880/v1/projects/alice \
-  -H "Authorization: Bearer alice_vdb_key" \
+  -H "Authorization: Bearer alice_embapi_key" \
   -H "Content-Type: application/json" \
   -d '{
     "project_handle": "research-docs",
@@ -108,7 +108,7 @@ Upload document embeddings to your project:
 
 ```bash
 curl -X POST http://localhost:8880/v1/embeddings/alice/research-docs \
-  -H "Authorization: Bearer alice_vdb_key" \
+  -H "Authorization: Bearer alice_embapi_key" \
   -H "Content-Type: application/json" \
   -d '{
     "embeddings": [
@@ -156,7 +156,7 @@ Find documents similar to an already-stored document:
 
 ```bash
 curl -X GET "http://localhost:8880/v1/similars/alice/research-docs/doc1?count=5&threshold=0.7" \
-  -H "Authorization: Bearer alice_vdb_key"
+  -H "Authorization: Bearer alice_embapi_key"
 ```
 
 **Response:**
@@ -184,7 +184,7 @@ Search without storing the query embedding:
 
 ```bash
 curl -X POST "http://localhost:8880/v1/similars/alice/research-docs?count=5&threshold=0.7" \
-  -H "Authorization: Bearer alice_vdb_key" \
+  -H "Authorization: Bearer alice_embapi_key" \
   -H "Content-Type: application/json" \
   -d '{
     "vector": [0.12, 0.22, 0.32, ..., 0.52]
@@ -197,7 +197,7 @@ Exclude documents from a specific author when searching:
 
 ```bash
 curl -X GET "http://localhost:8880/v1/similars/alice/research-docs/doc1?count=5&metadata_path=author&metadata_value=Alice" \
-  -H "Authorization: Bearer alice_vdb_key"
+  -H "Authorization: Bearer alice_embapi_key"
 ```
 
 This excludes all documents where `metadata.author` equals "Alice".
@@ -208,14 +208,14 @@ Get all embeddings in your project:
 
 ```bash
 curl -X GET "http://localhost:8880/v1/embeddings/alice/research-docs?limit=10&offset=0" \
-  -H "Authorization: Bearer alice_vdb_key"
+  -H "Authorization: Bearer alice_embapi_key"
 ```
 
 Get a specific embedding:
 
 ```bash
 curl -X GET http://localhost:8880/v1/embeddings/alice/research-docs/doc1 \
-  -H "Authorization: Bearer alice_vdb_key"
+  -H "Authorization: Bearer alice_embapi_key"
 ```
 
 ## Complete Workflow Example
@@ -235,7 +235,7 @@ USER_RESPONSE=$(curl -s -X POST "$API_URL/v1/users" \
   -H "Content-Type: application/json" \
   -d '{"user_handle":"alice","name":"Alice Smith","email":"alice@example.com"}')
 
-USER_KEY=$(echo $USER_RESPONSE | jq -r '.vdb_key')
+USER_KEY=$(echo $USER_RESPONSE | jq -r '.embapi_key')
 echo "User created with key: $USER_KEY"
 
 # 2. Create LLM service instance

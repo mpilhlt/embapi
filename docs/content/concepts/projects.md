@@ -244,7 +244,7 @@ List all projects owned by a user:
 
 ```bash
 GET /v1/projects/alice
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Returns array of project objects.
@@ -253,7 +253,7 @@ Returns array of project objects.
 
 ```bash
 GET /v1/projects/alice/research
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 Returns full project object including:
@@ -290,7 +290,7 @@ PUT /v1/projects/alice/research
 
 ```bash
 DELETE /v1/projects/alice/research
-Authorization: Bearer alice_vdb_key
+Authorization: Bearer alice_embapi_key
 ```
 
 **Cascading deletion:**

@@ -51,7 +51,7 @@ func TestApiKeyIsValid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := VDBKeyIsValid(tt.rawKey, tt.storedHash); got != tt.want {
+			if got := EmbAPIKeyIsValid(tt.rawKey, tt.storedHash); got != tt.want {
 				t.Errorf("apiKeyIsValid() = %v, want %v", got, tt.want)
 			}
 		})

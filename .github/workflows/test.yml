@@ -41,7 +41,7 @@ jobs:
       run: go mod download
       
     - name: Verify build
-      run: go build -o build/dhamps-vdb main.go
+      run: go build -o build/embapi main.go
       
     - name: Run tests
       run: go test -v ./...

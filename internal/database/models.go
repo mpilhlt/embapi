@@ -98,7 +98,7 @@ type User struct {
 	UserHandle string           `db:"user_handle" json:"user_handle"`
 	Name       pgtype.Text      `db:"name" json:"name"`
 	Email      string           `db:"email" json:"email"`
-	VDBKey     string           `db:"vdb_key" json:"vdb_key"`
+	EmbAPIKey     string           `db:"embapi_key" json:"embapi_key"`
 	CreatedAt  pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 }

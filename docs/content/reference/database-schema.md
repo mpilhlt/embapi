@@ -5,7 +5,7 @@ weight: 2
 
 # Database Schema Reference
 
-Complete reference for the dhamps-vdb PostgreSQL database schema. This document describes all tables, columns, types, constraints, relationships, and indexes.
+Complete reference for the embapi PostgreSQL database schema. This document describes all tables, columns, types, constraints, relationships, and indexes.
 
 ## Overview
 
@@ -39,14 +39,14 @@ Stores user accounts with API authentication.
 | `user_handle` | `VARCHAR(20)` | PRIMARY KEY | Unique user identifier (username) |
 | `name` | `TEXT` | | Full name or display name |
 | `email` | `TEXT` | UNIQUE, NOT NULL | Email address |
-| `vdb_key` | `CHAR(64)` | UNIQUE, NOT NULL | API key (64-character hex) |
+| `embapi_key` | `CHAR(64)` | UNIQUE, NOT NULL | API key (64-character hex) |
 | `created_at` | `TIMESTAMP` | NOT NULL | Creation timestamp |
 | `updated_at` | `TIMESTAMP` | NOT NULL | Last update timestamp |
 
 **Indexes:**
 - Primary key on `user_handle`
 - Unique constraint on `email`
-- Unique constraint on `vdb_key`
+- Unique constraint on `embapi_key`
 
 **Special Users:**
 - `_system` - Reserved system user for global LLM service definitions
@@ -59,7 +59,7 @@ Stores user accounts with API authentication.
 - Can share LLM service instances (N:M via `instances_shared_with`)
 
 **Notes:**
-- `vdb_key` is generated during user creation and returned once
+- `embapi_key` is generated during user creation and returned once
 - Cannot be recovered if lost
 - Transmitted as `Authorization: Bearer` token
 
@@ -463,7 +463,7 @@ ORDER BY embedding_count DESC;
 
 **Critical Data:**
 - User accounts (`users`)
-- API keys (`vdb_key` in users, `api_key_encrypted` in instances)
+- API keys (`embapi_key` in users, `api_key_encrypted` in instances)
 - ENCRYPTION_KEY environment variable (backup separately!)
 - Projects and embeddings
 

@@ -269,7 +269,7 @@ Researchers worldwide can access the data without credentials, but only authoriz
 
 ### Public API Backend
 
-Build a public search API on top of dhamps-vdb:
+Build a public search API on top of embapi:
 
 ```python
 import requests

@@ -5,11 +5,11 @@ weight: 1
 
 # Configuration Reference
 
-Complete reference for configuring dhamps-vdb. This guide consolidates all configuration options, including environment variables, command-line flags, and Docker configuration.
+Complete reference for configuring embapi. This guide consolidates all configuration options, including environment variables, command-line flags, and Docker configuration.
 
 ## Overview
 
-dhamps-vdb is configured through a combination of:
+embapi is configured through a combination of:
 
 1. **Environment variables** (recommended)
 2. **Command-line flags** (overrides environment variables)
@@ -64,7 +64,7 @@ Options for connecting to the PostgreSQL database with pgvector extension.
 - PostgreSQL 12+ (16+ recommended)
 - pgvector extension installed and enabled
 - User must have CREATE, ALTER, DROP, INSERT, SELECT, UPDATE, DELETE privileges
-- Database must exist before starting dhamps-vdb
+- Database must exist before starting embapi
 
 **Common Database Hosts:**
 - `localhost` - Local PostgreSQL instance
@@ -101,7 +101,7 @@ Critical security settings for authentication and encryption.
 
 ### .env File
 
-The recommended way to configure dhamps-vdb. Create a `.env` file in the project root:
+The recommended way to configure embapi. Create a `.env` file in the project root:
 
 ```bash
 # Copy template
@@ -179,7 +179,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  dhamps-vdb:
+  embapi:
     build:
       context: .
       dockerfile: Dockerfile
@@ -203,7 +203,7 @@ services:
 
 **Docker-Specific Variables:**
 - `POSTGRES_PORT` - External port for PostgreSQL (default: 5432)
-- `API_PORT` - External port for dhamps-vdb API (default: 8880)
+- `API_PORT` - External port for embapi API (default: 8880)
 
 ### Docker Setup Script
 
@@ -217,7 +217,7 @@ Automated setup using `docker-setup.sh`:
 docker-compose up -d
 
 # View logs
-docker-compose logs -f dhamps-vdb
+docker-compose logs -f embapi
 ```
 
 The script automatically:
@@ -232,7 +232,7 @@ For standalone container deployment:
 
 ```bash
 docker run -d \
-  --name dhamps-vdb \
+  --name embapi \
   -e SERVICE_DEBUG=false \
   -e SERVICE_HOST=0.0.0.0 \
   -e SERVICE_PORT=8880 \
@@ -244,7 +244,7 @@ docker run -d \
   -e SERVICE_ADMINKEY=admin_key_here \
   -e ENCRYPTION_KEY=encryption_key_here \
   -p 8880:8880 \
-  dhamps-vdb:latest
+  embapi:latest
 ```
 
 ### External Database
@@ -285,7 +285,7 @@ ENCRYPTION_KEY=dev-encryption-key-at-least-32-chars
 
 **Start service:**
 ```bash
-./dhamps-vdb
+./embapi
 ```
 
 ### Docker Development
@@ -362,7 +362,7 @@ go test -v ./...
 
 ### Startup Validation
 
-dhamps-vdb validates configuration on startup:
+embapi validates configuration on startup:
 
 1. **Required variables check** - Fails if missing
 2. **Database connection test** - Verifies connectivity
@@ -382,7 +382,7 @@ curl -X GET http://localhost:8880/v1/users \
   -H "Authorization: Bearer ${SERVICE_ADMINKEY}"
 
 # Check database connectivity
-docker-compose exec dhamps-vdb echo "Config OK"
+docker-compose exec embapi echo "Config OK"
 ```
 
 ### Common Issues
@@ -472,7 +472,7 @@ ConfigMap:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dhamps-vdb-config
+  name: embapi-config
 data:
   SERVICE_DEBUG: "false"
   SERVICE_HOST: "0.0.0.0"
@@ -488,7 +488,7 @@ Secrets:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dhamps-vdb-secrets
+  name: embapi-secrets
 type: Opaque
 stringData:
   SERVICE_DBPASSWORD: "secure_db_password"
@@ -505,7 +505,7 @@ echo "encryption_key" | docker secret create dhamps_encryption_key -
 
 # Reference in stack file
 services:
-  dhamps-vdb:
+  embapi:
     secrets:
       - dhamps_admin_key
       - dhamps_encryption_key

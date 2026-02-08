@@ -5,7 +5,7 @@ weight: 2
 
 # Database Setup
 
-dhamps-vdb requires PostgreSQL 11 or later with the pgvector extension.
+embapi requires PostgreSQL 11 or later with the pgvector extension.
 
 ## Requirements
 
@@ -96,7 +96,7 @@ CREATE DATABASE dhamps_vdb;
 
 ### Step 2: Create User
 
-Create a dedicated user for dhamps-vdb:
+Create a dedicated user for embapi:
 
 ```sql
 -- Create user with password
@@ -171,7 +171,7 @@ Exit psql:
 
 ## Connection String Format
 
-dhamps-vdb connects using these environment variables:
+embapi connects using these environment variables:
 
 ```bash
 SERVICE_DBHOST=localhost      # Database hostname
@@ -247,7 +247,7 @@ max_client_conn = 1000
 default_pool_size = 20
 ```
 
-Connect dhamps-vdb to PgBouncer instead of PostgreSQL directly.
+Connect embapi to PgBouncer instead of PostgreSQL directly.
 
 ### SSL/TLS Encryption
 
@@ -263,7 +263,7 @@ ssl_ca_file = '/etc/postgresql/ca.crt'
 Update connection string:
 
 ```bash
-# Update dhamps-vdb configuration
+# Update embapi configuration
 SERVICE_DBHOST=db.example.com
 # Change connection to use SSL (requires code modification or PostgreSQL parameter)
 ```
@@ -298,17 +298,17 @@ Daily backup script:
 
 ```bash
 #!/bin/bash
-# /usr/local/bin/backup-dhamps-vdb.sh
+# /usr/local/bin/backup-embapi.sh
 
-BACKUP_DIR="/backups/dhamps-vdb"
+BACKUP_DIR="/backups/embapi"
 DATE=$(date +%Y%m%d_%H%M%S)
 DB_NAME="dhamps_vdb"
 
 # Create backup
-pg_dump -U dhamps_user -h localhost $DB_NAME | gzip > "$BACKUP_DIR/dhamps-vdb-$DATE.sql.gz"
+pg_dump -U dhamps_user -h localhost $DB_NAME | gzip > "$BACKUP_DIR/embapi-$DATE.sql.gz"
 
 # Keep last 30 days
-find $BACKUP_DIR -name "dhamps-vdb-*.sql.gz" -mtime +30 -delete
+find $BACKUP_DIR -name "embapi-*.sql.gz" -mtime +30 -delete
 
 # Verify backup
 if [ $? -eq 0 ]; then
@@ -323,14 +323,14 @@ Set up cron job:
 
 ```bash
 # Run daily at 2 AM
-0 2 * * * /usr/local/bin/backup-dhamps-vdb.sh
+0 2 * * * /usr/local/bin/backup-embapi.sh
 ```
 
 ### Restore from Backup
 
 ```bash
 # Decompress and restore
-gunzip -c /backups/dhamps-vdb/dhamps-vdb-20240208.sql.gz | \
+gunzip -c /backups/embapi/embapi-20240208.sql.gz | \
   psql -U dhamps_user -h localhost dhamps_vdb
 ```
 
@@ -477,12 +477,12 @@ VACUUM ANALYZE;
 
 ## Migration from Other Databases
 
-dhamps-vdb is designed specifically for PostgreSQL with pgvector. Migration from other databases requires:
+embapi is designed specifically for PostgreSQL with pgvector. Migration from other databases requires:
 
 1. Export data from source database
 2. Set up PostgreSQL with pgvector
-3. Transform data to match dhamps-vdb schema
-4. Import using dhamps-vdb API or direct SQL
+3. Transform data to match embapi schema
+4. Import using embapi API or direct SQL
 
 ## Further Reading
 

@@ -5,7 +5,7 @@ weight: 4
 
 # First Project
 
-Step-by-step guide to creating your first complete project in dhamps-vdb.
+Step-by-step guide to creating your first complete project in embapi.
 
 ## Overview
 
@@ -35,7 +35,7 @@ curl -X POST http://localhost:8880/v1/users \
   }'
 ```
 
-Save the returned `vdb_key` to a variable:
+Save the returned `embapi_key` to a variable:
 
 ```bash
 export USER_KEY="your-returned-vdb-key"

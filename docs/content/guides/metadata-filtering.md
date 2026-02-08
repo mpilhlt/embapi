@@ -14,7 +14,7 @@ When searching for similar documents, you may want to exclude results that share
 - Filter out documents from the same source when finding related content
 - Exclude documents with the same category when exploring diversity
 
-dhamps-vdb provides metadata filtering using query parameters that perform **negative matching** - they exclude documents where the metadata field matches the specified value.
+embapi provides metadata filtering using query parameters that perform **negative matching** - they exclude documents where the metadata field matches the specified value.
 
 ## Query Parameters
 

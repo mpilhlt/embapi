@@ -5,7 +5,7 @@ weight: 2
 
 # Contributing Guide
 
-Thank you for your interest in contributing to dhamps-vdb! This guide will help you get started.
+Thank you for your interest in contributing to embapi! This guide will help you get started.
 
 ## Development Setup
 
@@ -21,8 +21,8 @@ Thank you for your interest in contributing to dhamps-vdb! This guide will help 
 
 ```bash
 # Clone repository
-git clone https://github.com/mpilhlt/dhamps-vdb.git
-cd dhamps-vdb
+git clone https://github.com/mpilhlt/embapi.git
+cd embapi
 
 # Install dependencies
 go get ./...
@@ -31,7 +31,7 @@ go get ./...
 sqlc generate --no-remote
 
 # Build application
-go build -o build/dhamps-vdb main.go
+go build -o build/embapi main.go
 
 # Or run directly
 go run main.go
@@ -99,7 +99,7 @@ go test -v ./...
 
 ### Go Formatting
 
-dhamps-vdb follows standard Go conventions:
+embapi follows standard Go conventions:
 
 ```bash
 # Format all code
@@ -130,8 +130,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	
 	// Internal packages
-	"github.com/mpilhlt/dhamps-vdb/internal/database"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/database"
+	"github.com/mpilhlt/embapi/internal/models"
 )
 
 // Exported function with doc comment
@@ -518,7 +518,7 @@ What should happen
 What actually happens
 
 ## Environment
-- dhamps-vdb version: v0.1.0
+- embapi version: v0.1.0
 - Go version: 1.21.5
 - PostgreSQL version: 16.1
 - OS: Ubuntu 22.04
@@ -680,4 +680,4 @@ Contributors are acknowledged in:
 - GitHub contributors page
 - Release notes (for significant contributions)
 
-Thank you for contributing to dhamps-vdb! 🎉
+Thank you for contributing to embapi! 🎉

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/mpilhlt/dhamps-vdb/internal/models"
+	"github.com/mpilhlt/embapi/internal/models"
 	"github.com/xeipuuv/gojsonschema"
 )
 
