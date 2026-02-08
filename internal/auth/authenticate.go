@@ -41,6 +41,12 @@ var Config = map[string]*huma.SecurityScheme{
 		Scheme: "bearer",
 		Name:   "Authorization",
 	},
+	"editorAuth": {
+		Type:   "VDBKey",
+		In:     "header",
+		Scheme: "bearer",
+		Name:   "Authorization",
+	},
 }
 
 // APITermination returns a middleware function that evaluates if any of the preceding
@@ -359,6 +365,182 @@ func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 
 			next(ctx)
 		}
+	}
+}
+
+// VDBKeyEditorAuth checks for an editor API key in the Authorization header.
+// This allows users with "editor" or "owner" role to authenticate.
+func VDBKeyEditorAuth(api huma.API, pool *pgxpool.Pool, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		// Check if editorAuth is applicable
+		isAuthorizationRequired := false
+		for _, opScheme := range ctx.Operation().Security {
+			var ok bool
+			if _, ok = opScheme["editorAuth"]; ok {
+				isAuthorizationRequired = true
+				break
+			}
+		}
+		if !isAuthorizationRequired {
+			next(ctx)
+			return
+		}
+		// Check if adminAuth or ownerAuth has already authenticated the request
+		if isAdmin, ok := ctx.Context().Value(IsAdminKey).(bool); ok && isAdmin {
+			next(ctx)
+			return
+		}
+		if isOwner, ok := ctx.Context().Value(IsOwnerKey).(bool); ok && isOwner {
+			next(ctx)
+			return
+		}
+
+		owner := ctx.Param("user_handle")
+		project := ctx.Param("project_handle")
+		definition := ctx.Param("definition_handle")
+		instance := ctx.Param("instance_handle")
+
+		// If no owner or project/definition/instance is specified, skip editor auth
+		if len(owner) == 0 || (len(project) == 0 && len(definition) == 0 && len(instance) == 0) {
+			next(ctx)
+			return
+		}
+
+		fmt.Printf("    Editor auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
+		// Branch based on whether project, definition, or instance is being accessed
+		if len(project) > 0 {
+			fmt.Print("        Checking project editor access...\n")
+			handleProjectEditorAuth(api, pool, owner, project)(ctx, next)
+			return
+		}
+		if len(definition) > 0 {
+			fmt.Print("        Checking definition editor access...\n")
+			handleDefinitionEditorAuth(api, pool, owner, definition)(ctx, next)
+			return
+		}
+		if len(instance) > 0 {
+			fmt.Print("        Checking instance editor access...\n")
+			handleInstanceEditorAuth(api, pool, owner, instance)(ctx, next)
+			return
+		}
+	}
+}
+
+func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, project string) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
+
+		// Check for authorized editors (users with "editor" or "owner" role)
+		queries := database.New(pool)
+		getKeysByProjectParams := database.GetKeysByProjectParams{
+			Owner:         owner,
+			ProjectHandle: project,
+			Limit:         50,
+			Offset:        0,
+		}
+		allowedKeys, err := queries.GetKeysByProject(ctx.Context(), getKeysByProjectParams)
+		if err != nil && err.Error() != "no rows in result set" {
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError, "unable to get linked users")
+			return
+		}
+		if err != nil && err.Error() == "no rows in result set" {
+			next(ctx)
+			return
+		}
+		for _, authKey := range allowedKeys {
+			// Only allow "editor" and "owner" roles
+			if authKey.Role != "editor" && authKey.Role != "owner" {
+				continue
+			}
+			storedHash := authKey.VDBKey
+
+			if VDBKeyIsValid(token, storedHash) {
+				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
+				next(ctx)
+				return
+			}
+		}
+
+		next(ctx)
+	}
+}
+
+func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, definition string) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
+
+		// Check for authorized editors
+		// Note: definitions_shared_with table doesn't have role column yet, 
+		// so we allow any shared user for now
+		queries := database.New(pool)
+		getKeysByDefinitionParams := database.GetKeysByDefinitionParams{
+			Owner:            owner,
+			DefinitionHandle: definition,
+			Limit:            50,
+			Offset:           0,
+		}
+		allowedKeys, err := queries.GetKeysByDefinition(ctx.Context(), getKeysByDefinitionParams)
+		if err != nil && err.Error() != "no rows in result set" {
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError, "unable to get linked users")
+			return
+		}
+		if err != nil && err.Error() == "no rows in result set" {
+			next(ctx)
+			return
+		}
+		for _, authKey := range allowedKeys {
+			storedHash := authKey.VDBKey
+
+			if VDBKeyIsValid(token, storedHash) {
+				fmt.Print("        Editor authentication successful\n")
+				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
+				next(ctx)
+				return
+			}
+		}
+
+		next(ctx)
+	}
+}
+
+func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, instance string) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
+
+		// Check for authorized editors
+		queries := database.New(pool)
+		getKeysByInstanceParams := database.GetKeysByInstanceParams{
+			Owner:          owner,
+			InstanceHandle: instance,
+			Limit:          50,
+			Offset:         0,
+		}
+		allowedKeys, err := queries.GetKeysByInstance(ctx.Context(), getKeysByInstanceParams)
+		if err != nil && err.Error() != "no rows in result set" {
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError, "unable to get linked users")
+			return
+		}
+		if err != nil && err.Error() == "no rows in result set" {
+			next(ctx)
+			return
+		}
+		for _, authKey := range allowedKeys {
+			// Only allow "editor" and "owner" roles
+			if authKey.Role != "editor" && authKey.Role != "owner" {
+				continue
+			}
+			storedHash := authKey.VDBKey
+
+			if VDBKeyIsValid(token, storedHash) {
+				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
+				next(ctx)
+				return
+			}
+		}
+
+		next(ctx)
 	}
 }
 

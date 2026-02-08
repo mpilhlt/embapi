@@ -1,0 +1,14 @@
+{
+  "embeddings": [
+    {
+      "text_id": "test-doc-1",
+      "user_handle": "alice",
+      "project_handle": "test-project",
+      "project_id": 1,
+      "instance_handle": "embedding1",
+      "vector": [0.1, 0.2, 0.3, 0.4, 0.5],
+      "vector_dim": 5,
+      "metadata": {}
+    }
+  ]
+}

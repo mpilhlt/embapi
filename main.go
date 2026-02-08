@@ -106,6 +106,7 @@ func main() {
 		api.UseMiddleware(auth.CORSMiddleware(api))
 		api.UseMiddleware(auth.VDBKeyAdminAuth(api, options))
 		api.UseMiddleware(auth.VDBKeyOwnerAuth(api, pool, options))
+		api.UseMiddleware(auth.VDBKeyEditorAuth(api, pool, options))
 		api.UseMiddleware(auth.VDBKeyReaderAuth(api, pool, options))
 		api.UseMiddleware(auth.AuthTermination(api))
 

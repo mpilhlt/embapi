@@ -415,6 +415,7 @@ func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		Security: []map[string][]string{
 			{"adminAuth": []string{"admin"}},
 			{"ownerAuth": []string{"owner"}},
+			{"editorAuth": []string{"editor"}},
 		},
 		Tags: []string{"embeddings"},
 	}
@@ -439,6 +440,7 @@ func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		Security: []map[string][]string{
 			{"adminAuth": []string{"admin"}},
 			{"ownerAuth": []string{"owner"}},
+			{"editorAuth": []string{"editor"}},
 		},
 		Tags: []string{"embeddings"},
 	}
@@ -463,6 +465,7 @@ func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		Security: []map[string][]string{
 			{"adminAuth": []string{"admin"}},
 			{"ownerAuth": []string{"owner"}},
+			{"editorAuth": []string{"editor"}},
 		},
 		Tags: []string{"embeddings"},
 	}
