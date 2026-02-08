@@ -17,6 +17,11 @@ import (
 
 // Define handler functions for each route
 func getSimilarFunc(ctx context.Context, input *models.GetSimilarRequest) (*models.SimilarResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if only one of input.MetadataField and input.MetadataValue are given
 	if input.MetadataPath != "" && input.MetadataValue == "" {
 		return nil, huma.Error400BadRequest("metadata_path is set but metadata_value is not")
@@ -111,6 +116,11 @@ func getSimilarFunc(ctx context.Context, input *models.GetSimilarRequest) (*mode
 }
 
 func postSimilarFunc(ctx context.Context, input *models.PostSimilarRequest) (*models.SimilarResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if only one of input.MetadataPath and input.MetadataValue are given
 	if input.MetadataPath != "" && input.MetadataValue == "" {
 		return nil, huma.Error400BadRequest("metadata_path is set but metadata_value is not")

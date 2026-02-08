@@ -44,6 +44,10 @@ func getUserProj(ctx context.Context, user, project string) (string, string, int
 
 // Create a new embeddings
 func postProjEmbeddingsFunc(ctx context.Context, input *models.PostProjEmbeddingsRequest) (*models.UploadProjEmbeddingsResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
 
 	// Get the database connection pool from the context
 	pool, err := GetDBPool(ctx)
@@ -258,6 +262,11 @@ func getProjEmbeddingsFunc(ctx context.Context, input *models.GetProjEmbeddingsR
 }
 
 func deleteProjEmbeddingsFunc(ctx context.Context, input *models.DeleteProjEmbeddingsRequest) (*models.DeleteProjEmbeddingsResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if user and project exist
 	_, _, _, err := getUserProj(ctx, input.UserHandle, input.ProjectHandle)
 	if err != nil {
@@ -355,6 +364,11 @@ func getDocEmbeddingsFunc(ctx context.Context, input *models.GetDocEmbeddingsReq
 }
 
 func deleteDocEmbeddingsFunc(ctx context.Context, input *models.DeleteEmbeddingsByDocIDRequest) (*models.DeleteEmbeddingsByDocIDResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Check if user and project exist
 	_, _, _, err := getUserProj(ctx, input.UserHandle, input.ProjectHandle)
 	if err != nil {

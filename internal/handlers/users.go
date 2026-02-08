@@ -17,6 +17,11 @@ import (
 
 // putUserFunc creates or updates a user
 func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.UploadUserResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	if input.UserHandle != input.Body.UserHandle {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("user handle in URL (%s) does not match user handle in body (%v).", input.UserHandle, input.Body.UserHandle))
 	}
@@ -236,6 +241,11 @@ func getUserFunc(ctx context.Context, input *models.GetUserRequest) (*models.Get
 
 // Delete a specific user
 func deleteUserFunc(ctx context.Context, input *models.DeleteUserRequest) (*models.DeleteUserResponse, error) {
+	// Validate that _system user cannot send requests
+	if err := ValidateNotSystemUser(input.UserHandle); err != nil {
+		return nil, err
+	}
+
 	// Get the database connection pool from the context
 	pool, err := GetDBPool(ctx)
 	if err != nil {
