@@ -1,6 +1,6 @@
 baseURL = 'https://mpilhlt.github.io/embapi/'
 languageCode = 'en-us'
-title = 'EmbAPI Documentation'
+title = 'EmbAPI ⚽ Documentation'
 theme = 'book'
 
 [params]

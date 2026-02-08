@@ -1,15 +1,15 @@
 ---
-title: embapi Documentation
+title: EmbAPI ⚽ Documentation
 type: docs
 ---
 
-# embapi Documentation
+# EmbAPI ⚽ Documentation
 
-Welcome to the documentation for **embapi**, a vector database designed for Digital Humanities applications at the Max Planck Society initiative.
+Welcome to the documentation for **EmbAPI** ⚽, a vector database API layer developed for Digital Humanities applications at the Max Planck Society.
 
-## What is embapi?
+## What is EmbAPI ⚽?
 
-embapi is a PostgreSQL-backed vector database with pgvector support, providing a RESTful API for managing embeddings in Retrieval Augmented Generation (RAG) workflows. It offers multi-user support, project management, and flexible embedding configurations.
+EmbAPI ⚽ is a PostgreSQL-backed vector database with pgvector support and it provides a RESTful API for managing embeddings, e.g. in Retrieval Augmented Generation (RAG) workflows. It offers multi-user support, project management, and flexible embedding configurations.
 
 ## Key Features
 
@@ -24,7 +24,7 @@ embapi is a PostgreSQL-backed vector database with pgvector support, providing a
 ## Quick Links
 
 - [Getting Started](getting-started/) - Installation and first steps
-- [Concepts](concepts/) - Understand how embapi works
+- [Concepts](concepts/) - Understand how EmbAPI works
 - [API Reference](api/) - Complete API documentation
 - [Guides](guides/) - How-to guides for common tasks
 - [Deployment](deployment/) - Production deployment guide
