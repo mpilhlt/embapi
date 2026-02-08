@@ -27,7 +27,26 @@ In both cases, the service returns a list of text identifiers along with their s
 
 ## Getting started
 
-### Compiling
+### Docker Deployment (Recommended)
+
+The easiest way to run dhamps-vdb is using Docker. See [DOCKER.md](./DOCKER.md) for comprehensive Docker deployment instructions.
+
+Quick start with Docker:
+
+```bash
+# Copy environment template
+cp .env.docker.template .env
+
+# Edit .env and set SERVICE_ADMINKEY and ENCRYPTION_KEY
+
+# Start with docker-compose (includes PostgreSQL with pgvector)
+docker-compose up -d
+
+# Access the API
+curl http://localhost:8880/docs
+```
+
+### Compiling from Source
 
 For **compiling**, you should run `go get ./... ; sqlc generate --no-remote ; go build -o build/dhamps-vdb main.go` (or in place of the last command you can also run it directly with `go run main.go`).
 

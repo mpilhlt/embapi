@@ -1,0 +1,58 @@
+services:
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: pgvector/pgvector:0.7.4-pg16
+    container_name: dhamps-postgres
+    environment:
+      POSTGRES_USER: ${SERVICE_DBUSER:-postgres}
+      POSTGRES_PASSWORD: ${SERVICE_DBPASSWORD:-postgres}
+      POSTGRES_DB: ${SERVICE_DBNAME:-dhamps_vdb}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SERVICE_DBUSER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dhamps-network
+
+  # dhamps-vdb middleware
+  dhamps-vdb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dhamps-vdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Service configuration
+      SERVICE_DEBUG: ${SERVICE_DEBUG:-false}
+      SERVICE_HOST: ${SERVICE_HOST:-0.0.0.0}
+      SERVICE_PORT: ${SERVICE_PORT:-8880}
+      
+      # Database configuration
+      SERVICE_DBHOST: ${SERVICE_DBHOST:-postgres}
+      SERVICE_DBPORT: ${SERVICE_DBPORT:-5432}
+      SERVICE_DBUSER: ${SERVICE_DBUSER:-postgres}
+      SERVICE_DBPASSWORD: ${SERVICE_DBPASSWORD:-postgres}
+      SERVICE_DBNAME: ${SERVICE_DBNAME:-dhamps_vdb}
+      
+      # Security configuration
+      SERVICE_ADMINKEY: ${SERVICE_ADMINKEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    ports:
+      - "${API_PORT:-8880}:8880"
+    networks:
+      - dhamps-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  dhamps-network:
+    driver: bridge
