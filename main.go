@@ -21,9 +21,6 @@ import (
 	huma "github.com/danielgtaylor/huma/v2"
 )
 
-// TODO: Set up limits (e.g. in server definition):
-//       <https://huma.rocks/features/request-limits/>
-
 func main() {
 	// Load env variables
 	err := godotenv.Load()
@@ -74,6 +71,13 @@ func main() {
 		fmt.Printf("    Options are debug:%v host:%v port: %v dbhost:%s dbname:%s\n",
 			options.Debug, options.Host, options.Port, options.DBHost, options.DBName)
 
+		// Validate required environment variables
+		if os.Getenv("ENCRYPTION_KEY") == "" {
+			fmt.Println("    ERROR: ENCRYPTION_KEY environment variable is not set")
+			fmt.Println("    Please set ENCRYPTION_KEY in your .env file or environment")
+			os.Exit(1)
+		}
+
 		// Initialize the database
 		pool, err := database.InitDB(options)
 		if err != nil {
@@ -121,7 +125,6 @@ func main() {
 		autopatch.AutoPatch(api)
 
 		// Create the HTTP server
-		// TODO: Add limits to the server (e.g. timeouts, max header size, etc.)
 		server := &http.Server{
 			Addr:    fmt.Sprintf("%s:%d", options.Host, options.Port),
 			Handler: router,

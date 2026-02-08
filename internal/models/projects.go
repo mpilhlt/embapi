@@ -30,7 +30,7 @@ type ProjectSubmission struct {
 	MetadataScheme string       `json:"metadataScheme,omitempty" doc:"Metadata json scheme used in the project."`
 	InstanceOwner  string       `json:"instance_owner,omitempty" doc:"User handle of the owner of the LLM Service Instance used in the project."`
 	InstanceHandle string       `json:"instance_handle,omitempty" doc:"Handle of the LLM Service Instance used in the project"`
-	PublicRead     bool         `json:"public_read,omitempty", default:"false" doc:"Whether the project is public or not"`
+	PublicRead     bool         `json:"public_read,omitempty" default:"false" doc:"Whether the project is public or not"`
 	SharedWith     []SharedUser `json:"shared_with,omitempty" doc:"List of users to share the project with upon creation"`
 }
 
@@ -101,7 +101,7 @@ type DeleteProjectResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
 }
 
-// TODO: Share project (add user to project with reader role and to instance readers if project has an instance assigned)
+// Share project with another user
 // - POST /v1/projects/{user_handle}/{project_handle}/share
 
 type ShareProjectRequest struct {
@@ -116,11 +116,11 @@ type ShareProjectRequest struct {
 type ShareProjectResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
 	Body   struct {
-		Owner              string `json:"owner" doc:"Project owner"`
-		ProjectHandle      string `json:"project_handle" doc:"Project handle"`
-		ProjectID          int    `json:"project_id" doc:"Project ID"`
-		SharedWithHandle   string `json:"shared_with_handle" doc:"User handle that was granted access"`
-		SharedWithRole     string `json:"shared_with_role" doc:"Role granted to the user"`
+		Owner            string `json:"owner" doc:"Project owner"`
+		ProjectHandle    string `json:"project_handle" doc:"Project handle"`
+		ProjectID        int    `json:"project_id" doc:"Project ID"`
+		SharedWithHandle string `json:"shared_with_handle" doc:"User handle that was granted access"`
+		SharedWithRole   string `json:"shared_with_role" doc:"Role granted to the user"`
 	}
 }
 

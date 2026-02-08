@@ -66,6 +66,11 @@ var (
 // Then it runs all the tests. Setup of api, router and server
 // is done in the tests themselves to provide better isolation.
 func TestMain(m *testing.M) {
+	// Set required environment variables for testing
+	if os.Getenv("ENCRYPTION_KEY") == "" {
+		os.Setenv("ENCRYPTION_KEY", "test-encryption-key-32-bytes-long-1234567890")
+	}
+
 	// Get a database connection pool
 	var err error
 	connPool, err, teardown = getTestDatabase()
@@ -510,58 +515,6 @@ func createDefinition(t *testing.T, DefinitionJSON string, user string, VDBKey s
 
 	fmt.Printf("        Successfully created LLM Service Definition (%s/%s, id %d).\n", DefinitionInfo.Owner, DefinitionInfo.DefinitionHandle, DefinitionInfo.DefinitionID)
 	return int32(DefinitionInfo.DefinitionID), nil
-}
-
-// createLLMInstanceFromDefinition creates an LLM service instance from a definition for testing
-// it accepts the definition owner/handle, instance handle, and optional overrides
-func createInstanceFromDefinition(t *testing.T, user string, instanceHandle string, definitionOwner string, definitionHandle string, VDBKey string, endpoint *string, description *string, apiKey string) (string, error) {
-	fmt.Printf("    Creating LLM service instance from definition (\"%s/%s\" from \"%s/%s\") for testing ...\n", user, instanceHandle, definitionOwner, definitionHandle)
-
-	requestURL := fmt.Sprintf("http://%s:%d/v1/llm-instances/%s/%s/from-definition/%s/%s", options.Host, options.Port, user, instanceHandle, definitionOwner, definitionHandle)
-
-	// Build request body
-	requestBody := map[string]interface{}{}
-	if endpoint != nil {
-		requestBody["endpoint"] = *endpoint
-	}
-	if description != nil {
-		requestBody["description"] = *description
-	}
-	if apiKey != "" {
-		requestBody["api_key"] = apiKey
-	}
-
-	bodyBytes, err := json.Marshal(requestBody)
-	if err != nil {
-		return "", fmt.Errorf("error marshalling request body: %v", err)
-	}
-
-	req, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewReader(bodyBytes))
-	req.Header.Set("Authorization", "Bearer "+VDBKey)
-	req.Header.Set("Content-Type", "application/json")
-	assert.NoError(t, err)
-
-	resp, err := http.DefaultClient.Do(req)
-	assert.NoError(t, err)
-	defer resp.Body.Close()
-
-	// get LLM service instance handle from response body
-	body, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
-
-	InstanceInfo := &struct {
-		Owner          string `json:"owner" doc:"User handle of the LLM Service Instance owner"`
-		InstanceHandle string `json:"instance_handle" doc:"Handle of created or updated LLM Service Instance"`
-		InstanceID     int    `json:"instance_id" doc:"System identifier of created or updated LLM Service Instance"`
-	}{}
-	err = json.Unmarshal(body, &InstanceInfo)
-	if err != nil {
-		fmt.Printf("Error unmarshalling LLM service instance info: %v\nbody: %v", err, string(body))
-	}
-	assert.NoError(t, err)
-
-	fmt.Printf("        Successfully created LLM Service Instance from definition (handle \"%s\", id %d).\n", InstanceInfo.InstanceHandle, InstanceInfo.InstanceID)
-	return InstanceInfo.InstanceHandle, nil
 }
 
 // createEmbeddings creates some embeddings entries for testing and returns an error value

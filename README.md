@@ -82,7 +82,7 @@ postgres=# CREATE EXTENSION IF NOT EXISTS vector;
 
 ### Client Authentication
 
-Clients should communicate the API key in the `Authorization` header with a `Bearer` prefix, e.g. `Bearer 024v2013621509245f2e24`. Most operations can only be done by the (admin or the) owner of the resource in question. 
+Clients should communicate the API key in the `Authorization` header with a `Bearer` prefix, e.g. `Bearer 024v2013621509245f2e24`. Most operations can only be done by the (admin or the) owner of the resource in question.
 
 **Project Sharing**: Projects can be shared with specific users for read or edit access. See the [Project Sharing](#project-sharing) section below for details on sharing projects with individual users.
 
@@ -123,6 +123,7 @@ When creating a project, you can specify users to share with using the `shared_w
 The project owner can manage sharing through dedicated endpoints:
 
 **Share a project with a user:**
+
 ```bash
 POST /v1/projects/{owner}/{project}/share
 {
@@ -132,11 +133,13 @@ POST /v1/projects/{owner}/{project}/share
 ```
 
 **Unshare a project from a user:**
+
 ```bash
 DELETE /v1/projects/{owner}/{project}/share/{user_handle}
 ```
 
 **List users a project is shared with:**
+
 ```bash
 GET /v1/projects/{owner}/{project}/shared-with
 ```
@@ -171,6 +174,7 @@ When uploading embeddings, the system automatically validates:
 If validation fails, you'll receive a `400 Bad Request` response with a detailed error message explaining the mismatch.
 
 **Example error response:**
+
 ```json
 {
   "title": "Bad Request",
@@ -211,6 +215,7 @@ The schema above requires an `author` field (string) and allows an optional `yea
 When uploading embeddings to a project with a metadata schema, the API validates each embedding's metadata against the schema. If validation fails, you'll receive a detailed error message:
 
 **Example error response:**
+
 ```json
 {
   "title": "Bad Request",
@@ -228,12 +233,14 @@ Administrators can verify database integrity using the `/v1/admin/sanity-check` 
 - Reports issues and warnings in a structured format
 
 **Example sanity check request:**
+
 ```bash
 curl -X GET http://localhost:8080/v1/admin/sanity-check \
   -H "Authorization: ******"
 ```
 
 **Example response:**
+
 ```json
 {
   "status": "PASSED",
@@ -254,6 +261,7 @@ Status values:
 #### Example Metadata Schemas
 
 **Simple schema with required fields:**
+
 ```json
 {
   "type": "object",
@@ -267,6 +275,7 @@ Status values:
 ```
 
 **Schema with nested objects:**
+
 ```json
 {
   "type": "object",
@@ -292,6 +301,7 @@ Status values:
 ```
 
 **Schema with enums and constraints:**
+
 ```json
 {
   "type": "object",
@@ -328,15 +338,15 @@ In the following table, the version number is skipped for readibility reasons. N
 For a more detailed, and always up-to-date documentation of the endpoints, including query parameters, return values and data schemes, see the automatically generated live OpenAPI document at `/openapi.yaml` or the browsable version at `/docs`.
 
 | Endpoint | Method | Description | Allowed Users |
-|----------|--------|-------------|---------------|
+| -------- | ------ | ----------- | ------------- |
 | /admin/footgun | GET | Reset Database: Remove all records from database and reset serials/counters | admin |
 | /admin/sanity-check | GET | Verify all data in database conforms to schemas and dimension requirements | admin |
-| /users | GET  | Get all users (list of handles) registered with the Db | admin |
+| /users | GET | Get all users (list of handles) registered with the Db | admin |
 | /users | POST | Register a new user with the Db | admin |
 | /users/\<username\> | GET | Get information about user \<username\> | admin, \<username\> |
 | /users/\<username\> | PUT | Register a new user with the Db | admin |
 | /users/\<username\> | DELETE | Delete a user and all their projects/llm services from the Db | admin, \<username\> |
-| /projects/\<username\> | GET  | Get all projects (objects) for user \<username\> | admin, \<username\> |
+| /projects/\<username\> | GET | Get all projects (objects) for user \<username\> | admin, \<username\> |
 | /projects/\<username\> | POST | Register a new project for user \<username\> | admin, \<username\> |
 | /projects/\<username\>/\<projectname\> | GET | Get project information for \<username\>'s project \<projectname\> | admin, \<username\>, authorized readers |
 | /projects/\<username\>/\<projectname\> | PUT | Register a new project calles \<projectname\> for user \<username\> | admin, \<username\> |
@@ -344,17 +354,17 @@ For a more detailed, and always up-to-date documentation of the endpoints, inclu
 | /projects/\<username\>/\<projectname\>/share | POST | Share \<username\>'s project \<projectname\> with another user | admin, \<username\> |
 | /projects/\<username\>/\<projectname\>/share/\<shared_user\> | DELETE | Unshare \<username\>'s project \<projectname\> from \<shared_user\> | admin, \<username\> |
 | /projects/\<username\>/\<projectname\>/shared-with | GET | Get list of users \<username\>'s project \<projectname\> is shared with | admin, \<username\> |
-| /llm-services/\<username\> | GET  | Get all LLM services (objects) for user \<username\> | admin, \<username\> |
+| /llm-services/\<username\> | GET | Get all LLM services (objects) for user \<username\> | admin, \<username\> |
 | /llm-services/\<username\> | POST | Register a new LLM service for user \<username\> | admin, \<username\> |
 | /llm-services/\<username\>/<llm_servicename> | GET | Get information about LLM service <llm_servicename> of user \<username\> | admin, \<username\> |
 | /llm-services/\<username\>/<llm_servicename> | PUT | Register a new LLM service called <llm_servicename> for user \<username\> | admin, \<username\> |
 | /llm-services/\<username\>/<llm_servicename> | DELETE | Delete \<username\>'s LLM service <llm_servicename> | admin, \<username\> |
-| /api-standards | GET  | Get all defined API standards* | public |
+| /api-standards | GET | Get all defined API standards* | public |
 | /api-standards | POST | Register a new API standard* | admin |
 | /api-standards/\<standardname\> | GET | Get information about API standard* \<standardname\> | public |
 | /api-standards/\<standardname\> | PUT | Register a new API standard* \<standardname\> | admin |
 | /api-standards/\<standardname\> | DELETE | Delete API standard* \<standardname\> | admin |
-| /embeddings/\<username\>/\<projectname\> | GET  | Get all embeddings for \<username\>'s project \<projectname\> (use `limit` and `offset` for paging) | admin, \<username\>, authorized readers |
+| /embeddings/\<username\>/\<projectname\> | GET | Get all embeddings for \<username\>'s project \<projectname\> (use `limit` and `offset` for paging) | admin, \<username\>, authorized readers |
 | /embeddings/\<username\>/\<projectname\> | POST | Register a new record with an embeddings vector for \<username\>'s project \<projectname\> | admin, \<username\> |
 | /embeddings/\<username\>/\<projectname\> | DELETE | Delete ***all*** embeddings for \<username\>'s project \<projectname\> | admin, \<username\> |
 | /embeddings/\<username\>/\<projectname\>/\<identifier\> | GET | Get embeddings and other information about text \<identifier\> from \<username\>'s project \<projectname\> | admin, \<username\>, authorized readers |
@@ -385,6 +395,7 @@ GET /v1/similars/{username}/{projectname}/{identifier}
 - `metadata_value` (optional): Metadata value to exclude from results (must be used with `metadata_path`)
 
 **Example:**
+
 ```bash
 curl -X GET "https://<hostname>/v1/similars/alice/myproject/doc123?count=5&threshold=0.7" \
   -H "Authorization: Bearer <vdb_key>"
@@ -399,6 +410,7 @@ POST /v1/similars/{username}/{projectname}
 ```
 
 **Request Body:**
+
 ```json
 {
   "vector": [0.1, 0.2, 0.3, ...]
@@ -410,6 +422,7 @@ The vector must be an array of float32 values with dimensions matching the proje
 **Query Parameters:** Same as GET endpoint above.
 
 **Example:**
+
 ```bash
 curl -X POST "https://<hostname>/v1/similars/alice/myproject?count=10&threshold=0.8" \
   -H "Authorization: Bearer <vdb_key>" \
@@ -446,6 +459,7 @@ Both similarity endpoints return the same response format with document identifi
 ```
 
 **Response Fields:**
+
 - `user_handle`: The project owner's username
 - `project_handle`: The project identifier
 - `results`: Array of similar documents, ordered by similarity (highest first)
@@ -460,6 +474,7 @@ When using the POST endpoint, the API automatically validates that:
 3. If dimensions don't match, a `400 Bad Request` error is returned with details
 
 **Example error:**
+
 ```json
 {
   "title": "Bad Request",
@@ -484,13 +499,15 @@ This is useful for excluding documents from the same source, author, or category
 
 For resources that support both GET and PUT operations, PATCH requests are automatically available for partial updates. You only need to include the fields you want to change. This is particularly useful for updating single fields without having to provide all resource data.
 
-**Supported resources:**
+#### **Supported resources:**
+
 - Users: `/v1/users/{username}`
 - Projects: `/v1/projects/{username}/{projectname}`
 - LLM Services: `/v1/llm-services/{username}/{llm_servicename}`
 - API Standards: `/v1/api-standards/{standardname}`
 
-**Example: Enable world-readable access for a project**
+#### **Example: Enable world-readable access for a project**
+
 ```bash
 curl -X PATCH https://<hostname>/v1/projects/alice/myproject \
   -H "Authorization: Bearer <vdb_key>" \
@@ -498,7 +515,8 @@ curl -X PATCH https://<hostname>/v1/projects/alice/myproject \
   -d '{"shared_with": ["*"]}'
 ```
 
-**Example: Update project description**
+#### **Example: Update project description**
+
 ```bash
 curl -X PATCH https://<hostname>/v1/projects/alice/myproject \
   -H "Authorization: Bearer <vdb_key>" \
@@ -595,9 +613,24 @@ dhamps-vdb/
 
 ## Roadmap
 
+- [ ] Revisit all **documentation**
+  - [ ] Add documentation for metadata filtering of similars (the GET query parameters are called `metadata_path` and `metadata_value` as in: `https://xy.org/vdb-api/v1/similars/sal/sal-openai-large/https%3A%2F%2Fid.myproject.net%2Ftexts%2FW0011%3A1.3.1.3.1?threshold=0.7&limit=5&metadata_path=author_id&metadata_value=A0083`)
+- [ ] **Transfer** of projects from one owner to another as new operation
+- [ ] Make sure **pagination** is supported consistently
+- [ ] Allow to request **verbose** information even in list outputs (with a verbose=yes query parameter?)
+- [ ] **Dockerization**
+- [ ] **Batch mode**
+- [ ] Prevent acceptance of requests as user "_system"
+- [ ] Add API standards for anthropic, mistral, llama.cpp, ollama, vllm, llmstudio
+- [ ] Network connectivity
+  - [ ] Implement and make consequent use of **max_idle** (5), **max_concurr** (5), **timeouts**, and **cancellations**
+  - [ ] **Concurrency** (leaky bucket approach) and **Rate limiting** (redis, sliding window, implement headers). See  <https://huma.rocks/features/request-limits/> for limiting.
+- [ ] Add possiblity to use PATCH method to change existing resources
+- [ ] Proper **logging** with `--verbose` and `--quiet` modes
+- [ ] Caching
+- [ ] HTML UI?
 - [x] Tests
   - [x] When testing, check cleanup by adding a new query/function to see if all tables are empty
-  - [ ] Make sure pagination is supported consistently
   - [x] Make sure input is validated consistently
 - [x] Catch POST to existing resources
 - [x] User authentication & restrictions on some API calls
@@ -606,28 +639,11 @@ dhamps-vdb/
 - [x] handle **metadata**
   - [x] Validation with metadata schema
 - [x] Allow to filter similar passages by metadata field (so as to exclude e.g. documents from the same author)
-  - [ ] Add documentation (the GET query parameters are called `metadata_path` and `metadata_value` as in: `https://xy.org/vdb-api/v1/similars/sal/sal-openai-large/https%3A%2F%2Fid.myproject.net%2Ftexts%2FW0011%3A1.3.1.3.1?threshold=0.7&limit=5&metadata_path=author_id&metadata_value=A0083`)
 - [x] Use **transactions** (most importantly, when an action requires several queries, e.g. projects being added and then linked to several read-authorized users)
-- [ ] Prevent acceptance of requests as user "_system"
-- [ ] Implement and make consequent use of **max_idle** (5), **max_concurr** (5), **timeouts**, and **cancellations**
-- [ ] **Concurrency** (leaky bucket approach) and **Rate limiting** (redis, sliding window, implement headers)
-- [ ] Always use specific error messages
+- [x] Always use specific error messages
 - [x] Add project sharing/unsharing functions & API paths
-- [ ] Add definition creation/listing/deletion functions & paths
-- [ ] Allow to request verbose information even in list outputs (with a verbose=yes query parameter?)
-- [ ] Add possiblity to use PATCH method to change existing resources
+- [x] Add definition creation/listing/deletion functions & paths
 - [x] Add mechanism to allow anonymous/public reading access to embeddings (via `"*"` in `shared_with`)
-- [ ] **Dockerization**
-- [ ] **Batch mode**
-- [ ] **Transfer** of projects from one owner to another as new operation
-- [ ] Revisit all documentation
-- [ ] Proper **logging** with `--verbose` and `--quiet` modes
-- [ ] Caching
-- [ ] HTML UI?
-- [ ] LLM handling processing (receive text and send it to an llm service on the user's behalf, then store the results)
-  - [ ] allow API keys for services to be read from env variables (on the server, but still maybe useful)
-  - [ ] calls to LLM services
-  - [ ] include rate limiting in service definitions/instances and obey it in proxying
 
 ## License
 
@@ -635,5 +651,5 @@ dhamps-vdb/
 
 ## Versions
 
-- 2026-02-XX **v0.1.0**: Fix many things, add many things, still API v1 on the way to stable...
+- 2026-02-08 **v0.1.0**: Fix many things, add many things, still API v1 on the way to stable...
 - 2024-12-10 **v0.0.1**: Initial public release (still work in progress) of API v1

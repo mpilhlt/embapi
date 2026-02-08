@@ -81,7 +81,7 @@ func getSimilarFunc(ctx context.Context, input *models.GetSimilarRequest) (*mode
 		simWithFilter, err = queries.GetSimilarsByIDWithFilter(ctx, params)
 		// Convert to common row type
 		for _, r := range simWithFilter {
-			sim = append(sim, database.GetSimilarsByIDRow{TextID: r.TextID, Similarity: r.Similarity})
+			sim = append(sim, database.GetSimilarsByIDRow(r))
 		}
 	}
 	fmt.Printf("got this response from the database: %v\n", sim)
@@ -192,7 +192,7 @@ func postSimilarFunc(ctx context.Context, input *models.PostSimilarRequest) (*mo
 		simWithFilter, err = queries.GetSimilarsByVectorWithProjectAndFilter(ctx, params)
 		// Convert to common row type
 		for _, r := range simWithFilter {
-			sim = append(sim, database.GetSimilarsByVectorWithProjectRow{TextID: r.TextID, Similarity: r.Similarity})
+			sim = append(sim, database.GetSimilarsByVectorWithProjectRow(r))
 		}
 	}
 	if err != nil {

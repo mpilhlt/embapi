@@ -241,7 +241,7 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get project %s for user %s. %v", input.ProjectHandle, input.UserHandle, err))
 		}
 		// Admin users have admin role
-		role = pgtype.Text{String: "admin", Valid: true}
+		role = pgtype.Text{String: "admin"}
 	} else {
 		// For non-admin users, use RetrieveProjectForUser which checks access permissions
 		params := database.RetrieveProjectForUserParams{
@@ -263,8 +263,6 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 			Owner:          projectRow.Owner,
 			Description:    projectRow.Description,
 			MetadataScheme: projectRow.MetadataScheme,
-			CreatedAt:      projectRow.CreatedAt,
-			UpdatedAt:      projectRow.UpdatedAt,
 			PublicRead:     projectRow.PublicRead,
 			InstanceID:     projectRow.InstanceID,
 		}
@@ -525,7 +523,7 @@ func getProjectSharedUsersFunc(ctx context.Context, input *models.GetProjectShar
 
 	// Only the project owner can see the list of shared users
 	if requestingUser.(string) != input.UserHandle {
-		return nil, huma.Error403Forbidden(fmt.Sprintf("only the project owner can view shared users list"))
+		return nil, huma.Error403Forbidden("only the project owner can view shared users list")
 	}
 
 	// Get shared users
@@ -567,9 +565,6 @@ func getProjectSharedUsersFunc(ctx context.Context, input *models.GetProjectShar
 
 	return response, nil
 }
-
-// TODO: Add project sharing/unsharing/shares_listing routes
-// (add user to project with reader role and to instance sharedUsers if project has an instance assigned)
 
 // RegisterProjectRoutes registers all the project routes with the API
 func RegisterProjectsRoutes(pool *pgxpool.Pool, api huma.API) error {

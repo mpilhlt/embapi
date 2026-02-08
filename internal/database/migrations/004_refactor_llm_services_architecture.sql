@@ -35,8 +35,6 @@ VALUES ('gemini',
         NOW())
 ON CONFLICT ("api_standard_handle") DO NOTHING;
 
--- TODO: Add API standards for anthropic, mistral, llama.cpp, ollama, vllm, llmstudio
-
 
 -- II. Definitions
 
@@ -44,7 +42,7 @@ ON CONFLICT ("api_standard_handle") DO NOTHING;
 -- Step 2: Create the _system user for global definitions
 INSERT INTO users ("user_handle", "name", "email", "vdb_key", "created_at", "updated_at")
 VALUES ('_system', 'System User', 'system@dhamps-vdb.internal',
-        -- TODO: Generate a system API key (64 chars of zeros as placeholder)
+        -- WARNING! There is a function that changes this after migrations. Make sure it does not stay like this!!
         '0000000000000000000000000000000000000000000000000000000000000000',
         NOW(), NOW())
 ON CONFLICT ("user_handle") DO NOTHING;
