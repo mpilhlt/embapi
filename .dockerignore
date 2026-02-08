@@ -1,0 +1,39 @@
+# Docker build artifacts
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git files
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Test files
+*_test.go
+testdata/
+
+# Build artifacts
+build/
+dhamps-vdb
+
+# Go workspace
+go.work
+
+# Environment files (secrets should be passed via docker env)
+.env
+tern.conf
+
+# IDE files
+.vscode/
+.idea/
+
+# CI/CD
+.github/
+
+# Misc
+repopack-output.xml
+repopack.config.json
+.repopackignore
