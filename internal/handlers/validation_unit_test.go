@@ -166,3 +166,44 @@ func TestValidateMetadataAgainstSchema(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateNotSystemUser(t *testing.T) {
+	tests := []struct {
+		name        string
+		userHandle  string
+		wantErr     bool
+		errContains string
+	}{
+		{
+			name:       "Valid regular user",
+			userHandle: "alice",
+			wantErr:    false,
+		},
+		{
+			name:       "Valid user with underscore",
+			userHandle: "alice_smith",
+			wantErr:    false,
+		},
+		{
+			name:        "System user should be rejected",
+			userHandle:  "_system",
+			wantErr:     true,
+			errContains: "cannot send requests",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateNotSystemUser(tt.userHandle)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateNotSystemUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err != nil && tt.errContains != "" {
+				if !strings.Contains(err.Error(), tt.errContains) {
+					t.Errorf("ValidateNotSystemUser() error = %v, should contain %v", err.Error(), tt.errContains)
+				}
+			}
+		})
+	}
+}
