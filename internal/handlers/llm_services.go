@@ -373,7 +373,7 @@ func getDefinitionSharedUsersFunc(ctx context.Context, input *models.GetDefiniti
 	}
 	queries := database.New(pool)
 
-	// Get shared users
+	// Get shared users - use input parameters for user-facing pagination
 	sharedUsers, err := queries.GetSharedUsersForDefinition(ctx, database.GetSharedUsersForDefinitionParams{
 		Owner:            input.UserHandle,
 		DefinitionHandle: input.DefinitionHandle,
@@ -541,7 +541,7 @@ func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInsta
 		// Check if user has access to the definition (either owner or shared)
 		if !definition.IsPublic && definition.Owner != ctx.Value(auth.AuthUserKey).(string) {
 			hasAccess := false
-			// Check if shared with user
+			// Check if shared with user - use maxSharedUsersPerQuery for authorization check
 			sharedUsers, err := queries.GetSharedUsersForDefinition(ctx, database.GetSharedUsersForDefinitionParams{
 				Owner:            input.Body.DefinitionOwner,
 				DefinitionHandle: input.Body.DefinitionHandle,
@@ -881,6 +881,7 @@ func unshareInstanceFunc(ctx context.Context, input *models.UnshareInstanceReque
 	}
 
 	// Check if target user exists and is currently shared
+	// Use maxSharedUsersPerQuery for internal check to ensure we scan all shared users
 	sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{
 		Owner:          input.UserHandle,
 		InstanceHandle: input.InstanceHandle,
@@ -921,7 +922,7 @@ func getInstanceSharedUsersFunc(ctx context.Context, input *models.GetInstanceSh
 	}
 	queries := database.New(pool)
 
-	// Get shared users
+	// Get shared users - use input parameters for user-facing pagination
 	sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{
 		Owner:          input.UserHandle,
 		InstanceHandle: input.InstanceHandle,
