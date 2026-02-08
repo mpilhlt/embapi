@@ -462,6 +462,23 @@ docker inspect --format='{{.State.Health.Status}}' dhamps-vdb
 docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' dhamps-vdb
 ```
 
+### Docker build fails with network/TLS errors
+
+If you encounter errors like "TLS: unspecified error" or "Permission denied" when pulling Alpine packages:
+
+```bash
+# Try building with host network mode
+docker build --network=host -t dhamps-vdb:latest .
+
+# Or use a different mirror
+docker build --build-arg ALPINE_MIRROR=http://dl-2.alpinelinux.org/alpine/ -t dhamps-vdb:latest .
+
+# Or pull a pre-built image if available
+docker pull <registry>/dhamps-vdb:latest
+```
+
+These errors typically indicate network restrictions or firewall issues in the build environment. The Docker files are correct and will work in standard environments.
+
 ## Advanced Topics
 
 ### Custom Build Arguments
@@ -507,6 +524,68 @@ networks:
   app-network:
     external: true
 ```
+
+## Verifying the Installation
+
+After starting the services, verify everything is working correctly:
+
+### Check Service Status
+
+```bash
+# Check if containers are running
+docker-compose ps
+
+# Expected output should show both services as "running" or "healthy"
+```
+
+### Test API Access
+
+```bash
+# Test if API is accessible
+curl http://localhost:8880/docs
+
+# Should return HTML documentation page
+
+# Test health endpoint (if available)
+curl http://localhost:8880/
+```
+
+### Check Database Connection
+
+```bash
+# Connect to PostgreSQL
+docker-compose exec postgres psql -U postgres -d dhamps_vdb
+
+# Check pgvector extension
+\dx
+
+# Should show the vector extension
+
+# Exit psql
+\q
+```
+
+### Create First User
+
+```bash
+# Use your admin key from .env file
+curl -X POST http://localhost:8880/v1/users \
+  -H "Authorization: Bearer YOUR_ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_handle": "testuser",
+    "full_name": "Test User"
+  }'
+
+# Should return a response with an API key for the new user
+```
+
+### Common Issues
+
+1. **Container won't start**: Check logs with `docker-compose logs dhamps-vdb`
+2. **Can't connect to database**: Verify postgres is healthy with `docker-compose ps`
+3. **API returns 401**: Check that SERVICE_ADMINKEY is set correctly
+4. **Port already in use**: Change API_PORT or POSTGRES_PORT in .env file
 
 ## Getting Help
 
