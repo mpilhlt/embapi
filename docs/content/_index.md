@@ -23,10 +23,13 @@ embapi is a PostgreSQL-backed vector database with pgvector support, providing a
 
 ## Quick Links
 
-- [Getting Started](/getting-started/) - Installation and first steps
-- [Concepts](/concepts/) - Understand how embapi works
-- [API Reference](/api/) - Complete API documentation
-- [Guides](/guides/) - How-to guides for common tasks
+- [Getting Started](getting-started/) - Installation and first steps
+- [Concepts](concepts/) - Understand how embapi works
+- [API Reference](api/) - Complete API documentation
+- [Guides](guides/) - How-to guides for common tasks
+- [Deployment](deployment/) - Production deployment guide
+- [Development](development/) - Contributing and development guide
+- [Reference](reference/) - Technical reference and specifications
 
 ## Getting Help
 
@@ -51,4 +54,4 @@ curl -X POST http://localhost:8880/v1/users \
 # See the Getting Started guide for a complete walkthrough
 ```
 
-Ready to get started? Head over to the [Installation Guide](/getting-started/installation/).
+Ready to get started? Head over to the [Installation Guide](getting-started/installation/).

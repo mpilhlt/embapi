@@ -30,3 +30,5 @@ tern.conf
 docs/public/
 docs/resources/
 docs/.hugo_build.lock
+docs/hugo
+docs/hugo.tar.gz
