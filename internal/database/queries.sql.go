@@ -2172,6 +2172,34 @@ func (q *Queries) RetrieveUser(ctx context.Context, userHandle string) (User, er
 	return i, err
 }
 
+const transferProjectOwnership = `-- name: TransferProjectOwnership :one
+UPDATE projects
+SET "owner" = $2,
+    "updated_at" = NOW()
+WHERE "owner" = $1
+AND "project_handle" = $3
+RETURNING "project_id", "owner", "project_handle"
+`
+
+type TransferProjectOwnershipParams struct {
+	Owner         string `db:"owner" json:"owner"`
+	Owner_2       string `db:"owner_2" json:"owner_2"`
+	ProjectHandle string `db:"project_handle" json:"project_handle"`
+}
+
+type TransferProjectOwnershipRow struct {
+	ProjectID     int32  `db:"project_id" json:"project_id"`
+	Owner         string `db:"owner" json:"owner"`
+	ProjectHandle string `db:"project_handle" json:"project_handle"`
+}
+
+func (q *Queries) TransferProjectOwnership(ctx context.Context, arg TransferProjectOwnershipParams) (TransferProjectOwnershipRow, error) {
+	row := q.db.QueryRow(ctx, transferProjectOwnership, arg.Owner, arg.Owner_2, arg.ProjectHandle)
+	var i TransferProjectOwnershipRow
+	err := row.Scan(&i.ProjectID, &i.Owner, &i.ProjectHandle)
+	return i, err
+}
+
 const unlinkDefinition = `-- name: UnlinkDefinition :exec
 DELETE
 FROM definitions_shared_with
