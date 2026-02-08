@@ -19,6 +19,10 @@ const (
 	// maxSharedUsersPerQuery is the maximum number of shared users to retrieve in a single query
 	// This prevents memory issues when a project is shared with many users
 	maxSharedUsersPerQuery = 1000
+	
+	// maxAdminQueryLimit is the maximum limit for admin operations that need to scan all records
+	// Used for operations like sanity checks that validate all data in the database
+	maxAdminQueryLimit = 999999
 )
 
 // Create a new project
