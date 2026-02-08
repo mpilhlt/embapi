@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -68,8 +69,8 @@ func TestProjectSharingFunc(t *testing.T) {
 		name         string
 		method       string
 		requestPath  string
-		bodyJSON     string
-		VDBKey       string
+		bodyPath     string
+		apiKey       string
 		expectBody   string
 		expectStatus int16
 	}{
@@ -77,8 +78,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Share project with nonexistent user - should fail",
 			method:       http.MethodPost,
 			requestPath:  "/v1/projects/alice/project1/share",
-			bodyJSON:     `{"share_with_handle": "charlie", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
+			bodyPath:     "../../testdata/share_project_with_charlie_reader.json",
+			apiKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Bad Request\",\n  \"status\": 400,\n  \"detail\": \"target user charlie does not exist: user charlie not found\"\n}\n",
 			expectStatus: http.StatusBadRequest,
 		},
@@ -86,8 +87,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Share nonexistent project - should fail",
 			method:       http.MethodPost,
 			requestPath:  "/v1/projects/alice/nonexistent/share",
-			bodyJSON:     `{"share_with_handle": "bob", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
+			bodyPath:     "../../testdata/share_project_with_bob_reader.json",
+			apiKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Not Found\",\n  \"status\": 404,\n  \"detail\": \"project alice/nonexistent not found\"\n}\n",
 			expectStatus: http.StatusNotFound,
 		},
@@ -95,8 +96,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Bob cannot share alice's project - should fail",
 			method:       http.MethodPost,
 			requestPath:  "/v1/projects/alice/project1/share",
-			bodyJSON:     `{"share_with_handle": "alice", "role": "editor"}`,
-			VDBKey:       bobAPIKey,
+			bodyPath:     "../../testdata/share_project_with_alice_editor.json",
+			apiKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Unauthorized\",\n  \"status\": 401,\n  \"detail\": \"Authentication failed. Perhaps a missing or incorrect API key?\"\n}\n",
 			expectStatus: http.StatusUnauthorized,
 		},
@@ -104,17 +105,17 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Share project with bob - valid",
 			method:       http.MethodPost,
 			requestPath:  "/v1/projects/alice/project1/share",
-			bodyJSON:     `{"share_with_handle": "bob", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareProjectResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"shared_with\": [\n    {\n      \"user_handle\": \"bob\",\n      \"role\": \"reader\"\n    }\n  ]\n}\n",
+			bodyPath:     "../../testdata/share_project_with_bob_reader.json",
+			apiKey:       aliceAPIKey,
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareProjectResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"project_id\": 1,\n  \"shared_with_handle\": \"bob\",\n  \"shared_with_role\": \"reader\"\n}\n",
 			expectStatus: http.StatusCreated,
 		},
 		{
 			name:         "Get shared users for project",
 			method:       http.MethodGet,
 			requestPath:  "/v1/projects/alice/project1/shared-with",
-			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			bodyPath:     "",
+			apiKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetProjectSharedUsersResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"shared_with\": [\n    {\n      \"user_handle\": \"bob\",\n      \"role\": \"reader\"\n    }\n  ]\n}\n",
 			expectStatus: http.StatusOK,
 		},
@@ -122,8 +123,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Unshare project from bob",
 			method:       http.MethodDelete,
 			requestPath:  "/v1/projects/alice/project1/share/bob",
-			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			bodyPath:     "",
+			apiKey:       aliceAPIKey,
 			expectBody:   "",
 			expectStatus: http.StatusNoContent,
 		},
@@ -131,8 +132,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Get shared users after unsharing - should be empty",
 			method:       http.MethodGet,
 			requestPath:  "/v1/projects/alice/project1/shared-with",
-			bodyJSON:     "",
-			VDBKey:       aliceAPIKey,
+			bodyPath:     "",
+			apiKey:       aliceAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetProjectSharedUsersResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"shared_with\": []\n}\n",
 			expectStatus: http.StatusOK,
 		},
@@ -140,17 +141,17 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Share project with bob again for access test",
 			method:       http.MethodPost,
 			requestPath:  "/v1/projects/alice/project1/share",
-			bodyJSON:     `{"share_with_handle": "bob", "role": "reader"}`,
-			VDBKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareProjectResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"shared_with\": [\n    {\n      \"user_handle\": \"bob\",\n      \"role\": \"reader\"\n    }\n  ]\n}\n",
+			bodyPath:     "../../testdata/share_project_with_bob_reader.json",
+			apiKey:       aliceAPIKey,
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ShareProjectResponseBody.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"project1\",\n  \"project_id\": 1,\n  \"shared_with_handle\": \"bob\",\n  \"shared_with_role\": \"reader\"\n}\n",
 			expectStatus: http.StatusCreated,
 		},
 		{
 			name:         "Bob can access shared project",
 			method:       http.MethodGet,
 			requestPath:  "/v1/projects/alice/project1",
-			bodyJSON:     "",
-			VDBKey:       bobAPIKey,
+			bodyPath:     "",
+			apiKey:       bobAPIKey,
 			expectBody:   "", // Just check status code
 			expectStatus: http.StatusOK,
 		},
@@ -158,8 +159,8 @@ func TestProjectSharingFunc(t *testing.T) {
 			name:         "Bob cannot see shared users list (not owner)",
 			method:       http.MethodGet,
 			requestPath:  "/v1/projects/alice/project1/shared-with",
-			bodyJSON:     "",
-			VDBKey:       bobAPIKey,
+			bodyPath:     "",
+			apiKey:       bobAPIKey,
 			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ErrorModel.json\",\n  \"title\": \"Unauthorized\",\n  \"status\": 401,\n  \"detail\": \"Authentication failed. Perhaps a missing or incorrect API key?\"\n}\n",
 			expectStatus: http.StatusUnauthorized,
 		},
@@ -167,18 +168,29 @@ func TestProjectSharingFunc(t *testing.T) {
 
 	for _, v := range tt {
 		t.Run(v.name, func(t *testing.T) {
-			requestURL := fmt.Sprintf("http://%s:%d%s", options.Host, options.Port, v.requestPath)
 
-			var req *http.Request
-			if v.bodyJSON != "" {
-				req, err = http.NewRequest(v.method, requestURL, bytes.NewBuffer([]byte(v.bodyJSON)))
+			// Handle the body for PUT and POST requests
+			reqBody := io.Reader(nil)
+			if v.method == http.MethodGet || v.method == http.MethodDelete {
+				reqBody = nil
 			} else {
-				req, err = http.NewRequest(v.method, requestURL, nil)
+				f, err := os.Open(v.bodyPath)
+				assert.NoError(t, err)
+				defer func() {
+					if err := f.Close(); err != nil {
+						t.Fatal(err)
+					}
+				}()
+				b := new(bytes.Buffer)
+				_, err = io.Copy(b, f)
+				assert.NoError(t, err)
+				reqBody = bytes.NewReader(b.Bytes())
 			}
-			assert.NoError(t, err)
 
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer "+v.VDBKey)
+			requestURL := fmt.Sprintf("http://%s:%d%s", options.Host, options.Port, v.requestPath)
+			req, err := http.NewRequest(v.method, requestURL, reqBody)
+			assert.NoError(t, err)
+			req.Header.Set("Authorization", "Bearer "+v.apiKey)
 
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {

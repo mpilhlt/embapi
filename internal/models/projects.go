@@ -115,9 +115,11 @@ type ShareProjectRequest struct {
 type ShareProjectResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
 	Body   struct {
-		Owner         string       `json:"owner" doc:"Instance owner"`
-		ProjectHandle string       `json:"project_handle" doc:"Project handle"`
-		SharedWith    []SharedUser `json:"shared_with" doc:"Users this project is shared with"`
+		Owner              string `json:"owner" doc:"Project owner"`
+		ProjectHandle      string `json:"project_handle" doc:"Project handle"`
+		ProjectID          int    `json:"project_id" doc:"Project ID"`
+		SharedWithHandle   string `json:"shared_with_handle" doc:"User handle that was granted access"`
+		SharedWithRole     string `json:"shared_with_role" doc:"Role granted to the user"`
 	}
 }
 
