@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Reference on dhamps-vdb Documentation</title><link>https://mpilhlt.github.io/dhamps-vdb/reference/</link><description>Recent content in Reference on dhamps-vdb Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://mpilhlt.github.io/dhamps-vdb/reference/index.xml" rel="self" type="application/rss+xml"/><item><title>Configuration Reference</title><link>https://mpilhlt.github.io/dhamps-vdb/reference/configuration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/reference/configuration/</guid><description>&lt;h1 id="configuration-reference">Configuration Reference&lt;a class="anchor" href="#configuration-reference">#&lt;/a>&lt;/h1>
+&lt;p>Complete reference for configuring dhamps-vdb. This guide consolidates all configuration options, including environment variables, command-line flags, and Docker configuration.&lt;/p>
+&lt;h2 id="overview">Overview&lt;a class="anchor" href="#overview">#&lt;/a>&lt;/h2>
+&lt;p>dhamps-vdb is configured through a combination of:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Environment variables&lt;/strong> (recommended)&lt;/li>
+&lt;li>&lt;strong>Command-line flags&lt;/strong> (overrides environment variables)&lt;/li>
+&lt;li>&lt;strong>&lt;code>.env&lt;/code> files&lt;/strong> (for Docker and local development)&lt;/li>
+&lt;/ol>
+&lt;p>Configuration is loaded in the following priority order (highest to lowest):&lt;/p>
+&lt;ol>
+&lt;li>Command-line flags&lt;/li>
+&lt;li>Environment variables&lt;/li>
+&lt;li>&lt;code>.env&lt;/code> file values&lt;/li>
+&lt;li>Default values from &lt;code>options.go&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h2 id="configuration-options">Configuration Options&lt;a class="anchor" href="#configuration-options">#&lt;/a>&lt;/h2>
+&lt;h3 id="service-configuration">Service Configuration&lt;a class="anchor" href="#service-configuration">#&lt;/a>&lt;/h3>
+&lt;p>Options for controlling the API service behavior.&lt;/p></description></item><item><title>Database Schema Reference</title><link>https://mpilhlt.github.io/dhamps-vdb/reference/database-schema/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/reference/database-schema/</guid><description>&lt;h1 id="database-schema-reference">Database Schema Reference&lt;a class="anchor" href="#database-schema-reference">#&lt;/a>&lt;/h1>
+&lt;p>Complete reference for the dhamps-vdb PostgreSQL database schema. This document describes all tables, columns, types, constraints, relationships, and indexes.&lt;/p>
+&lt;h2 id="overview">Overview&lt;a class="anchor" href="#overview">#&lt;/a>&lt;/h2>
+&lt;p>The database uses PostgreSQL 12+ with the pgvector extension for vector similarity search. The schema is managed through migrations in &lt;code>internal/database/migrations/&lt;/code>.&lt;/p>
+&lt;p>&lt;strong>Key Features:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Vector embeddings stored as &lt;code>halfvec&lt;/code> for efficient storage&lt;/li>
+&lt;li>HNSW indexes for fast approximate nearest neighbor search&lt;/li>
+&lt;li>Automatic timestamp tracking (&lt;code>created_at&lt;/code>, &lt;code>updated_at&lt;/code>)&lt;/li>
+&lt;li>Foreign key constraints with CASCADE deletion&lt;/li>
+&lt;li>Role-based access control through association tables&lt;/li>
+&lt;li>Multi-tenancy support (user-owned resources)&lt;/li>
+&lt;/ul>
+&lt;h2 id="schema-migrations">Schema Migrations&lt;a class="anchor" href="#schema-migrations">#&lt;/a>&lt;/h2>
+&lt;p>Current schema version is defined by 4 migration files:&lt;/p></description></item><item><title>Product Roadmap</title><link>https://mpilhlt.github.io/dhamps-vdb/reference/roadmap/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/reference/roadmap/</guid><description>&lt;h1 id="product-roadmap">Product Roadmap&lt;a class="anchor" href="#product-roadmap">#&lt;/a>&lt;/h1>
+&lt;p>Development roadmap for dhamps-vdb, tracking completed features, in-progress work, and planned enhancements.&lt;/p>
+&lt;h2 id="overview">Overview&lt;a class="anchor" href="#overview">#&lt;/a>&lt;/h2>
+&lt;p>This roadmap outlines the development priorities for dhamps-vdb. Items marked with [x] are completed, items in progress are noted, and planned features are listed by priority.&lt;/p>
+&lt;h2 id="completed-features">Completed Features&lt;a class="anchor" href="#completed-features">#&lt;/a>&lt;/h2>
+&lt;h3 id="core-functionality">Core Functionality&lt;a class="anchor" href="#core-functionality">#&lt;/a>&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;input checked="" disabled="" type="checkbox"> &lt;strong>User authentication &amp;amp; restrictions on some API calls&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Bearer token authentication&lt;/li>
+&lt;li>Role-based access control&lt;/li>
+&lt;li>Admin vs user permissions&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;input checked="" disabled="" type="checkbox"> &lt;strong>API versioning&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Version 1 API with &lt;code>/v1/&lt;/code> prefix&lt;/li>
+&lt;li>Backward compatibility support&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;input checked="" disabled="" type="checkbox"> &lt;strong>Better options handling&lt;/strong>&lt;/p></description></item></channel></rss>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Getting Started on dhamps-vdb Documentation</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/</link><description>Recent content in Getting Started on dhamps-vdb Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://mpilhlt.github.io/dhamps-vdb/getting-started/index.xml" rel="self" type="application/rss+xml"/><item><title>Installation</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/getting-started/installation/</guid><description>&lt;h1 id="installation">Installation&lt;a class="anchor" href="#installation">#&lt;/a>&lt;/h1>
+&lt;p>Install dhamps-vdb by compiling from source.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;a class="anchor" href="#prerequisites">#&lt;/a>&lt;/h2>
+&lt;ul>
+&lt;li>&lt;strong>Go 1.21 or later&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>PostgreSQL 11+&lt;/strong> with pgvector extension&lt;/li>
+&lt;li>&lt;strong>sqlc&lt;/strong> for code generation&lt;/li>
+&lt;/ul>
+&lt;h2 id="quick-install">Quick Install&lt;a class="anchor" href="#quick-install">#&lt;/a>&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Clone the repository&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://github.com/mpilhlt/dhamps-vdb.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd dhamps-vdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Install dependencies and generate code&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>go get ./...
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sqlc generate --no-remote
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Build the binary&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>go build -o build/dhamps-vdb main.go&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="detailed-steps">Detailed Steps&lt;a class="anchor" href="#detailed-steps">#&lt;/a>&lt;/h2>
+&lt;h3 id="1-install-dependencies">1. Install Dependencies&lt;a class="anchor" href="#1-install-dependencies">#&lt;/a>&lt;/h3>
+&lt;p>Download all Go module dependencies:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>go get ./...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="2-generate-database-code">2. Generate Database Code&lt;a class="anchor" href="#2-generate-database-code">#&lt;/a>&lt;/h3>
+&lt;p>Generate type-safe database queries using sqlc:&lt;/p></description></item><item><title>Configuration</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/configuration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/getting-started/configuration/</guid><description>&lt;h1 id="configuration">Configuration&lt;a class="anchor" href="#configuration">#&lt;/a>&lt;/h1>
+&lt;p>Configure dhamps-vdb using environment variables or command-line options.&lt;/p>
+&lt;h2 id="environment-variables">Environment Variables&lt;a class="anchor" href="#environment-variables">#&lt;/a>&lt;/h2>
+&lt;p>All configuration can be set via environment variables. Use a &lt;code>.env&lt;/code> file to keep sensitive information secure.&lt;/p>
+&lt;h3 id="service-configuration">Service Configuration&lt;a class="anchor" href="#service-configuration">#&lt;/a>&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Variable&lt;/th>
+ &lt;th>Description&lt;/th>
+ &lt;th>Default&lt;/th>
+ &lt;th>Required&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DEBUG&lt;/code>&lt;/td>
+ &lt;td>Enable debug logging&lt;/td>
+ &lt;td>&lt;code>true&lt;/code>&lt;/td>
+ &lt;td>No&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_HOST&lt;/code>&lt;/td>
+ &lt;td>Hostname to listen on&lt;/td>
+ &lt;td>&lt;code>localhost&lt;/code>&lt;/td>
+ &lt;td>No&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_PORT&lt;/code>&lt;/td>
+ &lt;td>Port to listen on&lt;/td>
+ &lt;td>&lt;code>8880&lt;/code>&lt;/td>
+ &lt;td>No&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="database-configuration">Database Configuration&lt;a class="anchor" href="#database-configuration">#&lt;/a>&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Variable&lt;/th>
+ &lt;th>Description&lt;/th>
+ &lt;th>Default&lt;/th>
+ &lt;th>Required&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DBHOST&lt;/code>&lt;/td>
+ &lt;td>Database hostname&lt;/td>
+ &lt;td>&lt;code>localhost&lt;/code>&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DBPORT&lt;/code>&lt;/td>
+ &lt;td>Database port&lt;/td>
+ &lt;td>&lt;code>5432&lt;/code>&lt;/td>
+ &lt;td>No&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DBUSER&lt;/code>&lt;/td>
+ &lt;td>Database username&lt;/td>
+ &lt;td>&lt;code>postgres&lt;/code>&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DBPASSWORD&lt;/code>&lt;/td>
+ &lt;td>Database password&lt;/td>
+ &lt;td>&lt;code>password&lt;/code>&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_DBNAME&lt;/code>&lt;/td>
+ &lt;td>Database name&lt;/td>
+ &lt;td>&lt;code>postgres&lt;/code>&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="security-configuration">Security Configuration&lt;a class="anchor" href="#security-configuration">#&lt;/a>&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Variable&lt;/th>
+ &lt;th>Description&lt;/th>
+ &lt;th>Default&lt;/th>
+ &lt;th>Required&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>SERVICE_ADMINKEY&lt;/code>&lt;/td>
+ &lt;td>Admin API key for administrative operations&lt;/td>
+ &lt;td>-&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ENCRYPTION_KEY&lt;/code>&lt;/td>
+ &lt;td>Encryption key for API keys (32+ characters)&lt;/td>
+ &lt;td>-&lt;/td>
+ &lt;td>Yes&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="configuration-file">Configuration File&lt;a class="anchor" href="#configuration-file">#&lt;/a>&lt;/h2>
+&lt;p>Create a &lt;code>.env&lt;/code> file in the project root:&lt;/p></description></item><item><title>Docker Deployment</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/docker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/getting-started/docker/</guid><description>&lt;h1 id="docker-deployment">Docker Deployment&lt;a class="anchor" href="#docker-deployment">#&lt;/a>&lt;/h1>
+&lt;p>Deploy dhamps-vdb using Docker containers. This is the recommended approach for most users.&lt;/p>
+&lt;h2 id="quick-start">Quick Start&lt;a class="anchor" href="#quick-start">#&lt;/a>&lt;/h2>
+&lt;p>The fastest way to get dhamps-vdb running with Docker:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Clone the repository&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://github.com/mpilhlt/dhamps-vdb.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd dhamps-vdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Run automated setup (generates secure keys)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>./docker-setup.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Start services with docker-compose&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up -d
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Check logs&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose logs -f dhamps-vdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Access the API&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl http://localhost:8880/docs&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="whats-included">What&amp;rsquo;s Included&lt;a class="anchor" href="#whats-included">#&lt;/a>&lt;/h2>
+&lt;p>The Docker Compose setup includes:&lt;/p></description></item><item><title>Quick Start</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/quick-start/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/getting-started/quick-start/</guid><description>&lt;h1 id="quick-start">Quick Start&lt;a class="anchor" href="#quick-start">#&lt;/a>&lt;/h1>
+&lt;p>Complete walkthrough from installation to searching similar documents using curl.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;a class="anchor" href="#prerequisites">#&lt;/a>&lt;/h2>
+&lt;ul>
+&lt;li>dhamps-vdb installed and running&lt;/li>
+&lt;li>Admin API key configured&lt;/li>
+&lt;li>PostgreSQL with pgvector ready&lt;/li>
+&lt;/ul>
+&lt;h2 id="1-create-a-user">1. Create a User&lt;a class="anchor" href="#1-create-a-user">#&lt;/a>&lt;/h2>
+&lt;p>Create a new user with the admin API key:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -X POST http://localhost:8880/v1/users &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;Authorization: Bearer YOUR_ADMIN_KEY&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -d &lt;span style="color:#e6db74">&amp;#39;{
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;user_handle&amp;#34;: &amp;#34;alice&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;name&amp;#34;: &amp;#34;Alice Smith&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;email&amp;#34;: &amp;#34;alice@example.com&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> }&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Response:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;user_handle&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;alice&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;name&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;Alice Smith&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;email&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;alice@example.com&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;vdb_key&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;024v2013621509245f2e24...&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;created_at&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;2024-01-15T10:30:00Z&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Save the &lt;code>vdb_key&lt;/code>&lt;/strong> - it cannot be recovered later.&lt;/p></description></item><item><title>First Project</title><link>https://mpilhlt.github.io/dhamps-vdb/getting-started/first-project/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/getting-started/first-project/</guid><description>&lt;h1 id="first-project">First Project&lt;a class="anchor" href="#first-project">#&lt;/a>&lt;/h1>
+&lt;p>Step-by-step guide to creating your first complete project in dhamps-vdb.&lt;/p>
+&lt;h2 id="overview">Overview&lt;a class="anchor" href="#overview">#&lt;/a>&lt;/h2>
+&lt;p>This guide walks you through creating a complete RAG (Retrieval Augmented Generation) workflow:&lt;/p>
+&lt;ol>
+&lt;li>Set up authentication&lt;/li>
+&lt;li>Configure an LLM service&lt;/li>
+&lt;li>Create a project with metadata validation&lt;/li>
+&lt;li>Upload document embeddings&lt;/li>
+&lt;li>Search for similar documents&lt;/li>
+&lt;li>Share your project with collaborators&lt;/li>
+&lt;/ol>
+&lt;h2 id="step-1-authentication-setup">Step 1: Authentication Setup&lt;a class="anchor" href="#step-1-authentication-setup">#&lt;/a>&lt;/h2>
+&lt;h3 id="get-your-api-key">Get Your API Key&lt;a class="anchor" href="#get-your-api-key">#&lt;/a>&lt;/h3>
+&lt;p>If you&amp;rsquo;re an admin, create your first user:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -X POST http://localhost:8880/v1/users &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;Authorization: Bearer YOUR_ADMIN_KEY&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -d &lt;span style="color:#e6db74">&amp;#39;{
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;user_handle&amp;#34;: &amp;#34;researcher1&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;name&amp;#34;: &amp;#34;Research User&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> &amp;#34;email&amp;#34;: &amp;#34;researcher@example.com&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> }&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Save the returned &lt;code>vdb_key&lt;/code> to a variable:&lt;/p></description></item></channel></rss>

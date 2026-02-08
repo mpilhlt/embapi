@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Development on dhamps-vdb Documentation</title><link>https://mpilhlt.github.io/dhamps-vdb/development/</link><description>Recent content in Development on dhamps-vdb Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://mpilhlt.github.io/dhamps-vdb/development/index.xml" rel="self" type="application/rss+xml"/><item><title>Testing</title><link>https://mpilhlt.github.io/dhamps-vdb/development/testing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/development/testing/</guid><description>&lt;h1 id="testing-guide">Testing Guide&lt;a class="anchor" href="#testing-guide">#&lt;/a>&lt;/h1>
+&lt;p>This guide covers how to run and write tests for dhamps-vdb.&lt;/p>
+&lt;h2 id="running-tests">Running Tests&lt;a class="anchor" href="#running-tests">#&lt;/a>&lt;/h2>
+&lt;p>dhamps-vdb uses integration tests that spin up real PostgreSQL containers using &lt;a href="https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/">testcontainers&lt;/a>. This approach ensures tests run against actual database instances with pgvector support.&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;a class="anchor" href="#prerequisites">#&lt;/a>&lt;/h3>
+&lt;p>&lt;strong>Using Podman (Recommended for Linux):&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Start podman socket&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>systemctl --user start podman.socket
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Export DOCKER_HOST for testcontainers&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export DOCKER_HOST&lt;span style="color:#f92672">=&lt;/span>unix://$XDG_RUNTIME_DIR/podman/podman.sock&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Using Docker:&lt;/strong>&lt;/p>
+&lt;p>Testcontainers works with Docker out of the box. Ensure Docker daemon is running.&lt;/p></description></item><item><title>Contributing</title><link>https://mpilhlt.github.io/dhamps-vdb/development/contributing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/development/contributing/</guid><description>&lt;h1 id="contributing-guide">Contributing Guide&lt;a class="anchor" href="#contributing-guide">#&lt;/a>&lt;/h1>
+&lt;p>Thank you for your interest in contributing to dhamps-vdb! This guide will help you get started.&lt;/p>
+&lt;h2 id="development-setup">Development Setup&lt;a class="anchor" href="#development-setup">#&lt;/a>&lt;/h2>
+&lt;h3 id="prerequisites">Prerequisites&lt;a class="anchor" href="#prerequisites">#&lt;/a>&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>Go 1.21+&lt;/strong>: &lt;a href="https://go.dev/dl/">Download Go&lt;/a>&lt;/li>
+&lt;li>&lt;strong>PostgreSQL 16+&lt;/strong>: With pgvector extension&lt;/li>
+&lt;li>&lt;strong>sqlc&lt;/strong>: For generating type-safe database code&lt;/li>
+&lt;li>&lt;strong>Docker/Podman&lt;/strong>: For running tests&lt;/li>
+&lt;li>&lt;strong>Git&lt;/strong>: For version control&lt;/li>
+&lt;/ul>
+&lt;h3 id="clone-and-build">Clone and Build&lt;a class="anchor" href="#clone-and-build">#&lt;/a>&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Clone repository&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://github.com/mpilhlt/dhamps-vdb.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd dhamps-vdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Install dependencies&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>go get ./...
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Generate sqlc code&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sqlc generate --no-remote
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Build application&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>go build -o build/dhamps-vdb main.go
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Or run directly&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>go run main.go&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="environment-setup">Environment Setup&lt;a class="anchor" href="#environment-setup">#&lt;/a>&lt;/h3>
+&lt;p>Create a &lt;code>.env&lt;/code> file for local development:&lt;/p></description></item><item><title>Architecture</title><link>https://mpilhlt.github.io/dhamps-vdb/development/architecture/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/development/architecture/</guid><description>&lt;h1 id="technical-architecture">Technical Architecture&lt;a class="anchor" href="#technical-architecture">#&lt;/a>&lt;/h1>
+&lt;p>This document provides a technical deep-dive into dhamps-vdb&amp;rsquo;s architecture for developers who want to understand or modify the codebase.&lt;/p>
+&lt;h2 id="project-structure">Project Structure&lt;a class="anchor" href="#project-structure">#&lt;/a>&lt;/h2>
+&lt;pre tabindex="0">&lt;code>dhamps-vdb/
+├── main.go # Application entry point
+├── go.mod # Go module definition
+├── go.sum # Dependency checksums
+├── sqlc.yaml # sqlc configuration
+├── template.env # Environment template
+├── .env # Local config (gitignored)
+│
+├── api/
+│ └── openapi.yml # OpenAPI spec (not actively maintained)
+│
+├── internal/ # Internal packages (non-importable)
+│ ├── auth/ # Authentication logic
+│ │ └── authenticate.go # Bearer token validation
+│ │
+│ ├── crypto/ # Encryption utilities
+│ │ └── crypto.go # AES-256-GCM encryption
+│ │
+│ ├── database/ # Database layer
+│ │ ├── database.go # Connection pool management
+│ │ ├── migrations.go # Migration runner
+│ │ ├── db.go # Generated by sqlc
+│ │ ├── models.go # Generated by sqlc
+│ │ ├── queries.sql.go # Generated by sqlc
+│ │ │
+│ │ ├── migrations/ # SQL migrations
+│ │ │ ├── 001_create_initial_scheme.sql
+│ │ │ ├── 002_create_emb_index.sql
+│ │ │ ├── 003_add_public_read_flag.sql
+│ │ │ ├── 004_refactor_llm_services_architecture.sql
+│ │ │ ├── tern.conf.tpl # Template for tern
+│ │ │ └── tern.conf # Generated (gitignored)
+│ │ │
+│ │ └── queries/ # SQL queries for sqlc
+│ │ └── queries.sql # All database queries
+│ │
+│ ├── handlers/ # HTTP request handlers
+│ │ ├── handlers.go # Common handler utilities
+│ │ ├── users.go # User endpoints
+│ │ ├── projects.go # Project endpoints
+│ │ ├── llm_services.go # LLM service endpoints
+│ │ ├── api_standards.go # API standard endpoints
+│ │ ├── embeddings.go # Embedding endpoints
+│ │ ├── similars.go # Similarity search endpoints
+│ │ ├── admin.go # Admin endpoints
+│ │ │
+│ │ └── *_test.go # Test files
+│ │ ├── users_test.go
+│ │ ├── projects_test.go
+│ │ ├── projects_sharing_test.go
+│ │ ├── embeddings_test.go
+│ │ ├── llm_services_test.go
+│ │ ├── editor_permissions_test.go
+│ │ └── handlers_test.go
+│ │
+│ └── models/ # Data models and options
+│ ├── options.go # CLI/environment options
+│ ├── users.go # User models
+│ ├── projects.go # Project models
+│ ├── instances.go # LLM instance models (new)
+│ ├── api_standards.go # API standard models
+│ ├── embeddings.go # Embedding models
+│ ├── similars.go # Similarity search models
+│ └── admin.go # Admin operation models
+│
+├── testdata/ # Test fixtures
+│ ├── postgres/ # PostgreSQL test data
+│ │ ├── enable-vector.sql
+│ │ └── users.yml
+│ │
+│ └── *.json # JSON test fixtures
+│ ├── valid_user.json
+│ ├── valid_embeddings.json
+│ ├── valid_api_standard_*.json
+│ └── valid_llm_service_*.json
+│
+└── docs/ # Documentation
+ ├── content/ # Hugo content
+ └── *.md # Additional docs&lt;/code>&lt;/pre>&lt;h2 id="code-organization">Code Organization&lt;a class="anchor" href="#code-organization">#&lt;/a>&lt;/h2>
+&lt;h3 id="1-entry-point-maingo">1. Entry Point (&lt;code>main.go&lt;/code>)&lt;a class="anchor" href="#1-entry-point-maingo">#&lt;/a>&lt;/h3>
+&lt;p>The application entry point handles:&lt;/p></description></item><item><title>Performance</title><link>https://mpilhlt.github.io/dhamps-vdb/development/performance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mpilhlt.github.io/dhamps-vdb/development/performance/</guid><description>&lt;h1 id="performance-optimization-guide">Performance Optimization Guide&lt;a class="anchor" href="#performance-optimization-guide">#&lt;/a>&lt;/h1>
+&lt;p>This guide covers performance optimization strategies for dhamps-vdb, including query optimization, indexing, caching, and performance testing.&lt;/p>
+&lt;h2 id="query-optimization">Query Optimization&lt;a class="anchor" href="#query-optimization">#&lt;/a>&lt;/h2>
+&lt;h3 id="getallaccessibleinstances-query">GetAllAccessibleInstances Query&lt;a class="anchor" href="#getallaccessibleinstances-query">#&lt;/a>&lt;/h3>
+&lt;p>&lt;strong>Problem:&lt;/strong> The original implementation uses a LEFT JOIN with OR conditions, which can result in inefficient query execution.&lt;/p>
+&lt;p>&lt;strong>Current Implementation:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">SELECT&lt;/span> instances.&lt;span style="color:#f92672">*&lt;/span>, 
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> COALESCE(instances_shared_with.&lt;span style="color:#66d9ef">role&lt;/span>, &lt;span style="color:#e6db74">&amp;#39;owner&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> &lt;span style="color:#66d9ef">role&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> (instances.&lt;span style="color:#66d9ef">owner&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#960050;background-color:#1e0010">$&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> is_owner
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">FROM&lt;/span> instances
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">LEFT&lt;/span> &lt;span style="color:#66d9ef">JOIN&lt;/span> instances_shared_with
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">ON&lt;/span> instances.instance_id &lt;span style="color:#f92672">=&lt;/span> instances_shared_with.instance_id
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">WHERE&lt;/span> instances.&lt;span style="color:#66d9ef">owner&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#960050;background-color:#1e0010">$&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">OR&lt;/span> instances_shared_with.user_handle &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#960050;background-color:#1e0010">$&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">ORDER&lt;/span> &lt;span style="color:#66d9ef">BY&lt;/span> instances.&lt;span style="color:#66d9ef">owner&lt;/span> &lt;span style="color:#66d9ef">ASC&lt;/span>, instances.instance_handle &lt;span style="color:#66d9ef">ASC&lt;/span> 
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">LIMIT&lt;/span> &lt;span style="color:#960050;background-color:#1e0010">$&lt;/span>&lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#66d9ef">OFFSET&lt;/span> &lt;span style="color:#960050;background-color:#1e0010">$&lt;/span>&lt;span style="color:#ae81ff">3&lt;/span>;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Issue:&lt;/strong> The query planner may struggle to use indexes effectively with LEFT JOIN combined with OR conditions in the WHERE clause.&lt;/p></description></item></channel></rss>
