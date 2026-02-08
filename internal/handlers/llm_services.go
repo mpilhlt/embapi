@@ -377,6 +377,8 @@ func getDefinitionSharedUsersFunc(ctx context.Context, input *models.GetDefiniti
 	sharedUsers, err := queries.GetSharedUsersForDefinition(ctx, database.GetSharedUsersForDefinitionParams{
 		Owner:            input.UserHandle,
 		DefinitionHandle: input.DefinitionHandle,
+		Limit:            int32(input.Limit),
+		Offset:           int32(input.Offset),
 	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {
@@ -543,6 +545,8 @@ func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInsta
 			sharedUsers, err := queries.GetSharedUsersForDefinition(ctx, database.GetSharedUsersForDefinitionParams{
 				Owner:            input.Body.DefinitionOwner,
 				DefinitionHandle: input.Body.DefinitionHandle,
+				Limit:            maxSharedUsersPerQuery,
+				Offset:           0,
 			})
 			if err != nil && err.Error() != "no rows in result set" {
 				return huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve shared users for definition %s/%s: %v", input.Body.DefinitionOwner, input.Body.DefinitionHandle, err))
@@ -648,7 +652,7 @@ func getInstanceFunc(ctx context.Context, input *models.GetInstanceRequest) (*mo
 	if authUserHandle, ok := ctx.Value(auth.AuthUserKey).(string); ok {
 		acessibleInstances, err := queries.GetAccessibleInstancesByUser(ctx, database.GetAccessibleInstancesByUserParams{
 			Owner:  authUserHandle,
-			Limit:  999,
+			Limit:  maxSharedUsersPerQuery,
 			Offset: 0,
 		})
 		if err != nil && err != pgx.ErrNoRows {
@@ -880,6 +884,8 @@ func unshareInstanceFunc(ctx context.Context, input *models.UnshareInstanceReque
 	sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{
 		Owner:          input.UserHandle,
 		InstanceHandle: input.InstanceHandle,
+		Limit:          maxSharedUsersPerQuery,
+		Offset:         0,
 	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {
@@ -919,6 +925,8 @@ func getInstanceSharedUsersFunc(ctx context.Context, input *models.GetInstanceSh
 	sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{
 		Owner:          input.UserHandle,
 		InstanceHandle: input.InstanceHandle,
+		Limit:          int32(input.Limit),
+		Offset:         int32(input.Offset),
 	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {

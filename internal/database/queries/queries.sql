@@ -180,7 +180,7 @@ LIMIT 1;
 -- name: GetAllProjects :many
 SELECT projects."owner", projects."project_handle"
 FROM projects
-ORDER BY "owner" ASC, "project_handle" ASC;
+ORDER BY "owner" ASC, "project_handle" ASC LIMIT $1 OFFSET $2;
 
 -- name: CountAllProjects :one
 SELECT COUNT(*)
@@ -279,7 +279,7 @@ ON definitions."definition_id" = definitions_shared_with."definition_id"
 WHERE definitions."owner" = $1
   AND definitions."definition_handle" = $2
   AND definitions_shared_with."user_handle" != '*'
-ORDER BY "user_handle" ASC;
+ORDER BY "user_handle" ASC LIMIT $3 OFFSET $4;
 
 -- name: GetAccessibleDefinitionsByUser :many
 -- Get all definitions accessible to a user (owned + shared + _system)
@@ -490,7 +490,7 @@ JOIN instances
 ON instances."instance_id" = instances_shared_with."instance_id"
 WHERE instances."owner" = $1
   AND instances."instance_handle" = $2
-ORDER BY "user_handle" ASC;
+ORDER BY "user_handle" ASC LIMIT $3 OFFSET $4;
 
 -- name: RetrieveSharedInstance :one
 -- Get single instance, but only if it is shared with requesting user

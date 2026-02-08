@@ -483,16 +483,21 @@ func (q *Queries) GetAllDefinitions(ctx context.Context, arg GetAllDefinitionsPa
 const getAllProjects = `-- name: GetAllProjects :many
 SELECT projects."owner", projects."project_handle"
 FROM projects
-ORDER BY "owner" ASC, "project_handle" ASC
+ORDER BY "owner" ASC, "project_handle" ASC LIMIT $1 OFFSET $2
 `
+
+type GetAllProjectsParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
 
 type GetAllProjectsRow struct {
 	Owner         string `db:"owner" json:"owner"`
 	ProjectHandle string `db:"project_handle" json:"project_handle"`
 }
 
-func (q *Queries) GetAllProjects(ctx context.Context) ([]GetAllProjectsRow, error) {
-	rows, err := q.db.Query(ctx, getAllProjects)
+func (q *Queries) GetAllProjects(ctx context.Context, arg GetAllProjectsParams) ([]GetAllProjectsRow, error) {
+	rows, err := q.db.Query(ctx, getAllProjects, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -954,16 +959,23 @@ ON definitions."definition_id" = definitions_shared_with."definition_id"
 WHERE definitions."owner" = $1
   AND definitions."definition_handle" = $2
   AND definitions_shared_with."user_handle" != '*'
-ORDER BY "user_handle" ASC
+ORDER BY "user_handle" ASC LIMIT $3 OFFSET $4
 `
 
 type GetSharedUsersForDefinitionParams struct {
 	Owner            string `db:"owner" json:"owner"`
 	DefinitionHandle string `db:"definition_handle" json:"definition_handle"`
+	Limit            int32  `db:"limit" json:"limit"`
+	Offset           int32  `db:"offset" json:"offset"`
 }
 
 func (q *Queries) GetSharedUsersForDefinition(ctx context.Context, arg GetSharedUsersForDefinitionParams) ([]string, error) {
-	rows, err := q.db.Query(ctx, getSharedUsersForDefinition, arg.Owner, arg.DefinitionHandle)
+	rows, err := q.db.Query(ctx, getSharedUsersForDefinition,
+		arg.Owner,
+		arg.DefinitionHandle,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -990,12 +1002,14 @@ JOIN instances
 ON instances."instance_id" = instances_shared_with."instance_id"
 WHERE instances."owner" = $1
   AND instances."instance_handle" = $2
-ORDER BY "user_handle" ASC
+ORDER BY "user_handle" ASC LIMIT $3 OFFSET $4
 `
 
 type GetSharedUsersForInstanceParams struct {
 	Owner          string `db:"owner" json:"owner"`
 	InstanceHandle string `db:"instance_handle" json:"instance_handle"`
+	Limit          int32  `db:"limit" json:"limit"`
+	Offset         int32  `db:"offset" json:"offset"`
 }
 
 type GetSharedUsersForInstanceRow struct {
@@ -1004,7 +1018,12 @@ type GetSharedUsersForInstanceRow struct {
 }
 
 func (q *Queries) GetSharedUsersForInstance(ctx context.Context, arg GetSharedUsersForInstanceParams) ([]GetSharedUsersForInstanceRow, error) {
-	rows, err := q.db.Query(ctx, getSharedUsersForInstance, arg.Owner, arg.InstanceHandle)
+	rows, err := q.db.Query(ctx, getSharedUsersForInstance,
+		arg.Owner,
+		arg.InstanceHandle,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}

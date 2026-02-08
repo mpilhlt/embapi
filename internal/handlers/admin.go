@@ -55,7 +55,10 @@ func sanityCheckFunc(ctx context.Context, input *models.SanityCheckRequest) (*mo
 	queries := database.New(pool)
 
 	// Get all projects with their metadata schemes
-	projects, err := queries.GetAllProjects(ctx)
+	projects, err := queries.GetAllProjects(ctx, database.GetAllProjectsParams{
+		Limit:  999999,
+		Offset: 0,
+	})
 	if err != nil {
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get projects. %v", err))
 	}
