@@ -19,6 +19,10 @@ const (
 	// maxSharedUsersPerQuery is the maximum number of shared users to retrieve in a single query
 	// This prevents memory issues when a project is shared with many users
 	maxSharedUsersPerQuery = 1000
+	
+	// maxAdminQueryLimit is the maximum limit for admin operations that need to scan all records
+	// Used for operations like sanity checks that validate all data in the database
+	maxAdminQueryLimit = 999999
 )
 
 // Create a new project
@@ -277,7 +281,7 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 			sharedUsers = append(sharedUsers, models.SharedUser{UserHandle: "*", Role: "reader"})
 		}
 		// Iterate all shared users
-		userRows, err := queries.GetUsersByProject(ctx, database.GetUsersByProjectParams{Owner: input.UserHandle, ProjectHandle: input.ProjectHandle, Limit: 999, Offset: 0})
+		userRows, err := queries.GetUsersByProject(ctx, database.GetUsersByProjectParams{Owner: input.UserHandle, ProjectHandle: input.ProjectHandle, Limit: maxSharedUsersPerQuery, Offset: 0})
 		if err != nil {
 			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get authorized reader accounts for %s's project %s. %v", input.UserHandle, input.ProjectHandle, err))
 		}
@@ -303,7 +307,7 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 		if llmRow.Owner == requestingUser.(string) {
 			accessRole = "owner"
 		} else {
-			sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{Owner: llmRow.Owner, InstanceHandle: llmRow.InstanceHandle})
+			sharedUsers, err := queries.GetSharedUsersForInstance(ctx, database.GetSharedUsersForInstanceParams{Owner: llmRow.Owner, InstanceHandle: llmRow.InstanceHandle, Limit: maxSharedUsersPerQuery, Offset: 0})
 			if err != nil {
 				return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get shared users for LLM Service Instance %s owned by %s. %v", llmRow.InstanceHandle, llmRow.Owner, err))
 			}

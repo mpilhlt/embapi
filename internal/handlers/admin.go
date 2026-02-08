@@ -55,7 +55,11 @@ func sanityCheckFunc(ctx context.Context, input *models.SanityCheckRequest) (*mo
 	queries := database.New(pool)
 
 	// Get all projects with their metadata schemes
-	projects, err := queries.GetAllProjects(ctx)
+	// Use maxAdminQueryLimit since sanity check needs to validate all projects
+	projects, err := queries.GetAllProjects(ctx, database.GetAllProjectsParams{
+		Limit:  maxAdminQueryLimit,
+		Offset: 0,
+	})
 	if err != nil {
 		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get projects. %v", err))
 	}

@@ -162,7 +162,11 @@ func getUserFunc(ctx context.Context, input *models.GetUserRequest) (*models.Get
 
 	// Get projects the user is a member of
 	projects := models.ProjectMemberships{}
-	ps, err := queries.GetProjectsByUser(ctx, database.GetProjectsByUserParams{UserHandle: input.UserHandle})
+	ps, err := queries.GetProjectsByUser(ctx, database.GetProjectsByUserParams{
+		UserHandle: input.UserHandle,
+		Limit:      maxSharedUsersPerQuery,
+		Offset:     0,
+	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			fmt.Printf("Warning: No LLM Services registered for user %s.", input.UserHandle)
@@ -182,7 +186,7 @@ func getUserFunc(ctx context.Context, input *models.GetUserRequest) (*models.Get
 	imemberships := models.InstanceMemberships{}
 	instances, err := queries.GetAccessibleInstancesByUser(ctx, database.GetAccessibleInstancesByUserParams{
 		Owner:  input.UserHandle,
-		Limit:  999,
+		Limit:  maxSharedUsersPerQuery,
 		Offset: 0,
 	})
 	if err != nil {

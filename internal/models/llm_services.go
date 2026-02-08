@@ -159,6 +159,8 @@ type UnshareDefinitionResponse struct {
 type GetDefinitionSharedUsersRequest struct {
 	UserHandle       string `json:"user_handle" path:"user_handle" maxLength:"20" minLength:"3" example:"_system" doc:"Definition owner handle"`
 	DefinitionHandle string `json:"definition_handle" path:"definition_handle" maxLength:"20" minLength:"3" example:"openai-large" doc:"Definition handle"`
+	Limit            int    `json:"limit,omitempty" query:"limit" minimum:"1" maximum:"200" example:"20" default:"100" doc:"Maximum number of users to return"`
+	Offset           int    `json:"offset,omitempty" query:"offset" minimum:"0" example:"0" default:"0" doc:"Offset into the list of users"`
 }
 
 type GetDefinitionSharedUsersResponse struct {
@@ -367,6 +369,8 @@ type UnshareInstanceResponse struct {
 type GetInstanceSharedUsersRequest struct {
 	UserHandle     string `json:"user_handle" path:"user_handle" maxLength:"20" minLength:"3" example:"alice" doc:"Instance owner handle"`
 	InstanceHandle string `json:"instance_handle" path:"instance_handle" maxLength:"20" minLength:"3" example:"my-openai" doc:"Instance handle"`
+	Limit          int    `json:"limit,omitempty" query:"limit" minimum:"1" maximum:"200" example:"20" default:"100" doc:"Maximum number of users to return"`
+	Offset         int    `json:"offset,omitempty" query:"offset" minimum:"0" example:"0" default:"0" doc:"Offset into the list of users"`
 }
 
 type GetInstanceSharedUsersResponse struct {
