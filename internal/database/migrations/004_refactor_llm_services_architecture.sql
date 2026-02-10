@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS definitions(
   "description" TEXT,
   "api_standard" VARCHAR(20) NOT NULL REFERENCES "api_standards"("api_standard_handle"),
   "model" TEXT NOT NULL,
-  "dimensions" INTEGER NOT NULL,
-  "context_limit" INTEGER NOT NULL,
+  "dimensions" INTEGER,
+  "context_limit" INTEGER,
   "is_public" BOOLEAN NOT NULL DEFAULT FALSE,  -- If true, shared with all users
   "created_at" TIMESTAMP NOT NULL,
   "updated_at" TIMESTAMP NOT NULL,
@@ -159,7 +159,7 @@ ALTER TABLE llm_services RENAME TO instances;
 ALTER TABLE instances RENAME COLUMN llm_service_id TO instance_id;
 ALTER TABLE instances RENAME COLUMN llm_service_handle TO instance_handle;
 ALTER TABLE instances DROP COLUMN IF EXISTS api_key;
-ALTER TABLE instances ADD COLUMN "context_limit" INTEGER NOT NULL;
+ALTER TABLE instances ADD COLUMN "context_limit" INTEGER;
 ALTER TABLE instances ADD COLUMN "definition_id" INTEGER REFERENCES "definitions"("definition_id") ON DELETE SET NULL;
 ALTER TABLE instances ADD COLUMN "api_key_encrypted" BYTEA;
 
