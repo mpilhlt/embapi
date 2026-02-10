@@ -95,7 +95,10 @@ func postProjEmbeddingsFunc(ctx context.Context, input *models.PostProjEmbedding
 		}
 
 		// Validate embedding dimensions
-		if err := ValidateEmbeddingDimensions(embedding, instance.Dimensions); err != nil {
+		if !instance.Dimensions.Valid {
+			return nil, huma.Error500InternalServerError("LLM service instance does not have dimensions configured")
+		}
+		if err := ValidateEmbeddingDimensions(embedding, instance.Dimensions.Int32); err != nil {
 			return nil, huma.Error400BadRequest(fmt.Sprintf("Dimension validation failed for input %s: %v", embedding.TextID, err))
 		}
 
