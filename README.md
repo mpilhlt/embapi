@@ -5,7 +5,7 @@ Vector Database for the DH at Max Planck Society initiative
 
 ## Introduction
 
-EmbAPI ⚽ is a PostgreSQL-backed vector database with pgvector support, providing a RESTful API for managing embeddings in Retrieval Augmented Generation (RAG) workflows. Store embeddings for text snippets with metadata, then find similar content using cosine similarity search.
+EmbAPI (/ɛmˈbɑːpeɪ/) ⚽ is a PostgreSQL-backed vector database with pgvector support, providing a RESTful API for managing embeddings in Retrieval Augmented Generation (RAG) workflows. Store embeddings for text snippets with metadata, then find similar content using cosine similarity search.
 
 The typical use case is as a RAG component: Create embeddings for your text collection, upload them with identifiers and optional metadata, then query for similar texts either by identifier (`GET`) or by posting raw embeddings (`POST`). The service returns text identifiers with similarity scores for use in your application.
 
