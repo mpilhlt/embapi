@@ -49,13 +49,13 @@ var Config = map[string]*huma.SecurityScheme{
 	},
 }
 
-// APITermination returns a middleware function that evaluates if any of the preceding
+// AuthTermination returns a middleware function that evaluates if any of the preceding
 //
 //	authentication middleware functions were successful. If not, it rejects the request,
 //	otherwise it calls the next middleware (or the final handler) function.
 //	This is supposed to be called as the last auth middleware function in
 //	the chain.
-func AuthTermination(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
+func AuthTermination(api huma.API, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		// Check if the current operation requires authentication
 		isAuthRequired := false
@@ -77,7 +77,9 @@ func AuthTermination(api huma.API) func(ctx huma.Context, next func(huma.Context
 			next(ctx)
 			return
 		}
-		fmt.Print("        Authentication failed.\n")
+		if options.AuthVerbose {
+			fmt.Print("        Authentication failed.\n")
+		}
 		_ = huma.WriteErr(api, ctx, http.StatusUnauthorized, "Authentication failed. Perhaps a missing or incorrect API key?")
 	}
 }
@@ -107,7 +109,9 @@ func EmbAPIKeyAdminAuth(api huma.API, options *models.Options) func(ctx huma.Con
 		if token == options.AdminKey {
 			ctx = huma.WithValue(ctx, IsAdminKey, true)
 			ctx = huma.WithValue(ctx, AuthUserKey, "admin")
-			fmt.Print("        Admin authentication successful\n")
+			if options.AuthVerbose {
+				fmt.Print("        Admin authentication successful\n")
+			}
 			next(ctx)
 			return
 		}
@@ -167,7 +171,9 @@ func EmbAPIKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Option
 		if EmbAPIKeyIsValid(token, storedHash) {
 			ctx = huma.WithValue(ctx, IsOwnerKey, true)
 			ctx = huma.WithValue(ctx, AuthUserKey, owner)
-			fmt.Printf("        Owner authentication successful: %s\n", owner)
+			if options.AuthVerbose {
+				fmt.Printf("        Owner authentication successful: %s\n", owner)
+			}
 			next(ctx)
 			return
 		}
@@ -213,27 +219,35 @@ func EmbAPIKeyReaderAuth(api huma.API, pool *pgxpool.Pool, options *models.Optio
 			return
 		}
 
-		fmt.Printf("    Reader auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
+		if options.AuthVerbose {
+			fmt.Printf("    Reader auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
+		}
 		// Branch based on whether project, definition, or instance is being accessed
 		if len(project) > 0 {
-			fmt.Print("        Checking project access...\n")
-			handleProjectReaderAuth(api, pool, owner, project)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking project access...\n")
+			}
+			handleProjectReaderAuth(api, pool, owner, project, options)(ctx, next)
 			return
 		}
 		if len(definition) > 0 {
-			fmt.Print("        Checking definition access...\n")
-			handleDefinitionReaderAuth(api, pool, owner, definition)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking definition access...\n")
+			}
+			handleDefinitionReaderAuth(api, pool, owner, definition, options)(ctx, next)
 			return
 		}
 		if len(instance) > 0 {
-			fmt.Print("        Checking instance access...\n")
-			handleInstanceReaderAuth(api, pool, owner, instance)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking instance access...\n")
+			}
+			handleInstanceReaderAuth(api, pool, owner, instance, options)(ctx, next)
 			return
 		}
 	}
 }
 
-func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, project string) func(ctx huma.Context, next func(huma.Context)) {
+func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, project string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	{
 		return func(ctx huma.Context, next func(huma.Context)) {
 
@@ -249,7 +263,9 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 			// If project exists and public_read is true, allow unauthenticated access
 			if err == nil && publicRead.Valid && publicRead.Bool {
 				// Public read is enabled, allow unauthenticated access
-				fmt.Print("        Public read access granted (no authentication required)\n")
+				if options.AuthVerbose {
+					fmt.Print("        Public read access granted (no authentication required)\n")
+				}
 				ctx = huma.WithValue(ctx, AuthUserKey, "public")
 				next(ctx)
 				return
@@ -278,7 +294,9 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					fmt.Print("        Reader authentication successful\n")
+					if options.AuthVerbose {
+						fmt.Print("        Reader authentication successful\n")
+					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
 					return
@@ -290,7 +308,7 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 	}
 }
 
-func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, definition string) func(ctx huma.Context, next func(huma.Context)) {
+func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, definition string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	{
 		return func(ctx huma.Context, next func(huma.Context)) {
 
@@ -317,7 +335,9 @@ func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					fmt.Print("        Reader authentication successful\n")
+					if options.AuthVerbose {
+						fmt.Print("        Reader authentication successful\n")
+					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
 					return
@@ -329,7 +349,7 @@ func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 	}
 }
 
-func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, instance string) func(ctx huma.Context, next func(huma.Context)) {
+func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, instance string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	{
 		return func(ctx huma.Context, next func(huma.Context)) {
 
@@ -356,7 +376,9 @@ func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					fmt.Print("        Reader authentication successful\n")
+					if options.AuthVerbose {
+						fmt.Print("        Reader authentication successful\n")
+					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 					next(ctx)
 					return
@@ -406,27 +428,35 @@ func EmbAPIKeyEditorAuth(api huma.API, pool *pgxpool.Pool, options *models.Optio
 			return
 		}
 
-		fmt.Printf("    Editor auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
+		if options.AuthVerbose {
+			fmt.Printf("    Editor auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
+		}
 		// Branch based on whether project, definition, or instance is being accessed
 		if len(project) > 0 {
-			fmt.Print("        Checking project editor access...\n")
-			handleProjectEditorAuth(api, pool, owner, project)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking project editor access...\n")
+			}
+			handleProjectEditorAuth(api, pool, owner, project, options)(ctx, next)
 			return
 		}
 		if len(definition) > 0 {
-			fmt.Print("        Checking definition editor access...\n")
-			handleDefinitionEditorAuth(api, pool, owner, definition)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking definition editor access...\n")
+			}
+			handleDefinitionEditorAuth(api, pool, owner, definition, options)(ctx, next)
 			return
 		}
 		if len(instance) > 0 {
-			fmt.Print("        Checking instance editor access...\n")
-			handleInstanceEditorAuth(api, pool, owner, instance)(ctx, next)
+			if options.AuthVerbose {
+				fmt.Print("        Checking instance editor access...\n")
+			}
+			handleInstanceEditorAuth(api, pool, owner, instance, options)(ctx, next)
 			return
 		}
 	}
 }
 
-func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, project string) func(ctx huma.Context, next func(huma.Context)) {
+func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, project string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
 
@@ -455,7 +485,9 @@ func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				if options.AuthVerbose {
+					fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
 				return
@@ -466,7 +498,7 @@ func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 	}
 }
 
-func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, definition string) func(ctx huma.Context, next func(huma.Context)) {
+func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, definition string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
 
@@ -493,7 +525,9 @@ func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				fmt.Print("        Editor authentication successful\n")
+				if options.AuthVerbose {
+					fmt.Print("        Editor authentication successful\n")
+				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
 				return
@@ -504,7 +538,7 @@ func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 	}
 }
 
-func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, instance string) func(ctx huma.Context, next func(huma.Context)) {
+func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, instance string, options *models.Options) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
 
@@ -533,7 +567,9 @@ func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				if options.AuthVerbose {
+					fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
+				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
 				next(ctx)
 				return
