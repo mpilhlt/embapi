@@ -592,10 +592,10 @@ func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInsta
 		if input.Body.Model == "" {
 			input.Body.Model = definition.Model
 		}
-		if input.Body.Dimensions == 0 {
+		if input.Body.Dimensions == 0 && definition.Dimensions.Valid {
 			input.Body.Dimensions = definition.Dimensions.Int32
 		}
-		if input.Body.ContextLimit == 0 {
+		if input.Body.ContextLimit == 0 && definition.ContextLimit.Valid {
 			input.Body.ContextLimit = definition.ContextLimit.Int32
 		}
 

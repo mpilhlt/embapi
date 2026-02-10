@@ -88,7 +88,12 @@ func sanityCheckFunc(ctx context.Context, input *models.SanityCheckRequest) (*mo
 
 		// Create a map with the single LLM service instance
 		llmDimensions := make(map[int32]int32)
-		llmDimensions[instance.InstanceID] = instance.Dimensions.Int32
+		if instance.Dimensions.Valid {
+			llmDimensions[instance.InstanceID] = instance.Dimensions.Int32
+		} else {
+			issues = append(issues, fmt.Sprintf("Project %s: LLM service instance does not have dimensions configured", projectName))
+			continue
+		}
 
 		// Get all embeddings for this project
 		embeddings, err := queries.GetEmbeddingsByProject(ctx, database.GetEmbeddingsByProjectParams{

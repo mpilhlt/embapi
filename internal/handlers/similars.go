@@ -166,6 +166,9 @@ func postSimilarFunc(ctx context.Context, input *models.PostSimilarRequest) (*mo
 	}
 
 	// Validate that the vector dimensions match the LLM service instance dimensions
+	if !instance.Dimensions.Valid {
+		return nil, huma.Error500InternalServerError("LLM service instance does not have dimensions configured")
+	}
 	if len(input.Body.Vector) != int(instance.Dimensions.Int32) {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("vector dimension mismatch: expected %d dimensions, got %d", instance.Dimensions.Int32, len(input.Body.Vector)))
 	}
