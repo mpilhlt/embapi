@@ -74,8 +74,8 @@ func putDefinitionFunc(ctx context.Context, input *models.PutDefinitionRequest) 
 			Description:      pgtype.Text{String: input.Body.Description, Valid: true},
 			APIStandard:      input.Body.APIStandard,
 			Model:            input.Body.Model,
-			Dimensions:       int32(input.Body.Dimensions),
-			ContextLimit:     int32(input.Body.ContextLimit),
+			Dimensions:       pgtype.Int4{Int32: int32(input.Body.Dimensions), Valid: input.Body.Dimensions != 0},
+			ContextLimit:     pgtype.Int4{Int32: int32(input.Body.ContextLimit), Valid: input.Body.ContextLimit != 0},
 			IsPublic:         input.Body.IsPublic,
 		})
 		if err != nil {
@@ -177,8 +177,8 @@ func getDefinitionFunc(ctx context.Context, input *models.GetDefinitionRequest) 
 		Description:      def.Description.String,
 		APIStandard:      def.APIStandard,
 		Model:            def.Model,
-		Dimensions:       def.Dimensions,
-		ContextLimit:     def.ContextLimit,
+		Dimensions:       def.Dimensions.Int32,
+		ContextLimit:     def.ContextLimit.Int32,
 		IsPublic:         def.IsPublic,
 	}
 	response := &models.GetDefinitionResponse{}
@@ -466,7 +466,8 @@ func putInstanceFunc(ctx context.Context, input *models.PutInstanceRequest) (*mo
 			APIKeyEncrypted: APIKeyEncrypted,
 			APIStandard:     input.Body.APIStandard,
 			Model:           input.Body.Model,
-			Dimensions:      int32(input.Body.Dimensions),
+			Dimensions:      pgtype.Int4{Int32: int32(input.Body.Dimensions), Valid: input.Body.Dimensions != 0},
+			ContextLimit:    pgtype.Int4{Int32: int32(input.Body.ContextLimit), Valid: input.Body.ContextLimit != 0},
 		})
 		if err != nil {
 			return huma.Error500InternalServerError(fmt.Sprintf("unable to upload llm service instance: %v", err))
@@ -592,10 +593,10 @@ func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInsta
 			input.Body.Model = definition.Model
 		}
 		if input.Body.Dimensions == 0 {
-			input.Body.Dimensions = definition.Dimensions
+			input.Body.Dimensions = definition.Dimensions.Int32
 		}
 		if input.Body.ContextLimit == 0 {
-			input.Body.ContextLimit = definition.ContextLimit
+			input.Body.ContextLimit = definition.ContextLimit.Int32
 		}
 
 		// 1. Upsert LLM service instance
@@ -608,8 +609,8 @@ func postInstanceFromDefinitionFunc(ctx context.Context, input *models.PostInsta
 			APIKeyEncrypted: APIKeyEncrypted,
 			APIStandard:     input.Body.APIStandard,
 			Model:           input.Body.Model,
-			Dimensions:      int32(input.Body.Dimensions),
-			ContextLimit:    int32(input.Body.ContextLimit),
+			Dimensions:      pgtype.Int4{Int32: int32(input.Body.Dimensions), Valid: input.Body.Dimensions != 0},
+			ContextLimit:    pgtype.Int4{Int32: int32(input.Body.ContextLimit), Valid: input.Body.ContextLimit != 0},
 		})
 		if err != nil {
 			return fmt.Errorf("unable to upload llm service instance: %v", err)
@@ -715,8 +716,8 @@ func getInstanceFunc(ctx context.Context, input *models.GetInstanceRequest) (*mo
 		// APIKey:         "", // Never return API key
 		APIStandard:  llm.APIStandard,
 		Model:        llm.Model,
-		Dimensions:   llm.Dimensions,
-		ContextLimit: llm.ContextLimit,
+		Dimensions:   llm.Dimensions.Int32,
+		ContextLimit: llm.ContextLimit.Int32,
 	}
 	response := &models.GetInstanceResponse{}
 	response.Body = ls

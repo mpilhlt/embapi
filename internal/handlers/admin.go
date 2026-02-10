@@ -88,7 +88,7 @@ func sanityCheckFunc(ctx context.Context, input *models.SanityCheckRequest) (*mo
 
 		// Create a map with the single LLM service instance
 		llmDimensions := make(map[int32]int32)
-		llmDimensions[instance.InstanceID] = instance.Dimensions
+		llmDimensions[instance.InstanceID] = instance.Dimensions.Int32
 
 		// Get all embeddings for this project
 		embeddings, err := queries.GetEmbeddingsByProject(ctx, database.GetEmbeddingsByProjectParams{

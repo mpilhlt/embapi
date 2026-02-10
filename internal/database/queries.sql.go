@@ -1749,7 +1749,7 @@ type RetrieveInstanceRow struct {
 	HasAPIKey        bool             `db:"has_api_key" json:"has_api_key"`
 	APIStandard      string           `db:"api_standard" json:"api_standard"`
 	Model            string           `db:"model" json:"model"`
-	Dimensions       int32            `db:"dimensions" json:"dimensions"`
+	Dimensions       pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit     pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt        pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt        pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -1805,7 +1805,7 @@ type RetrieveInstanceByIDRow struct {
 	Description    pgtype.Text      `db:"description" json:"description"`
 	APIStandard    string           `db:"api_standard" json:"api_standard"`
 	Model          string           `db:"model" json:"model"`
-	Dimensions     int32            `db:"dimensions" json:"dimensions"`
+	Dimensions     pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit   pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt      pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -1866,7 +1866,7 @@ type RetrieveInstanceByProjectRow struct {
 	Description    pgtype.Text      `db:"description" json:"description"`
 	APIStandard    string           `db:"api_standard" json:"api_standard"`
 	Model          string           `db:"model" json:"model"`
-	Dimensions     int32            `db:"dimensions" json:"dimensions"`
+	Dimensions     pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit   pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt      pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -1932,7 +1932,7 @@ type RetrieveInstanceByProjectForUserRow struct {
 	Description    pgtype.Text      `db:"description" json:"description"`
 	APIStandard    string           `db:"api_standard" json:"api_standard"`
 	Model          string           `db:"model" json:"model"`
-	Dimensions     int32            `db:"dimensions" json:"dimensions"`
+	Dimensions     pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit   pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt      pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -1989,7 +1989,7 @@ type RetrieveInstanceByProjectIDRow struct {
 	Description    pgtype.Text      `db:"description" json:"description"`
 	APIStandard    string           `db:"api_standard" json:"api_standard"`
 	Model          string           `db:"model" json:"model"`
-	Dimensions     int32            `db:"dimensions" json:"dimensions"`
+	Dimensions     pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit   pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt      pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -2126,7 +2126,7 @@ type RetrieveSharedInstanceRow struct {
 	Description    pgtype.Text      `db:"description" json:"description"`
 	APIStandard    string           `db:"api_standard" json:"api_standard"`
 	Model          string           `db:"model" json:"model"`
-	Dimensions     int32            `db:"dimensions" json:"dimensions"`
+	Dimensions     pgtype.Int4      `db:"dimensions" json:"dimensions"`
 	ContextLimit   pgtype.Int4      `db:"context_limit" json:"context_limit"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt      pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -2442,7 +2442,7 @@ type UpsertInstanceParams struct {
 	APIKeyEncrypted []byte      `db:"api_key_encrypted" json:"api_key_encrypted"`
 	APIStandard     string      `db:"api_standard" json:"api_standard"`
 	Model           string      `db:"model" json:"model"`
-	Dimensions      int32       `db:"dimensions" json:"dimensions"`
+	Dimensions      pgtype.Int4 `db:"dimensions" json:"dimensions"`
 	ContextLimit    pgtype.Int4 `db:"context_limit" json:"context_limit"`
 }
 
