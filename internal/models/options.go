@@ -3,7 +3,7 @@ package models
 // Options for the CLI.
 type Options struct {
 	Debug       bool   `                    env:"SERVICE_DEBUG"       doc:"Enable debug logging"                    short:"d" default:"true"`
-	AuthVerbose bool   `name:"auth-verbose" env:"SERVICE_AUTH_VERBOSE" doc:"Enable verbose authentication logging"  short:"v" default:"false"`
+	AuthVerbose bool   `name:"auth-verbose" env:"SERVICE_AUTH_VERBOSE" doc:"Enable verbose authentication logging"            default:"false"`
 	Host        string `                    env:"SERVICE_HOST"        doc:"Hostname to listen on"                             default:"localhost"`
 	Port        int    `                    env:"SERVICE_PORT"        doc:"Port to listen on"                       short:"p" default:"8880"`
 	DBHost      string `name:"db-host"      env:"SERVICE_DBHOST"      doc:"Database hostname"                                 default:"localhost"`

@@ -116,7 +116,7 @@ Enable verbose authentication logging.
 - **Required:** No
 - **Default:** `false`
 - **Environment Variable:** `SERVICE_AUTH_VERBOSE`
-- **Command-line Flag:** `-v`, `--auth-verbose`
+- **Command-line Flag:** `--auth-verbose`
 
 **Description:** Controls authentication log output. When enabled, logs all authentication attempts including successful and failed authentications. When disabled (default), authentication operates silently.
 
