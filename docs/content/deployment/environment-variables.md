@@ -108,6 +108,51 @@ SERVICE_DEBUG=true    # Development (verbose)
 - `true`: Detailed logs, useful for debugging
 - `false`: Minimal logs, recommended for production
 
+### SERVICE_AUTH_VERBOSE
+
+Enable verbose authentication logging.
+
+- **Type:** Boolean
+- **Required:** No
+- **Default:** `false`
+- **Environment Variable:** `SERVICE_AUTH_VERBOSE`
+- **Command-line Flag:** `-v`, `--auth-verbose`
+
+**Description:** Controls authentication log output. When enabled, logs all authentication attempts including successful and failed authentications. When disabled (default), authentication operates silently.
+
+**Example:**
+
+```bash
+SERVICE_AUTH_VERBOSE=false   # Quiet mode (default, recommended for production)
+SERVICE_AUTH_VERBOSE=true    # Verbose mode (useful for debugging)
+```
+
+**Use Cases:**
+
+- **`true` (verbose mode):** 
+  - Debugging authentication issues
+  - Monitoring security events
+  - Development and testing
+  - Auditing access patterns
+
+- **`false` (quiet mode, recommended):**
+  - Production environments
+  - Bulk upload operations
+  - High-traffic scenarios
+  - When crawlers or automated tools access the API frequently
+
+**Example Log Output (when `true`):**
+
+```
+    Owner authentication successful: alice
+    Reader auth for owner=bob project=test definition= instance= running...
+        Checking project access...
+        Reader authentication successful
+    Authentication failed.
+```
+
+**Note:** Authentication still functions normally when logging is disabled; only the console output is suppressed. This prevents log spam during bulk operations or high-traffic periods.
+
 ### SERVICE_HOST
 
 Hostname or IP address to bind the service to.
@@ -275,6 +320,7 @@ SERVICE_DBNAME=embapi_test     # Testing database
 ```bash
 # .env file for development
 SERVICE_DEBUG=true
+SERVICE_AUTH_VERBOSE=true
 SERVICE_HOST=localhost
 SERVICE_PORT=8880
 SERVICE_DBHOST=localhost
@@ -291,6 +337,7 @@ ENCRYPTION_KEY=dev-encryption-key-min-32-chars-long
 ```bash
 # .env file for Docker Compose
 SERVICE_DEBUG=false
+SERVICE_AUTH_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=postgres
@@ -307,6 +354,7 @@ ENCRYPTION_KEY=generated_encryption_key_from_setup_script
 ```bash
 # .env file for production (or use secrets management)
 SERVICE_DEBUG=false
+SERVICE_AUTH_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=db.internal.example.com
@@ -384,6 +432,7 @@ Some variables support command-line flags:
 ```bash
 ./embapi \
   --debug \
+  --auth-verbose \
   --host 0.0.0.0 \
   --port 8880 \
   --admin-key your-admin-key \
