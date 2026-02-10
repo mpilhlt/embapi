@@ -74,6 +74,8 @@ func putDefinitionFunc(ctx context.Context, input *models.PutDefinitionRequest) 
 			Description:      pgtype.Text{String: input.Body.Description, Valid: true},
 			APIStandard:      input.Body.APIStandard,
 			Model:            input.Body.Model,
+			// Note: Using != 0 to determine if value was provided (due to omitempty in JSON).
+			// This means 0 cannot be explicitly stored, which is acceptable for these fields.
 			Dimensions:       pgtype.Int4{Int32: int32(input.Body.Dimensions), Valid: input.Body.Dimensions != 0},
 			ContextLimit:     pgtype.Int4{Int32: int32(input.Body.ContextLimit), Valid: input.Body.ContextLimit != 0},
 			IsPublic:         input.Body.IsPublic,
