@@ -52,6 +52,19 @@ func (q *Queries) CountAllProjects(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const countDefinitionsByUser = `-- name: CountDefinitionsByUser :one
+SELECT COUNT(*)
+FROM definitions
+WHERE "owner" = $1
+`
+
+func (q *Queries) CountDefinitionsByUser(ctx context.Context, owner string) (int64, error) {
+	row := q.db.QueryRow(ctx, countDefinitionsByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countEmbeddingsByProject = `-- name: CountEmbeddingsByProject :one
 SELECT COUNT(*)
 FROM embeddings
@@ -73,6 +86,19 @@ func (q *Queries) CountEmbeddingsByProject(ctx context.Context, arg CountEmbeddi
 	return count, err
 }
 
+const countInstancesByDefinition = `-- name: CountInstancesByDefinition :one
+SELECT COUNT(*)
+FROM instances
+WHERE "definition_id" = $1
+`
+
+func (q *Queries) CountInstancesByDefinition(ctx context.Context, definitionID pgtype.Int4) (int64, error) {
+	row := q.db.QueryRow(ctx, countInstancesByDefinition, definitionID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countInstancesByUser = `-- name: CountInstancesByUser :one
 SELECT COUNT(*)
 FROM instances
@@ -81,6 +107,45 @@ WHERE "owner" = $1
 
 func (q *Queries) CountInstancesByUser(ctx context.Context, owner string) (int64, error) {
 	row := q.db.QueryRow(ctx, countInstancesByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countProjectsByUser = `-- name: CountProjectsByUser :one
+SELECT COUNT(DISTINCT projects."project_id")
+FROM projects
+WHERE projects."owner" = $1
+`
+
+func (q *Queries) CountProjectsByUser(ctx context.Context, owner string) (int64, error) {
+	row := q.db.QueryRow(ctx, countProjectsByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countProjectsUsingInstance = `-- name: CountProjectsUsingInstance :one
+SELECT COUNT(*)
+FROM projects
+WHERE "instance_id" = $1
+`
+
+func (q *Queries) CountProjectsUsingInstance(ctx context.Context, instanceID pgtype.Int4) (int64, error) {
+	row := q.db.QueryRow(ctx, countProjectsUsingInstance, instanceID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countSharedUsersForInstance = `-- name: CountSharedUsersForInstance :one
+SELECT COUNT(*)
+FROM instances_shared_with
+WHERE "instance_id" = $1
+`
+
+func (q *Queries) CountSharedUsersForInstance(ctx context.Context, instanceID int32) (int64, error) {
+	row := q.db.QueryRow(ctx, countSharedUsersForInstance, instanceID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -540,6 +605,71 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]str
 			return nil, err
 		}
 		items = append(items, user_handle)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllUsersWithCounts = `-- name: GetAllUsersWithCounts :many
+SELECT 
+    users."user_handle",
+    users."name",
+    COALESCE(project_counts.count, 0) AS project_count,
+    COALESCE(definition_counts.count, 0) AS definition_count,
+    COALESCE(instance_counts.count, 0) AS instance_count
+FROM users
+LEFT JOIN (
+    SELECT "owner", COUNT(DISTINCT "project_id") AS count
+    FROM projects
+    GROUP BY "owner"
+) project_counts ON users."user_handle" = project_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM definitions
+    GROUP BY "owner"
+) definition_counts ON users."user_handle" = definition_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM instances
+    GROUP BY "owner"
+) instance_counts ON users."user_handle" = instance_counts."owner"
+ORDER BY users."user_handle" ASC LIMIT $1 OFFSET $2
+`
+
+type GetAllUsersWithCountsParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+type GetAllUsersWithCountsRow struct {
+	UserHandle      string      `db:"user_handle" json:"user_handle"`
+	Name            pgtype.Text `db:"name" json:"name"`
+	ProjectCount    int64       `db:"project_count" json:"project_count"`
+	DefinitionCount int64       `db:"definition_count" json:"definition_count"`
+	InstanceCount   int64       `db:"instance_count" json:"instance_count"`
+}
+
+func (q *Queries) GetAllUsersWithCounts(ctx context.Context, arg GetAllUsersWithCountsParams) ([]GetAllUsersWithCountsRow, error) {
+	rows, err := q.db.Query(ctx, getAllUsersWithCounts, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllUsersWithCountsRow
+	for rows.Next() {
+		var i GetAllUsersWithCountsRow
+		if err := rows.Scan(
+			&i.UserHandle,
+			&i.Name,
+			&i.ProjectCount,
+			&i.DefinitionCount,
+			&i.InstanceCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

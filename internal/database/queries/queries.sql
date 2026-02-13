@@ -48,6 +48,41 @@ SELECT "user_handle"
 FROM users
 ORDER BY "user_handle" ASC LIMIT $1 OFFSET $2;
 
+-- name: GetAllUsersWithCounts :many
+SELECT 
+    users."user_handle",
+    users."name",
+    COALESCE(project_counts.count, 0) AS project_count,
+    COALESCE(definition_counts.count, 0) AS definition_count,
+    COALESCE(instance_counts.count, 0) AS instance_count
+FROM users
+LEFT JOIN (
+    SELECT "owner", COUNT(DISTINCT "project_id") AS count
+    FROM projects
+    GROUP BY "owner"
+) project_counts ON users."user_handle" = project_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM definitions
+    GROUP BY "owner"
+) definition_counts ON users."user_handle" = definition_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM instances
+    GROUP BY "owner"
+) instance_counts ON users."user_handle" = instance_counts."owner"
+ORDER BY users."user_handle" ASC LIMIT $1 OFFSET $2;
+
+-- name: CountProjectsByUser :one
+SELECT COUNT(DISTINCT projects."project_id")
+FROM projects
+WHERE projects."owner" = $1;
+
+-- name: CountDefinitionsByUser :one
+SELECT COUNT(*)
+FROM definitions
+WHERE "owner" = $1;
+
 -- name: GetUsersByProject :many
 SELECT users."user_handle", users_projects."role"
 FROM users JOIN users_projects
@@ -186,6 +221,11 @@ ORDER BY "owner" ASC, "project_handle" ASC LIMIT $1 OFFSET $2;
 SELECT COUNT(*)
 FROM projects;
 
+-- name: CountProjectsUsingInstance :one
+SELECT COUNT(*)
+FROM projects
+WHERE "instance_id" = $1;
+
 -- name: LinkProjectToUser :one
 INSERT
 INTO users_projects (
@@ -304,6 +344,11 @@ WHERE definitions."owner" = $1
    OR definitions_shared_with."user_handle" = $1
 ORDER BY definitions."owner" ASC, definitions."definition_handle" ASC 
 LIMIT $2 OFFSET $3;
+
+-- name: CountInstancesByDefinition :one
+SELECT COUNT(*)
+FROM instances
+WHERE "definition_id" = $1;
 
 
 -- === LLM Service Instances (user-specific instances with optional API keys) ===
@@ -563,6 +608,11 @@ LIMIT $2 OFFSET $3;
 SELECT COUNT(*)
 FROM instances
 WHERE "owner" = $1;
+
+-- name: CountSharedUsersForInstance :one
+SELECT COUNT(*)
+FROM instances_shared_with
+WHERE "instance_id" = $1;
 
 
 -- === EMBEDDINGS ===

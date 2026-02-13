@@ -36,6 +36,15 @@ type InstanceMembership struct {
 
 type InstanceMemberships []InstanceMembership
 
+// UserBrief represents brief user information with counts for list responses
+type UserBrief struct {
+	UserHandle          string `json:"user_handle" doc:"User handle" maxLength:"20" minLength:"3" example:"jdoe"`
+	Name                string `json:"name,omitempty" doc:"User name" maxLength:"50" example:"Jane Doe"`
+	NumberOfProjects    int    `json:"number_of_projects" readOnly:"true" doc:"Number of projects owned by the user"`
+	NumberOfDefinitions int    `json:"number_of_definitions" readOnly:"true" doc:"Number of LLM Service Definitions created by the user"`
+	NumberOfInstances   int    `json:"number_of_instances" readOnly:"true" doc:"Number of LLM Service Instances owned by the user"`
+}
+
 // Request and Response structs for the user administration API
 // The request structs must be structs with fields for the request path/query/header/cookie parameters and/or body.
 // The response structs must be structs with fields for the output headers and body of the operation, if any.
@@ -74,7 +83,7 @@ type GetUsersRequest struct {
 
 type GetUsersResponse struct {
 	Header []http.Header `json:"header,omitempty" doc:"Response headers"`
-	Body   []string      `json:"handles" doc:"Handles of all registered user accounts"`
+	Body   []UserBrief   `json:"users" doc:"Brief information about all registered user accounts"`
 }
 
 // Get single user information

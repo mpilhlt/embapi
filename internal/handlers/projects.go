@@ -192,12 +192,23 @@ func getProjectsFunc(ctx context.Context, input *models.GetProjectsRequest) (*mo
 
 	/* Build response array with brief output */
 	for _, p := range projectHandles {
-		projects = append(projects, models.ProjectBrief{
+		// Get the count of embeddings for this project
+		count, err := queries.CountEmbeddingsByProject(ctx, database.CountEmbeddingsByProjectParams{
 			Owner:         p.Owner,
 			ProjectHandle: p.ProjectHandle,
-			ProjectID:     int(p.ProjectID),
-			PublicRead:    p.PublicRead.Bool,
-			Role:          p.Role.(string),
+		})
+		if err != nil {
+			// If there's an error counting, default to 0
+			count = 0
+		}
+
+		projects = append(projects, models.ProjectBrief{
+			Owner:              p.Owner,
+			ProjectHandle:      p.ProjectHandle,
+			ProjectID:          int(p.ProjectID),
+			PublicRead:         p.PublicRead.Bool,
+			Role:               p.Role.(string),
+			NumberOfEmbeddings: int(count),
 		})
 	}
 	// Build the response
@@ -323,11 +334,25 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 				}
 			}
 		}
+		// Count projects using this instance
+		projectCount, err := queries.CountProjectsUsingInstance(ctx, pgtype.Int4{Int32: llmRow.InstanceID, Valid: true})
+		if err != nil {
+			projectCount = 0
+		}
+
+		// Count shared users for this instance
+		sharedUserCount, err := queries.CountSharedUsersForInstance(ctx, llmRow.InstanceID)
+		if err != nil {
+			sharedUserCount = 0
+		}
+
 		instance = models.InstanceBrief{
-			Owner:          llmRow.Owner,
-			InstanceID:     int(llmRow.InstanceID),
-			InstanceHandle: llmRow.InstanceHandle,
-			AccessRole:     accessRole,
+			Owner:               llmRow.Owner,
+			InstanceID:          int(llmRow.InstanceID),
+			InstanceHandle:      llmRow.InstanceHandle,
+			AccessRole:          accessRole,
+			NumberOfProjects:    int(projectCount),
+			NumberOfSharedUsers: int(sharedUserCount),
 		}
 	}
 

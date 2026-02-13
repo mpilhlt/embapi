@@ -119,9 +119,12 @@ func getUsersFunc(ctx context.Context, input *models.GetUsersRequest) (*models.G
 		return nil, huma.Error500InternalServerError("database connection pool is nil")
 	}
 
-	// Run the query
+	// Run the query to get all users with counts in a single query
 	queries := database.New(pool)
-	allUsers, err := queries.GetAllUsers(ctx, database.GetAllUsersParams{Limit: int32(input.Limit), Offset: int32(input.Offset)})
+	allUsersWithCounts, err := queries.GetAllUsersWithCounts(ctx, database.GetAllUsersWithCountsParams{
+		Limit:  int32(input.Limit),
+		Offset: int32(input.Offset),
+	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, huma.Error404NotFound("no users found.")
@@ -129,13 +132,25 @@ func getUsersFunc(ctx context.Context, input *models.GetUsersRequest) (*models.G
 			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get list of users. %v", err))
 		}
 	}
-	if len(allUsers) == 0 {
+	if len(allUsersWithCounts) == 0 {
 		return nil, huma.Error404NotFound("no users found.")
+	}
+
+	// Build the response with user briefs including counts
+	userBriefs := []models.UserBrief{}
+	for _, user := range allUsersWithCounts {
+		userBriefs = append(userBriefs, models.UserBrief{
+			UserHandle:          user.UserHandle,
+			Name:                user.Name.String,
+			NumberOfProjects:    int(user.ProjectCount),
+			NumberOfDefinitions: int(user.DefinitionCount),
+			NumberOfInstances:   int(user.InstanceCount),
+		})
 	}
 
 	// Build the response
 	response := &models.GetUsersResponse{}
-	response.Body = allUsers
+	response.Body = userBriefs
 
 	return response, nil
 }
