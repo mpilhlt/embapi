@@ -134,7 +134,7 @@ func TestUserFunc(t *testing.T) {
 			requestPath:  "/v1/users",
 			bodyPath:     "",
 			apiKey:       options.AdminKey,
-			expectBody:   "[\n  \"alice\",\n  \"_system\"\n]\n",
+			expectBody:   "[\n  {\n    \"user_handle\": \"alice\",\n    \"name\": \"Alice Doe\",\n    \"number_of_projects\": 0,\n    \"number_of_definitions\": 0,\n    \"number_of_instances\": 0\n  },\n  {\n    \"user_handle\": \"_system\",\n    \"name\": \"System User\",\n    \"number_of_projects\": 0,\n    \"number_of_definitions\": 4,\n    \"number_of_instances\": 0\n  }\n]\n",
 			expectStatus: http.StatusOK,
 		},
 		{

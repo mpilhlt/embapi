@@ -105,7 +105,7 @@ func TestInstancesFunc(t *testing.T) {
 			requestPath:  "/v1/llm-instances/alice",
 			bodyPath:     "",
 			EmbAPIKey:       options.AdminKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetUserInstancesResponseBody.json\",\n  \"instances\": [\n    {\n      \"owner\": \"alice\",\n      \"instance_handle\": \"embedding1\",\n      \"instance_id\": 1\n    }\n  ]\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetUserInstancesResponseBody.json\",\n  \"instances\": [\n    {\n      \"owner\": \"alice\",\n      \"instance_handle\": \"embedding1\",\n      \"instance_id\": 1,\n      \"number_of_projects\": 0,\n      \"number_of_shared_users\": 0\n    }\n  ]\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{
@@ -114,7 +114,7 @@ func TestInstancesFunc(t *testing.T) {
 			requestPath:  "/v1/llm-instances/alice",
 			bodyPath:     "",
 			EmbAPIKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetUserInstancesResponseBody.json\",\n  \"instances\": [\n    {\n      \"owner\": \"alice\",\n      \"instance_handle\": \"embedding1\",\n      \"instance_id\": 1\n    }\n  ]\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetUserInstancesResponseBody.json\",\n  \"instances\": [\n    {\n      \"owner\": \"alice\",\n      \"instance_handle\": \"embedding1\",\n      \"instance_id\": 1,\n      \"number_of_projects\": 0,\n      \"number_of_shared_users\": 0\n    }\n  ]\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{

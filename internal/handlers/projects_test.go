@@ -83,7 +83,7 @@ func TestProjectsFunc(t *testing.T) {
 			requestPath:  "/v1/projects/alice/test1",
 			bodyPath:     "../../testdata/valid_project.json",
 			apiKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"test1\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\"\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"test1\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 0\n}\n",
 			expectStatus: http.StatusCreated,
 		},
 		{
@@ -110,7 +110,7 @@ func TestProjectsFunc(t *testing.T) {
 			requestPath:  "/v1/projects/alice",
 			bodyPath:     "../../testdata/valid_project.json",
 			apiKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"test1\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\"\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"test1\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 0\n}\n",
 			expectStatus: http.StatusCreated,
 		},
 		{
@@ -128,7 +128,7 @@ func TestProjectsFunc(t *testing.T) {
 			requestPath:  "/v1/projects/alice/test1",
 			bodyPath:     "",
 			apiKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectFull.json\",\n  \"project_id\": 1,\n  \"project_handle\": \"test1\",\n  \"owner\": \"alice\",\n  \"description\": \"This is a test project\",\n  \"public_read\": false,\n  \"shared_with\": [\n    {\n      \"user_handle\": \"alice\",\n      \"role\": \"owner\"\n    }\n  ],\n  \"instance\": {\n    \"owner\": \"alice\",\n    \"instance_handle\": \"embedding1\",\n    \"instance_id\": 1,\n    \"access_role\": \"owner\"\n  },\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 0\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectFull.json\",\n  \"project_id\": 1,\n  \"project_handle\": \"test1\",\n  \"owner\": \"alice\",\n  \"description\": \"This is a test project\",\n  \"public_read\": false,\n  \"shared_with\": [\n    {\n      \"user_handle\": \"alice\",\n      \"role\": \"owner\"\n    }\n  ],\n  \"instance\": {\n    \"owner\": \"alice\",\n    \"instance_handle\": \"embedding1\",\n    \"instance_id\": 1,\n    \"access_role\": \"owner\",\n    \"number_of_projects\": 1,\n    \"number_of_shared_users\": 0\n  },\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 0\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{
@@ -137,7 +137,7 @@ func TestProjectsFunc(t *testing.T) {
 			requestPath:  "/v1/projects/alice",
 			bodyPath:     "",
 			apiKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetProjectsResponseBody.json\",\n  \"projects\": [\n    {\n      \"owner\": \"alice\",\n      \"project_handle\": \"test1\",\n      \"project_id\": 1,\n      \"public_read\": false,\n      \"role\": \"owner\"\n    }\n  ]\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/GetProjectsResponseBody.json\",\n  \"projects\": [\n    {\n      \"owner\": \"alice\",\n      \"project_handle\": \"test1\",\n      \"project_id\": 1,\n      \"public_read\": false,\n      \"role\": \"owner\",\n      \"number_of_embeddings\": 0\n    }\n  ]\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{

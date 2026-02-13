@@ -73,7 +73,7 @@ func TestProjectCreationWithSharingFunc(t *testing.T) {
 			requestPath:  "/v1/projects/alice/shared-project",
 			bodyPath:     "../../testdata/project_with_shared_user.json",
 			apiKey:       aliceAPIKey,
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"shared-project\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\"\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectBrief.json\",\n  \"owner\": \"alice\",\n  \"project_handle\": \"shared-project\",\n  \"project_id\": 1,\n  \"public_read\": false,\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 0\n}\n",
 			expectStatus: http.StatusCreated,
 		},
 		{
