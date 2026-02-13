@@ -139,7 +139,19 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 		return nil, huma.Error500InternalServerError(err.Error())
 	}
 
-	// 3. Build the response
+	// 3. Count embeddings for the project
+
+	queries = database.New(pool)
+	count, err := queries.CountEmbeddingsByProject(ctx, database.CountEmbeddingsByProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: projectHandle,
+	})
+	if err != nil {
+		// If there's an error counting, default to 0
+		count = 0
+	}
+
+	// 4. Build the response
 
 	response := &models.UploadProjectResponse{}
 	response.Body.Owner = input.UserHandle
@@ -147,6 +159,7 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 	response.Body.ProjectID = int(projectID)
 	response.Body.PublicRead = input.Body.PublicRead
 	response.Body.Role = "owner" // the user creating/updating the project is always the owner
+	response.Body.NumberOfEmbeddings = int(count)
 
 	return response, nil
 }
