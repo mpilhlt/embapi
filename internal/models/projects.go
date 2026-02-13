@@ -17,11 +17,12 @@ type ProjectFull struct {
 }
 
 type ProjectBrief struct {
-	Owner         string `json:"owner" readOnly:"true" doc:"User handle of the project owner"`
-	ProjectHandle string `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
-	ProjectID     int    `json:"project_id" readOnly:"true" doc:"Unique project identifier"`
-	PublicRead    bool   `json:"public_read" doc:"Whether the project is public or not"`
-	Role          string `json:"role,omitempty" doc:"Role of the requesting user in the project (can be owner or some other role)"`
+	Owner              string `json:"owner" readOnly:"true" doc:"User handle of the project owner"`
+	ProjectHandle      string `json:"project_handle" minLength:"3" maxLength:"20" example:"my-gpt-4" doc:"Project handle"`
+	ProjectID          int    `json:"project_id" readOnly:"true" doc:"Unique project identifier"`
+	PublicRead         bool   `json:"public_read" doc:"Whether the project is public or not"`
+	Role               string `json:"role,omitempty" doc:"Role of the requesting user in the project (can be owner or some other role)"`
+	NumberOfEmbeddings int    `json:"number_of_embeddings" readOnly:"true" doc:"Number of embeddings in the project"`
 }
 
 type ProjectSubmission struct {

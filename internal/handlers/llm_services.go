@@ -227,11 +227,18 @@ func getUserDefinitionsFunc(ctx context.Context, input *models.GetUserDefinition
 	// Build response
 	ls := []models.DefinitionBrief{}
 	for _, d := range def {
+		// Count instances using this definition
+		instanceCount, err := queries.CountInstancesByDefinition(ctx, pgtype.Int4{Int32: d.DefinitionID, Valid: true})
+		if err != nil {
+			instanceCount = 0
+		}
+
 		ls = append(ls, models.DefinitionBrief{
-			Owner:            d.Owner,
-			DefinitionHandle: d.DefinitionHandle,
-			DefinitionID:     int(d.DefinitionID),
-			IsPublic:         d.IsPublic,
+			Owner:             d.Owner,
+			DefinitionHandle:  d.DefinitionHandle,
+			DefinitionID:      int(d.DefinitionID),
+			IsPublic:          d.IsPublic,
+			NumberOfInstances: int(instanceCount),
 		})
 	}
 	response := &models.GetUserDefinitionsResponse{}
@@ -765,10 +772,24 @@ func getUserInstancesFunc(ctx context.Context, input *models.GetUserInstancesReq
 	// Build response (hide API keys for shared instances)
 	ls := []models.InstanceBrief{}
 	for _, llm := range llms {
+		// Count projects using this instance
+		projectCount, err := queries.CountProjectsUsingInstance(ctx, pgtype.Int4{Int32: llm.InstanceID, Valid: true})
+		if err != nil {
+			projectCount = 0
+		}
+
+		// Count shared users for this instance
+		sharedUserCount, err := queries.CountSharedUsersForInstance(ctx, llm.InstanceID)
+		if err != nil {
+			sharedUserCount = 0
+		}
+
 		ls = append(ls, models.InstanceBrief{
-			Owner:          llm.Owner,
-			InstanceHandle: llm.InstanceHandle,
-			InstanceID:     int(llm.InstanceID),
+			Owner:               llm.Owner,
+			InstanceHandle:      llm.InstanceHandle,
+			InstanceID:          int(llm.InstanceID),
+			NumberOfProjects:    int(projectCount),
+			NumberOfSharedUsers: int(sharedUserCount),
 		})
 	}
 	response := &models.GetUserInstancesResponse{}

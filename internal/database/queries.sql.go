@@ -52,6 +52,19 @@ func (q *Queries) CountAllProjects(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const countDefinitionsByUser = `-- name: CountDefinitionsByUser :one
+SELECT COUNT(*)
+FROM definitions
+WHERE "owner" = $1
+`
+
+func (q *Queries) CountDefinitionsByUser(ctx context.Context, owner string) (int64, error) {
+	row := q.db.QueryRow(ctx, countDefinitionsByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countEmbeddingsByProject = `-- name: CountEmbeddingsByProject :one
 SELECT COUNT(*)
 FROM embeddings
@@ -73,6 +86,19 @@ func (q *Queries) CountEmbeddingsByProject(ctx context.Context, arg CountEmbeddi
 	return count, err
 }
 
+const countInstancesByDefinition = `-- name: CountInstancesByDefinition :one
+SELECT COUNT(*)
+FROM instances
+WHERE "definition_id" = $1
+`
+
+func (q *Queries) CountInstancesByDefinition(ctx context.Context, definitionID pgtype.Int4) (int64, error) {
+	row := q.db.QueryRow(ctx, countInstancesByDefinition, definitionID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countInstancesByUser = `-- name: CountInstancesByUser :one
 SELECT COUNT(*)
 FROM instances
@@ -81,6 +107,45 @@ WHERE "owner" = $1
 
 func (q *Queries) CountInstancesByUser(ctx context.Context, owner string) (int64, error) {
 	row := q.db.QueryRow(ctx, countInstancesByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countProjectsByUser = `-- name: CountProjectsByUser :one
+SELECT COUNT(DISTINCT projects."project_id")
+FROM projects
+WHERE projects."owner" = $1
+`
+
+func (q *Queries) CountProjectsByUser(ctx context.Context, owner string) (int64, error) {
+	row := q.db.QueryRow(ctx, countProjectsByUser, owner)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countProjectsUsingInstance = `-- name: CountProjectsUsingInstance :one
+SELECT COUNT(*)
+FROM projects
+WHERE "instance_id" = $1
+`
+
+func (q *Queries) CountProjectsUsingInstance(ctx context.Context, instanceID pgtype.Int4) (int64, error) {
+	row := q.db.QueryRow(ctx, countProjectsUsingInstance, instanceID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countSharedUsersForInstance = `-- name: CountSharedUsersForInstance :one
+SELECT COUNT(*)
+FROM instances_shared_with
+WHERE "instance_id" = $1
+`
+
+func (q *Queries) CountSharedUsersForInstance(ctx context.Context, instanceID int32) (int64, error) {
+	row := q.db.QueryRow(ctx, countSharedUsersForInstance, instanceID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err

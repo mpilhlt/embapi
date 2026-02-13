@@ -46,10 +46,11 @@ type DefinitionFull struct {
 }
 
 type DefinitionBrief struct {
-	DefinitionID     int    `json:"definition_id" readOnly:"true" doc:"Unique LLM Service Definition identifier" example:"42"`
-	DefinitionHandle string `json:"definition_handle" minLength:"3" maxLength:"20" example:"openai-large" doc:"LLM Service Definition handle"`
-	Owner            string `json:"owner" readOnly:"true" doc:"User handle of the LLM Service Definition owner (_system for global)" example:"_system"`
-	IsPublic         bool   `json:"is_public" doc:"Whether the definition is public (shared with all users)"`
+	DefinitionID      int    `json:"definition_id" readOnly:"true" doc:"Unique LLM Service Definition identifier" example:"42"`
+	DefinitionHandle  string `json:"definition_handle" minLength:"3" maxLength:"20" example:"openai-large" doc:"LLM Service Definition handle"`
+	Owner             string `json:"owner" readOnly:"true" doc:"User handle of the LLM Service Definition owner (_system for global)" example:"_system"`
+	IsPublic          bool   `json:"is_public" doc:"Whether the definition is public (shared with all users)"`
+	NumberOfInstances int    `json:"number_of_instances" readOnly:"true" doc:"Number of instances using this definition"`
 }
 
 // Request and Response structs for the LLM Service Instance administration API
@@ -217,10 +218,12 @@ type InstanceInput struct {
 }
 
 type InstanceBrief struct {
-	Owner          string `json:"owner" readOnly:"true" doc:"User handle of the LLM Service Instance owner"`
-	InstanceHandle string `json:"instance_handle" minLength:"3" maxLength:"20" example:"my-openai-large" doc:"LLM Service Instance handle"`
-	InstanceID     int    `json:"instance_id" readOnly:"true" doc:"Unique LLM Service Instance identifier" example:"153"`
-	AccessRole     string `json:"access_role,omitempty" readOnly:"true" doc:"Access role of the requesting user for this instance (owner, editor, reader)"`
+	Owner               string `json:"owner" readOnly:"true" doc:"User handle of the LLM Service Instance owner"`
+	InstanceHandle      string `json:"instance_handle" minLength:"3" maxLength:"20" example:"my-openai-large" doc:"LLM Service Instance handle"`
+	InstanceID          int    `json:"instance_id" readOnly:"true" doc:"Unique LLM Service Instance identifier" example:"153"`
+	AccessRole          string `json:"access_role,omitempty" readOnly:"true" doc:"Access role of the requesting user for this instance (owner, editor, reader)"`
+	NumberOfProjects    int    `json:"number_of_projects" readOnly:"true" doc:"Number of projects using this instance"`
+	NumberOfSharedUsers int    `json:"number_of_shared_users" readOnly:"true" doc:"Number of users this instance is shared with"`
 }
 
 // In Output, never return the API key
