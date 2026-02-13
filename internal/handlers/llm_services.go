@@ -99,12 +99,20 @@ func putDefinitionFunc(ctx context.Context, input *models.PutDefinitionRequest) 
 		return nil, huma.Error500InternalServerError(err.Error())
 	}
 
+	// Count instances using this definition
+	queries := database.New(pool)
+	instanceCount, err := queries.CountInstancesByDefinition(ctx, pgtype.Int4{Int32: definitionID, Valid: true})
+	if err != nil {
+		instanceCount = 0
+	}
+
 	// Build response
 	response := &models.UploadDefinitionResponse{}
 	response.Body.Owner = owner
 	response.Body.DefinitionHandle = definitionHandle
 	response.Body.DefinitionID = int(definitionID)
 	response.Body.IsPublic = isPublic
+	response.Body.NumberOfInstances = int(instanceCount)
 
 	return response, nil
 }
