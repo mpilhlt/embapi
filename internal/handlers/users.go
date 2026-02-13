@@ -119,9 +119,12 @@ func getUsersFunc(ctx context.Context, input *models.GetUsersRequest) (*models.G
 		return nil, huma.Error500InternalServerError("database connection pool is nil")
 	}
 
-	// Run the query
+	// Run the query to get all users with counts in a single query
 	queries := database.New(pool)
-	allUserHandles, err := queries.GetAllUsers(ctx, database.GetAllUsersParams{Limit: int32(input.Limit), Offset: int32(input.Offset)})
+	allUsersWithCounts, err := queries.GetAllUsersWithCounts(ctx, database.GetAllUsersWithCountsParams{
+		Limit:  int32(input.Limit),
+		Offset: int32(input.Offset),
+	})
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, huma.Error404NotFound("no users found.")
@@ -129,44 +132,19 @@ func getUsersFunc(ctx context.Context, input *models.GetUsersRequest) (*models.G
 			return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to get list of users. %v", err))
 		}
 	}
-	if len(allUserHandles) == 0 {
+	if len(allUsersWithCounts) == 0 {
 		return nil, huma.Error404NotFound("no users found.")
 	}
 
 	// Build the response with user briefs including counts
 	userBriefs := []models.UserBrief{}
-	for _, userHandle := range allUserHandles {
-		// Get user details
-		user, err := queries.RetrieveUser(ctx, userHandle)
-		if err != nil {
-			// Skip users that can't be retrieved
-			continue
-		}
-
-		// Count projects
-		projectCount, err := queries.CountProjectsByUser(ctx, userHandle)
-		if err != nil {
-			projectCount = 0
-		}
-
-		// Count definitions
-		definitionCount, err := queries.CountDefinitionsByUser(ctx, userHandle)
-		if err != nil {
-			definitionCount = 0
-		}
-
-		// Count instances
-		instanceCount, err := queries.CountInstancesByUser(ctx, userHandle)
-		if err != nil {
-			instanceCount = 0
-		}
-
+	for _, user := range allUsersWithCounts {
 		userBriefs = append(userBriefs, models.UserBrief{
 			UserHandle:          user.UserHandle,
 			Name:                user.Name.String,
-			NumberOfProjects:    int(projectCount),
-			NumberOfDefinitions: int(definitionCount),
-			NumberOfInstances:   int(instanceCount),
+			NumberOfProjects:    int(user.ProjectCount),
+			NumberOfDefinitions: int(user.DefinitionCount),
+			NumberOfInstances:   int(user.InstanceCount),
 		})
 	}
 

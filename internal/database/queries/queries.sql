@@ -48,6 +48,31 @@ SELECT "user_handle"
 FROM users
 ORDER BY "user_handle" ASC LIMIT $1 OFFSET $2;
 
+-- name: GetAllUsersWithCounts :many
+SELECT 
+    users."user_handle",
+    users."name",
+    COALESCE(project_counts.count, 0) AS project_count,
+    COALESCE(definition_counts.count, 0) AS definition_count,
+    COALESCE(instance_counts.count, 0) AS instance_count
+FROM users
+LEFT JOIN (
+    SELECT "owner", COUNT(DISTINCT "project_id") AS count
+    FROM projects
+    GROUP BY "owner"
+) project_counts ON users."user_handle" = project_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM definitions
+    GROUP BY "owner"
+) definition_counts ON users."user_handle" = definition_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM instances
+    GROUP BY "owner"
+) instance_counts ON users."user_handle" = instance_counts."owner"
+ORDER BY users."user_handle" ASC LIMIT $1 OFFSET $2;
+
 -- name: CountProjectsByUser :one
 SELECT COUNT(DISTINCT projects."project_id")
 FROM projects

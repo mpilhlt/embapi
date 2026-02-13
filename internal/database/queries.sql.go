@@ -612,6 +612,71 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]str
 	return items, nil
 }
 
+const getAllUsersWithCounts = `-- name: GetAllUsersWithCounts :many
+SELECT 
+    users."user_handle",
+    users."name",
+    COALESCE(project_counts.count, 0) AS project_count,
+    COALESCE(definition_counts.count, 0) AS definition_count,
+    COALESCE(instance_counts.count, 0) AS instance_count
+FROM users
+LEFT JOIN (
+    SELECT "owner", COUNT(DISTINCT "project_id") AS count
+    FROM projects
+    GROUP BY "owner"
+) project_counts ON users."user_handle" = project_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM definitions
+    GROUP BY "owner"
+) definition_counts ON users."user_handle" = definition_counts."owner"
+LEFT JOIN (
+    SELECT "owner", COUNT(*) AS count
+    FROM instances
+    GROUP BY "owner"
+) instance_counts ON users."user_handle" = instance_counts."owner"
+ORDER BY users."user_handle" ASC LIMIT $1 OFFSET $2
+`
+
+type GetAllUsersWithCountsParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+type GetAllUsersWithCountsRow struct {
+	UserHandle      string      `db:"user_handle" json:"user_handle"`
+	Name            pgtype.Text `db:"name" json:"name"`
+	ProjectCount    int64       `db:"project_count" json:"project_count"`
+	DefinitionCount int64       `db:"definition_count" json:"definition_count"`
+	InstanceCount   int64       `db:"instance_count" json:"instance_count"`
+}
+
+func (q *Queries) GetAllUsersWithCounts(ctx context.Context, arg GetAllUsersWithCountsParams) ([]GetAllUsersWithCountsRow, error) {
+	rows, err := q.db.Query(ctx, getAllUsersWithCounts, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllUsersWithCountsRow
+	for rows.Next() {
+		var i GetAllUsersWithCountsRow
+		if err := rows.Scan(
+			&i.UserHandle,
+			&i.Name,
+			&i.ProjectCount,
+			&i.DefinitionCount,
+			&i.InstanceCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDefinitionsByUser = `-- name: GetDefinitionsByUser :many
 SELECT definitions."definition_handle", definitions."definition_id"
 FROM definitions
