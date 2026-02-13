@@ -35,6 +35,9 @@ func main() {
 		if os.Getenv("SERVICE_DEBUG") != "" {
 			options.Debug = os.Getenv("SERVICE_DEBUG") == "true"
 		}
+		if os.Getenv("SERVICE_AUTH_VERBOSE") != "" {
+			options.AuthVerbose = os.Getenv("SERVICE_AUTH_VERBOSE") == "true"
+		}
 		if os.Getenv("SERVICE_HOST") != "" {
 			options.Host = os.Getenv("SERVICE_HOST")
 		}
@@ -112,7 +115,7 @@ func main() {
 		api.UseMiddleware(auth.EmbAPIKeyOwnerAuth(api, pool, options))
 		api.UseMiddleware(auth.EmbAPIKeyEditorAuth(api, pool, options))
 		api.UseMiddleware(auth.EmbAPIKeyReaderAuth(api, pool, options))
-		api.UseMiddleware(auth.AuthTermination(api))
+		api.UseMiddleware(auth.AuthTermination(api, options))
 
 		// Add routes to the API
 		err = handlers.AddRoutes(pool, keyGen, api)

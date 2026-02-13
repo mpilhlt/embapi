@@ -49,14 +49,15 @@ import (
 
 var (
 	options = models.Options{
-		Debug:      true,
-		Host:       "localhost",
-		Port:       8080,
-		DBHost:     "localhost",
-		DBName:     "testdb",
-		DBUser:     "test",
-		DBPassword: "test",
-		AdminKey:   "Password123",
+		Debug:       true,
+		AuthVerbose: false, // Set to false for cleaner test output
+		Host:        "localhost",
+		Port:        8080,
+		DBHost:      "localhost",
+		DBName:      "testdb",
+		DBUser:      "test",
+		DBPassword:  "test",
+		AdminKey:    "Password123",
 	}
 	connPool *pgxpool.Pool
 	teardown func()
@@ -188,7 +189,7 @@ func startTestServer(t *testing.T, pool *pgxpool.Pool, keyGen handlers.RandomKey
 	api.UseMiddleware(auth.EmbAPIKeyOwnerAuth(api, pool, &options))
 	api.UseMiddleware(auth.EmbAPIKeyEditorAuth(api, pool, &options))
 	api.UseMiddleware(auth.EmbAPIKeyReaderAuth(api, pool, &options))
-	api.UseMiddleware(auth.AuthTermination(api))
+	api.UseMiddleware(auth.AuthTermination(api, &options))
 
 	err := handlers.AddRoutes(pool, keyGen, api)
 	if err != nil {
