@@ -37,6 +37,19 @@ The typical use case is as a RAG component: Create embeddings for your text coll
 
 ## Quick Start
 
+### 0. Discover the API
+
+```bash
+# Get the service manifest with all available endpoints
+curl http://localhost:8880/v1
+
+# Response includes:
+# - Service name, version, and description
+# - Available API versions
+# - Authentication schemes
+# - Complete list of endpoints with descriptions
+```
+
 ### 1. Start with Docker
 
 ```bash
@@ -45,6 +58,9 @@ The typical use case is as a RAG component: Create embeddings for your text coll
 
 # Start services (includes PostgreSQL with pgvector)
 docker-compose up -d
+
+# Discover available API endpoints
+curl http://localhost:8880/v1
 
 # Access the API documentation
 curl http://localhost:8880/docs
