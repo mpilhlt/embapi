@@ -97,7 +97,7 @@ func TestPublicAccess(t *testing.T) {
 			requestPath:  "/v1/projects/alice/public-test",
 			bodyPath:     "",
 			EmbAPIKey:       "",
-			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectFull.json\",\n  \"project_id\": 1,\n  \"project_handle\": \"public-test\",\n  \"owner\": \"alice\",\n  \"description\": \"This is a test project\",\n  \"public_read\": false,\n  \"instance\": {\n    \"owner\": \"alice\",\n    \"instance_handle\": \"embedding1\",\n    \"instance_id\": 1,\n    \"number_of_projects\": 1,\n    \"number_of_shared_users\": 0\n  },\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 3\n}\n",
+			expectBody:   "{\n  \"$schema\": \"http://localhost:8080/schemas/ProjectFull.json\",\n  \"project_id\": 1,\n  \"project_handle\": \"public-test\",\n  \"owner\": \"alice\",\n  \"description\": \"This is a test project\",\n  \"public_read\": true,\n  \"instance\": {\n    \"owner\": \"alice\",\n    \"instance_handle\": \"embedding1\",\n    \"instance_id\": 1,\n    \"number_of_projects\": 1,\n    \"number_of_shared_users\": 0\n  },\n  \"role\": \"owner\",\n  \"number_of_embeddings\": 3\n}\n",
 			expectStatus: http.StatusOK,
 		},
 		{
