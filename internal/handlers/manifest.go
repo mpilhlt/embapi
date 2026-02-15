@@ -225,28 +225,18 @@ func getManifestFunc(ctx context.Context, input *models.GetManifestRequest) (*mo
 func RegisterManifestRoutes(pool *pgxpool.Pool, api huma.API) error {
 	// Define huma.Operations for the manifest endpoint
 	// This endpoint is public and doesn't require authentication
-	getManifestOp := huma.Operation{
-		OperationID: "getManifest",
-		Method:      http.MethodGet,
-		Path:        "/",
-		Summary:     "Get service manifest describing the API",
-		Description: "Returns a service manifest with metadata about the API and a list of available endpoints",
-		Security:    []map[string][]string{},
-		Tags:        []string{"public", "manifest"},
-	}
-
+	// We register only at /v1 (without trailing slash) to get an exact match
 	getManifestV1Op := huma.Operation{
 		OperationID: "getManifestV1",
 		Method:      http.MethodGet,
-		Path:        "/v1/",
+		Path:        "/v1",
 		Summary:     "Get service manifest for API version 1",
 		Description: "Returns a service manifest with metadata about API version 1 and a list of available endpoints",
 		Security:    []map[string][]string{},
 		Tags:        []string{"public", "manifest"},
 	}
 
-	// Register the routes
-	huma.Register(api, getManifestOp, addPoolToContext(pool, getManifestFunc))
+	// Register the route
 	huma.Register(api, getManifestV1Op, addPoolToContext(pool, getManifestFunc))
 	return nil
 }
