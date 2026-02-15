@@ -181,7 +181,7 @@ func startTestServer(t *testing.T, pool *pgxpool.Pool, keyGen handlers.RandomKey
 	*/
 
 	// Create a new router & API
-	config := huma.DefaultConfig("DHaMPS Vector Database API", "0.0.1")
+	config := huma.DefaultConfig(models.APIName, models.APIVersion)
 	config.Components.SecuritySchemes = auth.Config
 	router := http.NewServeMux()
 	api := humago.New(router, config)
@@ -191,7 +191,7 @@ func startTestServer(t *testing.T, pool *pgxpool.Pool, keyGen handlers.RandomKey
 	api.UseMiddleware(auth.EmbAPIKeyReaderAuth(api, pool, &options))
 	api.UseMiddleware(auth.AuthTermination(api, &options))
 
-	err := handlers.AddRoutes(pool, keyGen, api)
+	err := handlers.AddRoutes(pool, keyGen, api, &options)
 	if err != nil {
 		fmt.Printf("Unable to add routes to API: %v", err)
 		return err, func() {}

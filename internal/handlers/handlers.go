@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mpilhlt/embapi/internal/models"
 
 	huma "github.com/danielgtaylor/huma/v2"
 )
@@ -17,14 +18,16 @@ type contextKey string
 
 // Context keys
 const (
-	PoolKey   = contextKey("dbPool")
-	KeyGenKey = contextKey("keyGen")
+	PoolKey    = contextKey("dbPool")
+	KeyGenKey  = contextKey("keyGen")
+	OptionsKey = contextKey("options")
 )
 
 // Error responses
 var (
-	ErrPoolNotFound   = errors.New("database connection pool not found in context")
-	ErrKeyGenNotFound = errors.New("key generator not found in context")
+	ErrPoolNotFound    = errors.New("database connection pool not found in context")
+	ErrKeyGenNotFound  = errors.New("key generator not found in context")
+	ErrOptionsNotFound = errors.New("options not found in context")
 )
 
 // The type definitions and functions that follow are used to
@@ -45,8 +48,13 @@ func (s StandardKeyGen) RandomKey(len int) (string, error) {
 }
 
 // AddRoutes adds all the routes to the API
-func AddRoutes(pool *pgxpool.Pool, keyGen RandomKeyGenerator, api huma.API) error {
-	err := RegisterUsersRoutes(pool, keyGen, api)
+func AddRoutes(pool *pgxpool.Pool, keyGen RandomKeyGenerator, api huma.API, options *models.Options) error {
+	err := RegisterManifestRoutes(pool, api, options)
+	if err != nil {
+		fmt.Printf("    Unable to register Manifest routes: %v\n", err)
+		return err
+	}
+	err = RegisterUsersRoutes(pool, keyGen, api)
 	if err != nil {
 		fmt.Printf("    Unable to register Users routes: %v\n", err)
 		return err
@@ -111,6 +119,17 @@ func addKeyGenToContext[I any, O any](keyGen RandomKeyGenerator, next func(conte
 	}
 }
 
+// Middleware to add the options to the context
+func addOptionsToContext[I any, O any](options *models.Options, next func(context.Context, *I) (*O, error)) func(context.Context, *I) (*O, error) {
+	return func(ctx context.Context, input *I) (*O, error) {
+		if options == nil {
+			return nil, fmt.Errorf("provided options is nil")
+		}
+		ctx = context.WithValue(ctx, OptionsKey, options)
+		return next(ctx, input)
+	}
+}
+
 // Get the database connection pool from the context
 // (exported helper function so that blackbox testing can access it)
 func GetDBPool(ctx context.Context) (*pgxpool.Pool, error) {
@@ -129,4 +148,14 @@ func GetKeyGen(ctx context.Context) (RandomKeyGenerator, error) {
 		return nil, huma.NewError(http.StatusInternalServerError, ErrKeyGenNotFound.Error())
 	}
 	return keyGen, nil
+}
+
+// Get the options from the context
+// (exported helper function so that blackbox testing can access it)
+func GetOptions(ctx context.Context) (*models.Options, error) {
+	options, ok := ctx.Value(OptionsKey).(*models.Options)
+	if !ok {
+		return nil, huma.NewError(http.StatusInternalServerError, ErrOptionsNotFound.Error())
+	}
+	return options, nil
 }
