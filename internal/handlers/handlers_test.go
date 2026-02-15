@@ -50,7 +50,7 @@ import (
 var (
 	options = models.Options{
 		Debug:       true,
-		AuthVerbose: false, // Set to false for cleaner test output
+		Verbose:     false, // Set to false for cleaner test output
 		Host:        "localhost",
 		Port:        8080,
 		DBHost:      "localhost",

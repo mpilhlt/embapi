@@ -71,7 +71,15 @@ func postProjEmbeddingsFunc(ctx context.Context, input *models.PostProjEmbedding
 		return nil, huma.Error404NotFound(fmt.Sprintf("Project %s/%s not found: %v", input.UserHandle, input.ProjectHandle, err))
 	}
 
-	fmt.Printf("Found project %s ...", project.ProjectHandle)
+	// Get options to check verbose flag
+	options, err := GetOptions(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if options.Verbose {
+		fmt.Printf("Found project %s ...", project.ProjectHandle)
+	}
 
 	// Even though each of the submitted embeddings specifies an instance handle,
 	// we may postulate that only one instance is involved: the one that is
