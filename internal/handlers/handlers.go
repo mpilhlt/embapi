@@ -46,7 +46,12 @@ func (s StandardKeyGen) RandomKey(len int) (string, error) {
 
 // AddRoutes adds all the routes to the API
 func AddRoutes(pool *pgxpool.Pool, keyGen RandomKeyGenerator, api huma.API) error {
-	err := RegisterUsersRoutes(pool, keyGen, api)
+	err := RegisterManifestRoutes(pool, api)
+	if err != nil {
+		fmt.Printf("    Unable to register Manifest routes: %v\n", err)
+		return err
+	}
+	err = RegisterUsersRoutes(pool, keyGen, api)
 	if err != nil {
 		fmt.Printf("    Unable to register Users routes: %v\n", err)
 		return err
