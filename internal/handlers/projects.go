@@ -139,9 +139,19 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 		return nil, huma.Error500InternalServerError(err.Error())
 	}
 
-	// 3. Count embeddings for the project
+	// 3. Retrieve the project to get actual database values
 
 	queries = database.New(pool)
+	proj, err := queries.RetrieveProject(ctx, database.RetrieveProjectParams{
+		Owner:         input.UserHandle,
+		ProjectHandle: projectHandle,
+	})
+	if err != nil {
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("unable to retrieve project after upsert: %v", err))
+	}
+
+	// 4. Count embeddings for the project
+
 	count, err := queries.CountEmbeddingsByProject(ctx, database.CountEmbeddingsByProjectParams{
 		Owner:         input.UserHandle,
 		ProjectHandle: projectHandle,
@@ -151,13 +161,13 @@ func putProjectFunc(ctx context.Context, input *models.PutProjectRequest) (*mode
 		count = 0
 	}
 
-	// 4. Build the response
+	// 5. Build the response
 
 	response := &models.UploadProjectResponse{}
 	response.Body.Owner = input.UserHandle
 	response.Body.ProjectHandle = projectHandle
 	response.Body.ProjectID = int(projectID)
-	response.Body.PublicRead = input.Body.PublicRead
+	response.Body.PublicRead = proj.PublicRead.Bool
 	response.Body.Role = "owner" // the user creating/updating the project is always the owner
 	response.Body.NumberOfEmbeddings = int(count)
 
@@ -387,6 +397,7 @@ func getProjectFunc(ctx context.Context, input *models.GetProjectRequest) (*mode
 		Owner:              p.Owner,
 		Description:        p.Description.String,
 		MetadataScheme:     p.MetadataScheme.String,
+		PublicRead:         p.PublicRead.Bool,
 		SharedWith:         sharedUsers,
 		Instance:           instance,
 		Role:               role.String,
