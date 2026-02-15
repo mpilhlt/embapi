@@ -12,15 +12,37 @@ import (
 
 // getManifestFunc returns the service manifest
 func getManifestFunc(ctx context.Context, input *models.GetManifestRequest) (*models.GetManifestResponse, error) {
+	// Get options from context
+	options, err := GetOptions(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Use configured values or fall back to defaults
+	apiName := models.APIName
+	if options.APIName != "" {
+		apiName = options.APIName
+	}
+
+	apiDescription := models.APIDescription
+	if options.APIDescription != "" {
+		apiDescription = options.APIDescription
+	}
+
+	apiDocURL := "https://mpilhlt.github.io/embapi/"
+	if options.APIDocURL != "" {
+		apiDocURL = options.APIDocURL
+	}
+
 	// Build the manifest
 	// Note: The endpoint list is manually maintained to provide comprehensive API documentation.
 	// While it could be generated dynamically from registered routes, the manual approach ensures
 	// accurate descriptions and proper grouping, and allows filtering of internal/test endpoints.
 	manifest := models.ServiceManifest{
-		Name:           models.APIName,
+		Name:           apiName,
 		Versions:       []string{"v1"},
-		Description:    models.APIDescription,
-		Documentation:  "https://mpilhlt.github.io/embapi/",
+		Description:    apiDescription,
+		Documentation:  apiDocURL,
 		ServiceVersion: models.APIVersion,
 		Authentication: map[string]interface{}{
 			"adminAuth": map[string]interface{}{
@@ -225,10 +247,20 @@ func getManifestFunc(ctx context.Context, input *models.GetManifestRequest) (*mo
 }
 
 // RegisterManifestRoutes registers the manifest routes with the API
-func RegisterManifestRoutes(pool *pgxpool.Pool, api huma.API) error {
+func RegisterManifestRoutes(pool *pgxpool.Pool, api huma.API, options *models.Options) error {
 	// Define huma.Operations for the manifest endpoint
 	// This endpoint is public and doesn't require authentication
-	// We register only at /v1 (without trailing slash) to get an exact match
+	// We register at both / (root) and /v1 (versioned root) for discoverability
+	getManifestRootOp := huma.Operation{
+		OperationID: "getManifestRoot",
+		Method:      http.MethodGet,
+		Path:        "/{$}",
+		Summary:     "Get service manifest describing the API",
+		Description: "Returns a service manifest with metadata about the API and a list of available endpoints",
+		Security:    []map[string][]string{},
+		Tags:        []string{"public", "manifest"},
+	}
+
 	getManifestV1Op := huma.Operation{
 		OperationID: "getManifestV1",
 		Method:      http.MethodGet,
@@ -239,7 +271,13 @@ func RegisterManifestRoutes(pool *pgxpool.Pool, api huma.API) error {
 		Tags:        []string{"public", "manifest"},
 	}
 
-	// Register the route
-	huma.Register(api, getManifestV1Op, addPoolToContext(pool, getManifestFunc))
+	// Create a handler wrapper that includes both pool and options in context
+	handler := func(ctx context.Context, input *models.GetManifestRequest) (*models.GetManifestResponse, error) {
+		return getManifestFunc(ctx, input)
+	}
+
+	// Register the routes with both pool and options in context
+	huma.Register(api, getManifestRootOp, addOptionsToContext(options, addPoolToContext(pool, handler)))
+	huma.Register(api, getManifestV1Op, addOptionsToContext(options, addPoolToContext(pool, handler)))
 	return nil
 }

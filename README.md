@@ -41,13 +41,22 @@ The typical use case is as a RAG component: Create embeddings for your text coll
 
 ```bash
 # Get the service manifest with all available endpoints
+curl http://localhost:8880/
+# or
 curl http://localhost:8880/v1
 
 # Response includes:
-# - Service name, version, and description
+# - Service name, version, and description (customizable via env variables)
 # - Available API versions
 # - Authentication schemes
 # - Complete list of endpoints with descriptions
+```
+
+**Customize the manifest**: Set environment variables in your `.env` file:
+```bash
+SERVICE_API_NAME="My Custom API"
+SERVICE_API_DESCRIPTION="My custom description"
+SERVICE_API_DOC_URL="https://my-docs.example.com"
 ```
 
 ### 1. Start with Docker
@@ -59,7 +68,9 @@ curl http://localhost:8880/v1
 # Start services (includes PostgreSQL with pgvector)
 docker-compose up -d
 
-# Discover available API endpoints
+# Discover available API endpoints (at root or versioned endpoint)
+curl http://localhost:8880/
+# or
 curl http://localhost:8880/v1
 
 # Access the API documentation

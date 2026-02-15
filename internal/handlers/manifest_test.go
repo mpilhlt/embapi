@@ -30,6 +30,12 @@ func TestManifestFunc(t *testing.T) {
 		expectStatus int
 	}{
 		{
+			name:         "Get manifest at root",
+			method:       http.MethodGet,
+			requestPath:  "/",
+			expectStatus: http.StatusOK,
+		},
+		{
 			name:         "Get manifest at /v1",
 			method:       http.MethodGet,
 			requestPath:  "/v1",

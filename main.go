@@ -68,6 +68,15 @@ func main() {
 		if os.Getenv("SERVICE_ADMINKEY") != "" {
 			options.AdminKey = os.Getenv("SERVICE_ADMINKEY")
 		}
+		if os.Getenv("SERVICE_API_NAME") != "" {
+			options.APIName = os.Getenv("SERVICE_API_NAME")
+		}
+		if os.Getenv("SERVICE_API_DESCRIPTION") != "" {
+			options.APIDescription = os.Getenv("SERVICE_API_DESCRIPTION")
+		}
+		if os.Getenv("SERVICE_API_DOC_URL") != "" {
+			options.APIDocURL = os.Getenv("SERVICE_API_DOC_URL")
+		}
 
 		println()
 		println("=== Starting DH@MPS Vector Database ...")
@@ -118,7 +127,7 @@ func main() {
 		api.UseMiddleware(auth.AuthTermination(api, options))
 
 		// Add routes to the API
-		err = handlers.AddRoutes(pool, keyGen, api)
+		err = handlers.AddRoutes(pool, keyGen, api, options)
 		if err != nil {
 			fmt.Printf("    Unable to add routes: %v\n", err)
 			os.Exit(1)
