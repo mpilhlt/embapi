@@ -31,6 +31,6 @@ type GetManifestRequest struct {
 
 // GetManifestResponse is the response containing the service manifest
 type GetManifestResponse struct {
-	Header []http.Header   `json:"header,omitempty" doc:"Response headers"`
+	Header http.Header     `json:"header,omitempty" doc:"Response headers"`
 	Body   ServiceManifest `json:"manifest" doc:"Service manifest"`
 }

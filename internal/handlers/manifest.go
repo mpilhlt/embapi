@@ -13,12 +13,15 @@ import (
 // getManifestFunc returns the service manifest
 func getManifestFunc(ctx context.Context, input *models.GetManifestRequest) (*models.GetManifestResponse, error) {
 	// Build the manifest
+	// Note: The endpoint list is manually maintained to provide comprehensive API documentation.
+	// While it could be generated dynamically from registered routes, the manual approach ensures
+	// accurate descriptions and proper grouping, and allows filtering of internal/test endpoints.
 	manifest := models.ServiceManifest{
-		Name:           "DHaMPS Vector Database API",
+		Name:           models.APIName,
 		Versions:       []string{"v1"},
-		Description:    "PostgreSQL-backed vector database with pgvector support, providing a RESTful API for managing embeddings in Retrieval Augmented Generation (RAG) workflows",
+		Description:    models.APIDescription,
 		Documentation:  "https://mpilhlt.github.io/embapi/",
-		ServiceVersion: "0.0.1",
+		ServiceVersion: models.APIVersion,
 		Authentication: map[string]interface{}{
 			"adminAuth": map[string]interface{}{
 				"type":   "http",

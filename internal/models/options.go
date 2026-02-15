@@ -1,5 +1,12 @@
 package models
 
+// Version constants for the API
+const (
+	APIVersion     = "0.0.1"
+	APIName        = "DHaMPS Vector Database API"
+	APIDescription = "PostgreSQL-backed vector database with pgvector support, providing a RESTful API for managing embeddings in Retrieval Augmented Generation (RAG) workflows"
+)
+
 // Options for the CLI.
 type Options struct {
 	Debug       bool   `                    env:"SERVICE_DEBUG"       doc:"Enable debug logging"                    short:"d" default:"true"`
