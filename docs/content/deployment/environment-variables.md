@@ -108,23 +108,23 @@ SERVICE_DEBUG=true    # Development (verbose)
 - `true`: Detailed logs, useful for debugging
 - `false`: Minimal logs, recommended for production
 
-### SERVICE_AUTH_VERBOSE
+### SERVICE_VERBOSE
 
-Enable verbose authentication logging.
+Enable verbose logging.
 
 - **Type:** Boolean
 - **Required:** No
 - **Default:** `false`
-- **Environment Variable:** `SERVICE_AUTH_VERBOSE`
-- **Command-line Flag:** `--auth-verbose`
+- **Environment Variable:** `SERVICE_VERBOSE`
+- **Command-line Flag:** `--verbose`
 
-**Description:** Controls authentication log output. When enabled, logs all authentication attempts including successful and failed authentications. When disabled (default), authentication operates silently.
+**Description:** Controls verbose log output. When enabled, logs all authentication attempts, project lookups, and other operational details. When disabled (default), most operational logs are suppressed for cleaner output.
 
 **Example:**
 
 ```bash
-SERVICE_AUTH_VERBOSE=false   # Quiet mode (default, recommended for production)
-SERVICE_AUTH_VERBOSE=true    # Verbose mode (useful for debugging)
+SERVICE_VERBOSE=false   # Quiet mode (default, recommended for production)
+SERVICE_VERBOSE=true    # Verbose mode (useful for debugging)
 ```
 
 **Use Cases:**
@@ -320,7 +320,7 @@ SERVICE_DBNAME=embapi_test     # Testing database
 ```bash
 # .env file for development
 SERVICE_DEBUG=true
-SERVICE_AUTH_VERBOSE=true
+SERVICE_VERBOSE=true
 SERVICE_HOST=localhost
 SERVICE_PORT=8880
 SERVICE_DBHOST=localhost
@@ -337,7 +337,7 @@ ENCRYPTION_KEY=dev-encryption-key-min-32-chars-long
 ```bash
 # .env file for Docker Compose
 SERVICE_DEBUG=false
-SERVICE_AUTH_VERBOSE=false
+SERVICE_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=postgres
@@ -354,7 +354,7 @@ ENCRYPTION_KEY=generated_encryption_key_from_setup_script
 ```bash
 # .env file for production (or use secrets management)
 SERVICE_DEBUG=false
-SERVICE_AUTH_VERBOSE=false
+SERVICE_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=db.internal.example.com
@@ -432,7 +432,7 @@ Some variables support command-line flags:
 ```bash
 ./embapi \
   --debug \
-  --auth-verbose \
+  --verbose \
   --host 0.0.0.0 \
   --port 8880 \
   --admin-key your-admin-key \

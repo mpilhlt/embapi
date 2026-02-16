@@ -17,27 +17,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAuthVerboseFlag tests that authentication logging is controlled by the AuthVerbose flag
-func TestAuthVerboseFlag(t *testing.T) {
+// TestVerboseFlag tests that authentication logging is controlled by the Verbose flag
+func TestVerboseFlag(t *testing.T) {
 	// Set required environment variables for testing
 	if os.Getenv("ENCRYPTION_KEY") == "" {
 		os.Setenv("ENCRYPTION_KEY", "test-encryption-key-32-bytes-long-1234567890")
 	}
 
 	tests := []struct {
-		name        string
-		authVerbose bool
-		expectLogs  bool
+		name       string
+		verbose    bool
+		expectLogs bool
 	}{
 		{
-			name:        "AuthVerbose=true should produce logs",
-			authVerbose: true,
-			expectLogs:  true,
+			name:       "Verbose=true should produce logs",
+			verbose:    true,
+			expectLogs: true,
 		},
 		{
-			name:        "AuthVerbose=false should suppress logs",
-			authVerbose: false,
-			expectLogs:  false,
+			name:       "Verbose=false should suppress logs",
+			verbose:    false,
+			expectLogs: false,
 		},
 	}
 
@@ -50,8 +50,8 @@ func TestAuthVerboseFlag(t *testing.T) {
 
 			// Create test options
 			options := &models.Options{
-				AuthVerbose: tt.authVerbose,
-				AdminKey:    "test-admin-key",
+				Verbose:  tt.verbose,
+				AdminKey: "test-admin-key",
 			}
 
 			// Create a simple API and router
@@ -128,25 +128,25 @@ func TestAuthVerboseFlag(t *testing.T) {
 	}
 }
 
-// TestAuthVerboseEnvironmentVariable tests that the environment variable is properly handled
-func TestAuthVerboseEnvironmentVariable(t *testing.T) {
+// TestVerboseEnvironmentVariable tests that the environment variable is properly handled
+func TestVerboseEnvironmentVariable(t *testing.T) {
 	tests := []struct {
 		name     string
 		envValue string
 		expected bool
 	}{
 		{
-			name:     "SERVICE_AUTH_VERBOSE=true",
+			name:     "SERVICE_VERBOSE=true",
 			envValue: "true",
 			expected: true,
 		},
 		{
-			name:     "SERVICE_AUTH_VERBOSE=false",
+			name:     "SERVICE_VERBOSE=false",
 			envValue: "false",
 			expected: false,
 		},
 		{
-			name:     "SERVICE_AUTH_VERBOSE empty",
+			name:     "SERVICE_VERBOSE empty",
 			envValue: "",
 			expected: false, // default value
 		},
@@ -155,28 +155,28 @@ func TestAuthVerboseEnvironmentVariable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Clean up environment
-			os.Unsetenv("SERVICE_AUTH_VERBOSE")
+			os.Unsetenv("SERVICE_VERBOSE")
 
 			if tt.envValue != "" {
-				os.Setenv("SERVICE_AUTH_VERBOSE", tt.envValue)
-				defer os.Unsetenv("SERVICE_AUTH_VERBOSE")
+				os.Setenv("SERVICE_VERBOSE", tt.envValue)
+				defer os.Unsetenv("SERVICE_VERBOSE")
 			}
 
 			options := &models.Options{
-				AuthVerbose: false, // default
+				Verbose: false, // default
 			}
 
 			// Simulate what main.go does
-			if os.Getenv("SERVICE_AUTH_VERBOSE") != "" {
-				options.AuthVerbose = os.Getenv("SERVICE_AUTH_VERBOSE") == "true"
+			if os.Getenv("SERVICE_VERBOSE") != "" {
+				options.Verbose = os.Getenv("SERVICE_VERBOSE") == "true"
 			}
 
-			assert.Equal(t, tt.expected, options.AuthVerbose, "AuthVerbose should match expected value")
+			assert.Equal(t, tt.expected, options.Verbose, "Verbose should match expected value")
 		})
 	}
 }
 
-// TestNoAuthLogsInQuietMode verifies that with AuthVerbose=false, various auth scenarios don't produce logs
+// TestNoAuthLogsInQuietMode verifies that with Verbose=false, various auth scenarios don't produce logs
 func TestNoAuthLogsInQuietMode(t *testing.T) {
 	// This test demonstrates the fix for the bulk upload/crawler scenario
 	// Capture stdout
@@ -185,7 +185,7 @@ func TestNoAuthLogsInQuietMode(t *testing.T) {
 	os.Stdout = w
 
 	options := &models.Options{
-		AuthVerbose: false, // Quiet mode
+		Verbose: false, // Quiet mode
 		AdminKey:    "test-admin-key",
 	}
 

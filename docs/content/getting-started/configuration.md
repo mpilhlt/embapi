@@ -16,7 +16,7 @@ All configuration can be set via environment variables. Use a `.env` file to kee
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `SERVICE_DEBUG` | Enable debug logging | `true` | No |
-| `SERVICE_AUTH_VERBOSE` | Enable verbose authentication logging | `false` | No |
+| `SERVICE_VERBOSE` | Enable verbose logging | `false` | No |
 | `SERVICE_HOST` | Hostname to listen on | `localhost` | No |
 | `SERVICE_PORT` | Port to listen on | `8880` | No |
 
@@ -44,7 +44,7 @@ Create a `.env` file in the project root:
 ```bash
 # Service Configuration
 SERVICE_DEBUG=false
-SERVICE_AUTH_VERBOSE=false
+SERVICE_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 
@@ -67,7 +67,7 @@ You can also provide configuration via command-line flags:
 ```bash
 ./embapi \
   --debug \
-  --auth-verbose \
+  --verbose \
   -p 8880 \
   --db-host localhost \
   --db-port 5432 \
@@ -119,7 +119,7 @@ Configuration is loaded in the following order (later sources override earlier o
 ```bash
 # .env (development)
 SERVICE_DEBUG=true
-SERVICE_AUTH_VERBOSE=true
+SERVICE_VERBOSE=true
 SERVICE_HOST=localhost
 SERVICE_PORT=8880
 SERVICE_DBHOST=localhost
@@ -136,7 +136,7 @@ ENCRYPTION_KEY=dev-encryption-key-32-chars-min
 ```bash
 # .env (production)
 SERVICE_DEBUG=false
-SERVICE_AUTH_VERBOSE=false
+SERVICE_VERBOSE=false
 SERVICE_HOST=0.0.0.0
 SERVICE_PORT=8880
 SERVICE_DBHOST=prod-db.example.com
@@ -150,27 +150,28 @@ ENCRYPTION_KEY=$(cat /run/secrets/encryption_key)
 
 ## Logging Configuration
 
-### Authentication Logging
+### Verbose Logging
 
-The `SERVICE_AUTH_VERBOSE` flag controls authentication log output. This is particularly useful for production environments or during bulk operations:
+The `SERVICE_VERBOSE` flag controls verbose log output. This is particularly useful for production environments or during bulk operations:
 
-- **`SERVICE_AUTH_VERBOSE=true`** (verbose mode): Logs all authentication attempts, including successful and failed authentications. Useful for debugging authentication issues or monitoring security events.
+- **`SERVICE_VERBOSE=true`** (verbose mode): Logs all authentication attempts, project lookups, and other operational details. Useful for debugging or monitoring system behavior.
 
-- **`SERVICE_AUTH_VERBOSE=false`** (quiet mode, default): Suppresses authentication logs. Recommended for production, especially during:
+- **`SERVICE_VERBOSE=false`** (quiet mode, default): Suppresses verbose logs. Recommended for production, especially during:
   - Bulk upload operations
   - High-traffic scenarios
   - When crawlers or automated tools access the API frequently
 
-Example log output with `SERVICE_AUTH_VERBOSE=true`:
+Example log output with `SERVICE_VERBOSE=true`:
 ```
     Owner authentication successful: alice
     Reader auth for owner=bob project=test definition= instance= running...
         Checking project access...
         Reader authentication successful
+    Found project test1 ...
     Authentication failed.
 ```
 
-With `SERVICE_AUTH_VERBOSE=false`, these messages are suppressed while authentication still works normally.
+With `SERVICE_VERBOSE=false`, these messages are suppressed while operations still work normally.
 
 ## Validation
 

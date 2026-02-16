@@ -35,8 +35,8 @@ func main() {
 		if os.Getenv("SERVICE_DEBUG") != "" {
 			options.Debug = os.Getenv("SERVICE_DEBUG") == "true"
 		}
-		if os.Getenv("SERVICE_AUTH_VERBOSE") != "" {
-			options.AuthVerbose = os.Getenv("SERVICE_AUTH_VERBOSE") == "true"
+		if os.Getenv("SERVICE_VERBOSE") != "" {
+			options.Verbose = os.Getenv("SERVICE_VERBOSE") == "true"
 		}
 		if os.Getenv("SERVICE_HOST") != "" {
 			options.Host = os.Getenv("SERVICE_HOST")

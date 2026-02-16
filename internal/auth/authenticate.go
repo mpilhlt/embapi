@@ -77,7 +77,7 @@ func AuthTermination(api huma.API, options *models.Options) func(ctx huma.Contex
 			next(ctx)
 			return
 		}
-		if options.AuthVerbose {
+		if options.Verbose {
 			fmt.Print("        Authentication failed.\n")
 		}
 		_ = huma.WriteErr(api, ctx, http.StatusUnauthorized, "Authentication failed. Perhaps a missing or incorrect API key?")
@@ -109,7 +109,7 @@ func EmbAPIKeyAdminAuth(api huma.API, options *models.Options) func(ctx huma.Con
 		if token == options.AdminKey {
 			ctx = huma.WithValue(ctx, IsAdminKey, true)
 			ctx = huma.WithValue(ctx, AuthUserKey, "admin")
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Admin authentication successful\n")
 			}
 			next(ctx)
@@ -171,7 +171,7 @@ func EmbAPIKeyOwnerAuth(api huma.API, pool *pgxpool.Pool, options *models.Option
 		if EmbAPIKeyIsValid(token, storedHash) {
 			ctx = huma.WithValue(ctx, IsOwnerKey, true)
 			ctx = huma.WithValue(ctx, AuthUserKey, owner)
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Printf("        Owner authentication successful: %s\n", owner)
 			}
 			next(ctx)
@@ -219,26 +219,26 @@ func EmbAPIKeyReaderAuth(api huma.API, pool *pgxpool.Pool, options *models.Optio
 			return
 		}
 
-		if options.AuthVerbose {
+		if options.Verbose {
 			fmt.Printf("    Reader auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
 		}
 		// Branch based on whether project, definition, or instance is being accessed
 		if len(project) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking project access...\n")
 			}
 			handleProjectReaderAuth(api, pool, owner, project, options)(ctx, next)
 			return
 		}
 		if len(definition) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking definition access...\n")
 			}
 			handleDefinitionReaderAuth(api, pool, owner, definition, options)(ctx, next)
 			return
 		}
 		if len(instance) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking instance access...\n")
 			}
 			handleInstanceReaderAuth(api, pool, owner, instance, options)(ctx, next)
@@ -263,7 +263,7 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 			// If project exists and public_read is true, allow unauthenticated access
 			if err == nil && publicRead.Valid && publicRead.Bool {
 				// Public read is enabled, allow unauthenticated access
-				if options.AuthVerbose {
+				if options.Verbose {
 					fmt.Print("        Public read access granted (no authentication required)\n")
 				}
 				ctx = huma.WithValue(ctx, AuthUserKey, "public")
@@ -294,7 +294,7 @@ func handleProjectReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					if options.AuthVerbose {
+					if options.Verbose {
 						fmt.Print("        Reader authentication successful\n")
 					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
@@ -335,7 +335,7 @@ func handleDefinitionReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					if options.AuthVerbose {
+					if options.Verbose {
 						fmt.Print("        Reader authentication successful\n")
 					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
@@ -376,7 +376,7 @@ func handleInstanceReaderAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 				storedHash := authKey.EmbAPIKey
 
 				if EmbAPIKeyIsValid(token, storedHash) {
-					if options.AuthVerbose {
+					if options.Verbose {
 						fmt.Print("        Reader authentication successful\n")
 					}
 					ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
@@ -428,26 +428,26 @@ func EmbAPIKeyEditorAuth(api huma.API, pool *pgxpool.Pool, options *models.Optio
 			return
 		}
 
-		if options.AuthVerbose {
+		if options.Verbose {
 			fmt.Printf("    Editor auth for owner=%s project=%s definition=%s instance=%s running...\n", owner, project, definition, instance)
 		}
 		// Branch based on whether project, definition, or instance is being accessed
 		if len(project) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking project editor access...\n")
 			}
 			handleProjectEditorAuth(api, pool, owner, project, options)(ctx, next)
 			return
 		}
 		if len(definition) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking definition editor access...\n")
 			}
 			handleDefinitionEditorAuth(api, pool, owner, definition, options)(ctx, next)
 			return
 		}
 		if len(instance) > 0 {
-			if options.AuthVerbose {
+			if options.Verbose {
 				fmt.Print("        Checking instance editor access...\n")
 			}
 			handleInstanceEditorAuth(api, pool, owner, instance, options)(ctx, next)
@@ -485,7 +485,7 @@ func handleProjectEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, pro
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				if options.AuthVerbose {
+				if options.Verbose {
 					fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
 				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
@@ -525,7 +525,7 @@ func handleDefinitionEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, 
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				if options.AuthVerbose {
+				if options.Verbose {
 					fmt.Print("        Editor authentication successful\n")
 				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
@@ -567,7 +567,7 @@ func handleInstanceEditorAuth(api huma.API, pool *pgxpool.Pool, owner string, in
 			storedHash := authKey.EmbAPIKey
 
 			if EmbAPIKeyIsValid(token, storedHash) {
-				if options.AuthVerbose {
+				if options.Verbose {
 					fmt.Printf("        Editor authentication successful (role: %s)\n", authKey.Role)
 				}
 				ctx = huma.WithValue(ctx, AuthUserKey, authKey.UserHandle)
