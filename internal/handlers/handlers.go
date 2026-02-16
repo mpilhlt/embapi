@@ -64,7 +64,7 @@ func AddRoutes(pool *pgxpool.Pool, keyGen RandomKeyGenerator, api huma.API, opti
 		fmt.Printf("    Unable to register Projects routes: %v\n", err)
 		return err
 	}
-	err = RegisterEmbeddingsRoutes(pool, api)
+	err = RegisterEmbeddingsRoutes(pool, api, options)
 	if err != nil {
 		fmt.Printf("    Unable to register Embeddings routes: %v\n", err)
 		return err

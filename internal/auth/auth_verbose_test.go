@@ -25,19 +25,19 @@ func TestVerboseFlag(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
-		authVerbose bool
-		expectLogs  bool
+		name       string
+		verbose    bool
+		expectLogs bool
 	}{
 		{
-			name:        "Verbose=true should produce logs",
-			authVerbose: true,
-			expectLogs:  true,
+			name:       "Verbose=true should produce logs",
+			verbose:    true,
+			expectLogs: true,
 		},
 		{
-			name:        "Verbose=false should suppress logs",
-			authVerbose: false,
-			expectLogs:  false,
+			name:       "Verbose=false should suppress logs",
+			verbose:    false,
+			expectLogs: false,
 		},
 	}
 
@@ -50,8 +50,8 @@ func TestVerboseFlag(t *testing.T) {
 
 			// Create test options
 			options := &models.Options{
-				Verbose: tt.authVerbose,
-				AdminKey:    "test-admin-key",
+				Verbose:  tt.verbose,
+				AdminKey: "test-admin-key",
 			}
 
 			// Create a simple API and router

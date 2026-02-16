@@ -429,7 +429,7 @@ func deleteDocEmbeddingsFunc(ctx context.Context, input *models.DeleteEmbeddings
 }
 
 // RegisterEmbeddingsRoutes registers all the embeddings routes with the API
-func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API) error {
+func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API, options *models.Options) error {
 	// Define huma.Operations for each route
 	postProjEmbeddingsOp := huma.Operation{
 		OperationID:   "postEmbeddings",
@@ -495,11 +495,11 @@ func RegisterEmbeddingsRoutes(pool *pgxpool.Pool, api huma.API) error {
 		Tags: []string{"embeddings"},
 	}
 
-	// huma.Register(api, putProjEmbeddingsOp, addPoolToContext(pool, putProjEmbeddingsFunc))
-	huma.Register(api, postProjEmbeddingsOp, addPoolToContext(pool, postProjEmbeddingsFunc))
-	huma.Register(api, getProjEmbeddingsOp, addPoolToContext(pool, getProjEmbeddingsFunc))
-	huma.Register(api, deleteProjEmbeddingsOp, addPoolToContext(pool, deleteProjEmbeddingsFunc))
-	huma.Register(api, getDocEmbeddingsOp, addPoolToContext(pool, getDocEmbeddingsFunc))
-	huma.Register(api, deleteDocEmbeddingsOp, addPoolToContext(pool, deleteDocEmbeddingsFunc))
+	// huma.Register(api, putProjEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, putProjEmbeddingsFunc)))
+	huma.Register(api, postProjEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, postProjEmbeddingsFunc)))
+	huma.Register(api, getProjEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, getProjEmbeddingsFunc)))
+	huma.Register(api, deleteProjEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, deleteProjEmbeddingsFunc)))
+	huma.Register(api, getDocEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, getDocEmbeddingsFunc)))
+	huma.Register(api, deleteDocEmbeddingsOp, addOptionsToContext(options, addPoolToContext(pool, deleteDocEmbeddingsFunc)))
 	return nil
 }
