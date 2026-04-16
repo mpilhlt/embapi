@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/danielgtaylor/huma/v2 v2.34.1
-	github.com/jackc/pgx/v5 v5.7.6
+	github.com/jackc/pgx/v5 v5.9.0
 	github.com/jackc/tern/v2 v2.3.3
 	github.com/joho/godotenv v1.5.1
 	github.com/pgvector/pgvector-go v0.3.0
