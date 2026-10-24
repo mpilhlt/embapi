@@ -1,7 +1,7 @@
 services:
   # PostgreSQL with pgvector extension
   postgres:
-    image: pgvector/pgvector:0.7.4-pg16
+    image: pgvector/pgvector:0.7.4-pg16@sha256:0f7adb53ad971b3fb78e71f2b5daaa88a94c8b0731b114e4673cbf281da0c691
     container_name: embapi-postgres
     environment:
       POSTGRES_USER: ${SERVICE_DBUSER:-postgres}
@@ -33,14 +33,14 @@ services:
       SERVICE_DEBUG: ${SERVICE_DEBUG:-false}
       SERVICE_HOST: ${SERVICE_HOST:-0.0.0.0}
       SERVICE_PORT: ${SERVICE_PORT:-8880}
-      
+
       # Database configuration
       SERVICE_DBHOST: ${SERVICE_DBHOST:-postgres}
       SERVICE_DBPORT: ${SERVICE_DBPORT:-5432}
       SERVICE_DBUSER: ${SERVICE_DBUSER:-postgres}
       SERVICE_DBPASSWORD: ${SERVICE_DBPASSWORD:-postgres}
       SERVICE_DBNAME: ${SERVICE_DBNAME:-embapi}
-      
+
       # Security configuration
       SERVICE_ADMINKEY: ${SERVICE_ADMINKEY}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
