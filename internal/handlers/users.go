@@ -55,7 +55,7 @@ func putUserFunc(ctx context.Context, input *models.PutUserRequest) (*models.Upl
 	if u.UserHandle == input.UserHandle {
 		// User exists, so don't create API key
 		storeKey = u.EmbAPIKey
-		fmt.Printf("        User %s already exists, stored key hash is %s.\n", input.UserHandle, storeKey)
+		fmt.Printf("        User %s already exists; API key unchanged.\n", input.UserHandle)
 		// fmt.Printf("        User %s already exists: %v.\n", input.UserHandle, u)
 		// fmt.Printf("        User %s. Stored key hash: '%s'.\n", input.UserHandle, u.EmbAPIKey)
 		EmbAPIKey = "not changed"
