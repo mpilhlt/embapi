@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.24-alpine3.21 AS builder
+FROM golang:1.24-alpine3.21@sha256:a57b286438c2b1503d639cb0c8e170b6a72f46de3fad72d0e00fc1c3383ab952 AS builder
 
 # Install build dependencies (with retry logic for network issues)
 RUN apk update && apk add --no-cache git make || \
@@ -25,7 +25,7 @@ RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o embapi main.go
 
 # Runtime stage
-FROM alpine:3.21
+FROM alpine:3.21@sha256:7e6b9fa64f522478522f563b3180b58e98f55b4ffc0dccabc1855371467ec67d
 
 # Update package index and install ca-certificates for HTTPS (with retry logic)
 RUN apk update && apk add --no-cache ca-certificates wget || \
